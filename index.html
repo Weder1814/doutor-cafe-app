@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Doutor Café</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:Arial,sans-serif;background:#f0f7f1;min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+.header{width:100%;background:linear-gradient(170deg,#0f2e14,#1e5c28);padding:40px 24px 36px;text-align:center;border-radius:0 0 40px 40px;}
+.titulo{font-size:32px;font-weight:900;color:white;letter-spacing:-0.5px;}
+.titulo span{color:#8de89a;}
+.subtitulo{color:rgba(255,255,255,0.6);margin-top:6px;font-size:14px;}
+.corpo{width:100%;max-width:420px;padding:24px 20px 40px;display:flex;flex-direction:column;align-items:center;gap:14px;}
+.btn-foto{width:100%;background:linear-gradient(145deg,#2d8a3e,#1a5228);color:white;border:none;border-radius:28px;padding:28px 20px;font-size:22px;font-weight:900;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;box-shadow:0 8px 28px rgba(45,138,62,0.4);}
+.btn-foto span{font-size:52px;}
+.btn-foto small{font-size:13px;color:rgba(255,255,255,0.7);}
+.btn-gal{width:100%;background:white;color:#1a3a1f;border:2.5px solid #b8dbbe;border-radius:20px;padding:16px;font-size:17px;font-weight:800;cursor:pointer;}
+.spinner{display:none;width:100%;background:linear-gradient(170deg,#0f2e14,#1e5c28);border-radius:20px;padding:32px;text-align:center;color:white;}
+.spinner p{font-size:18px;font-weight:900;margin-top:12px;}
+.resultado{display:none;width:100%;background:white;border-radius:20px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,0.1);}
+.resultado h2{font-size:24px;font-weight:900;margin-bottom:10px;}
+.resultado p{font-size:16px;line-height:1.6;color:#333;}
+.btn-voz{width:100%;background:#1a3a1f;color:white;border:none;border-radius:16px;padding:15px;font-size:16px;font-weight:800;cursor:pointer;margin-top:12px;}
+.btn-nova{width:100%;background:#f0f7f1;color:#1a3a1f;border:2px solid #b8dbbe;border-radius:16px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;margin-top:8px;}
+input[type=file]{display:none;}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="titulo">Doutor <span>Café</span></div>
+  <div class="subtitulo">O agrônomo no seu bolso 🌿</div>
+</div>
+<div class="corpo">
+  <input type="file" id="cam" accept="image/*" capture="environment">
+  <input type="file" id="gal" accept="image/*">
+  <button class="btn-foto" onclick="document.getElementById('cam').click()">
+    <span>📷</span>
+    FOTOGRAFAR A FOLHA
+    <small>Toque para abrir a câmera</small>
+  </button>
+  <button class="btn-gal" onclick="document.getElementById('gal').click()">🖼️ Escolher da Galeria</button>
+  <div class="spinner" id="spinner">
+    <div style="font-size:48px">🔍</div>
+    <p>Doutor Café analisando...</p>
+  </div>
+  <div class="resultado" id="resultado"></div>
+</div>
+<script>
+var SERVIDOR = "https://doutor-cafe-production.up.railway.app";
+var ultimaAcao = "";
+
+function processar(file) {
+  if (!file) return;
+  document.getElementById("spinner").style.display = "block";
+  document.getElementById("resultado").style.display = "none";
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var b64 = e.target.result.split(",")[1];
+    fetch(SERVIDOR + "/diagnostico", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({imagem: b64, tipo: file.type})
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      document.getElementById("spinner").style.display = "none";
+      var div = document.getElementById("resultado");
+      div.style.display = "block";
+      var diagnostico = data.diagnostico || "Erro";
+      var acao = data.acao || data.erro || "Tente novamente.";
+      ultimaAcao = acao;
+      var emojis = {ferrugem:"🟠",bicho:"🪲",nitrogenio:"🌿",magnesio:"🟡",cercosporiose:"🔵",phoma:"🟤",saudavel:"✅"};
+      var emoji = emojis[diagnostico] || "🌿";
+      div.innerHTML = "<h2>" + emoji + " " + diagnostico.toUpperCase() + "</h2><p style='margin:10px 0'>" + acao + "</p><button class='btn-voz' onclick='falar()'>🔊 Ouvir em voz alta</button><button class='btn-nova' onclick='resetar()'>📷 Nova análise</button>";
+      falar();
+    })
+    .catch(function() {
+      document.getElementById("spinner").style.display = "none";
+      var div = document.getElementById("resultado");
+      div.style.display = "block";
+      div.innerHTML = "<p>Erro ao analisar. Verifique sua conexão e tente novamente.</p><button class='btn-nova' onclick='resetar()'>📷 Tentar novamente</button>";
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+function falar() {
+  if (window.speechSynthesis && ultimaAcao) {
+    window.speechSynthesis.cancel();
+    var msg = new SpeechSynthesisUtterance(ultimaAcao);
+    msg.lang = "pt-BR";
+    msg.rate = 0.85;
+    window.speechSynthesis.speak(msg);
+  }
+}
+
+function resetar() {
+  document.getElementById("resultado").style.display = "none";
+  document.getElementById("cam").value = "";
+  document.getElementById("gal").value = "";
+  ultimaAcao = "";
+}
+
+document.getElementById("cam").onchange = function(e) { processar(e.target.files[0]); e.target.value=""; };
+document.getElementById("gal").onchange = function(e) { processar(e.target.files[0]); e.target.value=""; };
+</script>
+</body>
+</html>
