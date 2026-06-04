@@ -2,93 +2,90 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Doutor Café</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{font-family:Arial,sans-serif;background:#f0f7f1;min-height:100vh;display:flex;flex-direction:column;align-items:center;}
-.header{width:100%;background:linear-gradient(170deg,#0f2e14,#1e5c28);padding:40px 24px 36px;text-align:center;border-radius:0 0 40px 40px;}
-.titulo{font-size:32px;font-weight:900;color:white;letter-spacing:-0.5px;}
-.titulo span{color:#8de89a;}
-.subtitulo{color:rgba(255,255,255,0.6);margin-top:6px;font-size:14px;}
-.corpo{width:100%;max-width:420px;padding:24px 20px 40px;display:flex;flex-direction:column;align-items:center;gap:14px;}
-.btn-foto{width:100%;background:linear-gradient(145deg,#2d8a3e,#1a5228);color:white;border:none;border-radius:28px;padding:28px 20px;font-size:22px;font-weight:900;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;box-shadow:0 8px 28px rgba(45,138,62,0.4);}
-.btn-foto span{font-size:52px;}
-.btn-foto small{font-size:13px;color:rgba(255,255,255,0.7);}
-.btn-gal{width:100%;background:white;color:#1a3a1f;border:2.5px solid #b8dbbe;border-radius:20px;padding:16px;font-size:17px;font-weight:800;cursor:pointer;}
-.spinner{display:none;width:100%;background:linear-gradient(170deg,#0f2e14,#1e5c28);border-radius:20px;padding:32px;text-align:center;color:white;}
-.spinner p{font-size:18px;font-weight:900;margin-top:12px;}
-.resultado{display:none;width:100%;background:white;border-radius:20px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,0.1);}
-.resultado h2{font-size:24px;font-weight:900;margin-bottom:10px;}
-.resultado p{font-size:16px;line-height:1.6;color:#333;}
-.btn-voz{width:100%;background:#1a3a1f;color:white;border:none;border-radius:16px;padding:15px;font-size:16px;font-weight:800;cursor:pointer;margin-top:12px;}
-.btn-nova{width:100%;background:#f0f7f1;color:#1a3a1f;border:2px solid #b8dbbe;border-radius:16px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;margin-top:8px;}
-input[type=file]{display:none;}
+body{font-family:Arial,sans-serif;background:#f0f7f1;margin:0;padding:0;display:flex;flex-direction:column;align-items:center;}
+.header{width:100%;background:linear-gradient(170deg,#0f2e14,#1e5c28);padding:40px 24px;text-align:center;border-radius:0 0 40px 40px;}
+h1{color:white;font-size:30px;margin:0;}
+h1 span{color:#8de89a;}
+.sub{color:rgba(255,255,255,0.6);margin-top:6px;font-size:14px;}
+.corpo{width:100%;max-width:420px;padding:24px 20px;display:flex;flex-direction:column;gap:12px;}
+button{width:100%;padding:18px;border:none;border-radius:20px;font-size:18px;font-weight:800;cursor:pointer;}
+.b1{background:linear-gradient(145deg,#2d8a3e,#1a5228);color:white;padding:28px;font-size:20px;}
+.b2{background:white;color:#1a3a1f;border:2px solid #b8dbbe !important;}
+.b3{background:#1a3a1f;color:white;}
+.b4{background:#f0f7f1;color:#1a3a1f;border:2px solid #b8dbbe !important;}
+#spinner{display:none;text-align:center;padding:24px;color:#1a3a1f;font-size:18px;font-weight:800;}
+#resultado{display:none;background:white;border-radius:20px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,0.1);}
+#resultado h2{font-size:22px;margin-bottom:10px;}
+#resultado p{font-size:15px;line-height:1.6;color:#333;}
+input{display:none;}
 </style>
 </head>
 <body>
 <div class="header">
-  <div class="titulo">Doutor <span>Café</span></div>
-  <div class="subtitulo">O agrônomo no seu bolso 🌿</div>
+<h1>Doutor <span>Café</span></h1>
+<div class="sub">O agrônomo no seu bolso 🌿</div>
 </div>
 <div class="corpo">
-  <input type="file" id="cam" accept="image/*" capture="environment">
-  <input type="file" id="gal" accept="image/*">
-  <button class="btn-foto" onclick="document.getElementById('cam').click()">
-    <span>📷</span>
-    FOTOGRAFAR A FOLHA
-    <small>Toque para abrir a câmera</small>
-  </button>
-  <button class="btn-gal" onclick="document.getElementById('gal').click()">🖼️ Escolher da Galeria</button>
-  <div class="spinner" id="spinner">
-    <div style="font-size:48px">🔍</div>
-    <p>Doutor Café analisando...</p>
-  </div>
-  <div class="resultado" id="resultado"></div>
+<input id="cam" type="file" accept="image/*" capture="environment">
+<input id="gal" type="file" accept="image/*">
+<button class="b1" id="btnCam">📷 FOTOGRAFAR A FOLHA</button>
+<button class="b2" id="btnGal">🖼️ Escolher da Galeria</button>
+<div id="spinner">🔍 Analisando a folha...</div>
+<div id="resultado"></div>
 </div>
 <script>
-var SERVIDOR = "https://doutor-cafe-production.up.railway.app";
-var ultimaAcao = "";
+document.getElementById("btnCam").addEventListener("click", function() {
+  document.getElementById("cam").click();
+});
+document.getElementById("btnGal").addEventListener("click", function() {
+  document.getElementById("gal").click();
+});
+document.getElementById("cam").addEventListener("change", function(e) {
+  if (e.target.files[0]) processar(e.target.files[0]);
+});
+document.getElementById("gal").addEventListener("change", function(e) {
+  if (e.target.files[0]) processar(e.target.files[0]);
+});
 
 function processar(file) {
-  if (!file) return;
   document.getElementById("spinner").style.display = "block";
   document.getElementById("resultado").style.display = "none";
   var reader = new FileReader();
   reader.onload = function(e) {
     var b64 = e.target.result.split(",")[1];
-    fetch(SERVIDOR + "/diagnostico", {
+    fetch("https://doutor-cafe-production.up.railway.app/diagnostico", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({imagem: b64, tipo: file.type})
     })
-    .then(function(res) { return res.json(); })
+    .then(function(r) { return r.json(); })
     .then(function(data) {
       document.getElementById("spinner").style.display = "none";
       var div = document.getElementById("resultado");
       div.style.display = "block";
-      var diagnostico = data.diagnostico || "Erro";
-      var acao = data.acao || data.erro || "Tente novamente.";
-      ultimaAcao = acao;
-      var emojis = {ferrugem:"🟠",bicho:"🪲",nitrogenio:"🌿",magnesio:"🟡",cercosporiose:"🔵",phoma:"🟤",saudavel:"✅"};
-      var emoji = emojis[diagnostico] || "🌿";
-      div.innerHTML = "<h2>" + emoji + " " + diagnostico.toUpperCase() + "</h2><p style='margin:10px 0'>" + acao + "</p><button class='btn-voz' onclick='falar()'>🔊 Ouvir em voz alta</button><button class='btn-nova' onclick='resetar()'>📷 Nova análise</button>";
-      falar();
+      var emojis = {ferrugem:"🟠",bicho:"🪲",nitrogenio:"🌿",magnesio:"🟡",saudavel:"✅"};
+      var emoji = emojis[data.diagnostico] || "🌿";
+      var texto = data.acao || data.erro || "Tente novamente.";
+      div.innerHTML = "<h2>" + emoji + " " + (data.diagnostico || "").toUpperCase() + "</h2><p>" + texto + "</p><button class='b3' onclick='falar(\"" + texto.replace(/"/g,"") + "\")'>🔊 Ouvir em voz alta</button><button class='b4' onclick='resetar()' style='margin-top:8px'>📷 Nova análise</button>";
+      falar(texto);
     })
     .catch(function() {
       document.getElementById("spinner").style.display = "none";
       var div = document.getElementById("resultado");
       div.style.display = "block";
-      div.innerHTML = "<p>Erro ao analisar. Verifique sua conexão e tente novamente.</p><button class='btn-nova' onclick='resetar()'>📷 Tentar novamente</button>";
+      div.innerHTML = "<p>Erro ao analisar. Verifique sua conexão e tente novamente.</p>";
     });
   };
   reader.readAsDataURL(file);
 }
 
-function falar() {
-  if (window.speechSynthesis && ultimaAcao) {
+function falar(texto) {
+  if (window.speechSynthesis) {
     window.speechSynthesis.cancel();
-    var msg = new SpeechSynthesisUtterance(ultimaAcao);
+    var msg = new SpeechSynthesisUtterance(texto);
     msg.lang = "pt-BR";
     msg.rate = 0.85;
     window.speechSynthesis.speak(msg);
@@ -99,11 +96,7 @@ function resetar() {
   document.getElementById("resultado").style.display = "none";
   document.getElementById("cam").value = "";
   document.getElementById("gal").value = "";
-  ultimaAcao = "";
 }
-
-document.getElementById("cam").onchange = function(e) { processar(e.target.files[0]); e.target.value=""; };
-document.getElementById("gal").onchange = function(e) { processar(e.target.files[0]); e.target.value=""; };
 </script>
 </body>
 </html>
