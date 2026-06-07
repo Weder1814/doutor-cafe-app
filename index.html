@@ -90,13 +90,11 @@ input { display: none; }
 .dica { background: white; border-radius: 14px; padding: 12px 14px; display: flex; align-items: flex-start; gap: 10px; border-left: 3px solid var(--verde-neon); }
 .dica p { font-size: 12px; color: var(--cinza); line-height: 1.5; }
 .dica strong { color: var(--marrom); }
-
 #spinner { display: none; background: white; border-radius: 20px; padding: 32px 20px; text-align: center; box-shadow: 0 2px 16px rgba(0,0,0,0.07); }
 .spinner-folha { font-size: 40px; animation: spin-pulse 1.2s ease-in-out infinite; display: block; margin-bottom: 12px; }
 @keyframes spin-pulse { 0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; } 50% { transform: scale(1.15) rotate(10deg); opacity: 0.7; } }
 #spinner p { color: var(--verde); font-weight: 700; font-size: 16px; }
 #spinner small { color: var(--cinza); font-size: 12px; margin-top: 4px; display: block; }
-
 #resultado { display: none; }
 .card-resultado { background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.1); animation: slideUp 0.4s ease; }
 @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -128,7 +126,6 @@ input { display: none; }
 .btn-voz { flex: 1; min-width: 80px; background: var(--verde); color: white; border: none; border-radius: 14px; padding: 13px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
 .btn-nova { flex: 1; min-width: 80px; background: var(--creme); color: var(--verde); border: 2px solid #c8ddc8; border-radius: 14px; padding: 13px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
 .btn-share { flex: 1; min-width: 80px; background: #25D366; color: white; border: none; border-radius: 14px; padding: 13px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
-
 .solo-grid { padding: 0 20px 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .solo-item { background: var(--creme); border-radius: 10px; padding: 10px 12px; }
 .solo-item .solo-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--cinza); }
@@ -137,7 +134,6 @@ input { display: none; }
 .solo-ok { color: #2e7d32; }
 .solo-baixo { color: #c62828; }
 .solo-alto { color: #e65100; }
-
 .card-historico { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
 .hist-header { padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
 .hist-titulo { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--marrom); font-weight: 700; }
@@ -183,19 +179,13 @@ canvas { display: none; }
  <input id="soloGal" type="file" accept="image/*">
  <canvas id="canvas"></canvas>
 
- <div class="secao-titulo">🌤️ Clima e Risco Agora</div>
- <div class="card-clima" id="cardClima">
-   <div class="clima-topo"><span style="font-size:13px;color:var(--cinza)">Obtendo clima...</span></div>
- </div>
-
- <div class="secao-titulo" style="margin-top:4px">📅 Calendário Fitossanitário</div>
- <div class="card-calendario" id="cardCalendario"></div>
-
- <div class="secao-titulo" style="margin-top:4px">🌿 Diagnóstico de Folhas e Frutos</div>
+ <!-- 1. DIAGNÓSTICO -->
+ <div class="secao-titulo">🌿 Diagnóstico de Folhas e Frutos</div>
  <button class="btn-foto" id="btnCam"><span class="btn-icon">📷</span><span class="btn-text">Fotografar a Folha<small>Análise por foto única</small></span></button>
  <button class="btn-video" id="btnVid"><span class="btn-icon">🎥</span><span class="btn-text">Gravar Vídeo da Folha<small>Mais preciso — vários ângulos</small></span></button>
  <button class="btn-galeria" id="btnGal"><span class="btn-icon">🖼️</span><span class="btn-text">Escolher da Galeria<small>Use uma foto já tirada</small></span></button>
 
+ <!-- 2. SOLO -->
  <div class="secao-titulo" style="margin-top:4px">🌱 Análise de Solo</div>
  <div class="solo-row">
    <button class="btn-solo" id="btnSolo"><span class="btn-icon">🧪</span><span class="btn-text">Fotografar Laudo<small>Câmera</small></span></button>
@@ -214,6 +204,17 @@ canvas { display: none; }
  </div>
  <div id="resultado"></div>
 
+ <!-- 3. CLIMA -->
+ <div class="secao-titulo" style="margin-top:4px">🌤️ Clima e Risco Agora</div>
+ <div class="card-clima" id="cardClima">
+   <div class="clima-topo"><span style="font-size:13px;color:var(--cinza)">Obtendo clima...</span></div>
+ </div>
+
+ <!-- 4. CALENDÁRIO -->
+ <div class="secao-titulo" style="margin-top:4px">📅 Calendário Fitossanitário</div>
+ <div class="card-calendario" id="cardCalendario"></div>
+
+ <!-- 5. HISTÓRICO -->
  <div class="secao-titulo" style="margin-top:4px">📋 Histórico de Análises</div>
  <div class="card-historico" id="cardHistorico"></div>
 </div>
@@ -291,11 +292,9 @@ function obterClima(lat, lon) {
      var climaIcon = wcode <= 1 ? "☀️" : wcode <= 3 ? "⛅" : wcode <= 49 ? "🌫️" : wcode <= 67 ? "🌧️" : wcode <= 77 ? "❄️" : wcode <= 82 ? "🌦️" : "⛈️";
      var risco = calcularRiscoFerrugem(temp, umidade, chuva);
      var html = '<div class="clima-topo"><span style="font-size:13px;font-weight:600;color:var(--marrom)">' + climaIcon + ' Agora</span><span style="font-size:11px;color:var(--cinza)">Atualizado agora</span></div>';
-     html += '<div class="clima-dados">';
-     html += '<div class="clima-item"><div class="clima-valor">' + temp + '°C</div><div class="clima-label">Temperatura</div></div>';
+     html += '<div class="clima-dados"><div class="clima-item"><div class="clima-valor">' + temp + '°C</div><div class="clima-label">Temperatura</div></div>';
      html += '<div class="clima-item"><div class="clima-valor">' + umidade + '%</div><div class="clima-label">Umidade</div></div>';
-     html += '<div class="clima-item"><div class="clima-valor">' + chuva.toFixed(1) + 'mm</div><div class="clima-label">Chuva</div></div>';
-     html += '</div>';
+     html += '<div class="clima-item"><div class="clima-valor">' + chuva.toFixed(1) + 'mm</div><div class="clima-label">Chuva</div></div></div>';
      html += '<div class="risco-box risco-' + risco.nivel + '"><span class="risco-icon">' + risco.icon + '</span><div class="risco-info"><div class="risco-titulo">' + risco.txt + '</div><div class="risco-desc">' + risco.desc + '</div></div></div>';
      document.getElementById("cardClima").innerHTML = html;
    })
@@ -376,7 +375,6 @@ function identificarRegiao(lat, lon) {
  if (lat >= -21.0 && lat <= -17.0 && lon >= -41.5 && lon <= -39.0) return "Espírito Santo";
  return "Região Cafeeira";
 }
-
 function obterGPS() {
  if (!navigator.geolocation) { document.getElementById("regiaoTag").textContent = "📍 GPS não disponível"; return; }
  navigator.geolocation.getCurrentPosition(
