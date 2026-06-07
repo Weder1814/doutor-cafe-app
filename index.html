@@ -16,39 +16,86 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'DM Sans', sans-serif; background: var(--creme); min-height: 100vh; overflow-x: hidden; }
-.header { background: var(--verde); padding: 36px 24px 48px; text-align: center; position: relative; overflow: hidden; }
-.header::before { content: ''; position: absolute; top: -60px; right: -60px; width: 200px; height: 200px; border-radius: 50%; background: rgba(93,222,116,0.08); }
-.header::after { content: ''; position: absolute; bottom: -40px; left: -40px; width: 150px; height: 150px; border-radius: 50%; background: rgba(93,222,116,0.05); }
-.logo-icon { font-size: 44px; display: block; margin-bottom: 8px; animation: float 3s ease-in-out infinite; }
-@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
-.header h1 { font-family: 'Playfair Display', serif; font-size: 36px; color: white; letter-spacing: -0.5px; }
+
+.header {
+ width: 100%;
+ position: relative;
+ overflow: hidden;
+ padding: 28px 24px 40px;
+ text-align: center;
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ justify-content: center;
+}
+
+.header::before {
+ content: '';
+ position: absolute;
+ inset: 0;
+ background: linear-gradient(160deg, #0d3318 0%, #1a5c2a 40%, #0f2e14 70%, #0a1f0e 100%);
+ z-index: 0;
+}
+
+.header-bg {
+ position: absolute;
+ inset: 0;
+ z-index: 1;
+ pointer-events: none;
+ width: 100%;
+ height: 100%;
+}
+
+.header-content { position: relative; z-index: 2; }
+
+.logo-icon { font-size: 38px; display: block; margin-bottom: 6px; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5)); }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+.header h1 { font-family: 'Playfair Display', serif; font-size: 34px; color: white; letter-spacing: -0.5px; text-shadow: 0 2px 16px rgba(0,0,0,0.5); }
 .header h1 span { color: var(--verde-neon); }
-.header .sub { color: rgba(255,255,255,0.55); font-size: 13px; margin-top: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
-.regiao-tag { display: inline-block; margin-top: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 4px 12px; font-size: 12px; color: rgba(255,255,255,0.75); }
-.wave { display: block; background: var(--verde); height: 40px; clip-path: ellipse(55% 100% at 50% 0%); margin-bottom: -2px; }
-.corpo { max-width: 420px; margin: 0 auto; padding: 24px 20px 40px; display: flex; flex-direction: column; gap: 14px; }
-.btn-foto { background: linear-gradient(135deg, var(--verde-claro), var(--verde)); color: white; border: none; border-radius: 18px; padding: 22px 28px; font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 4px 20px rgba(26,92,42,0.3); width: 100%; }
-.btn-foto:active { transform: scale(0.97); }
-.btn-video { background: linear-gradient(135deg, #1565c0, #0d47a1); color: white; border: none; border-radius: 18px; padding: 22px 28px; font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 4px 20px rgba(13,71,161,0.3); width: 100%; }
-.btn-video:active { transform: scale(0.97); }
-.btn-solo { background: linear-gradient(135deg, #795548, #4e342e); color: white; border: none; border-radius: 18px; padding: 22px 28px; font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 4px 20px rgba(78,52,46,0.3); width: 100%; }
-.btn-solo:active { transform: scale(0.97); }
-.btn-galeria { background: white; color: var(--verde); border: 2px solid #c8ddc8; border-radius: 18px; padding: 16px 28px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: transform 0.15s; width: 100%; }
-.btn-galeria:active { transform: scale(0.97); }
-.btn-icon { font-size: 26px; flex-shrink: 0; }
-.btn-text { text-align: left; line-height: 1.3; }
-.btn-text small { display: block; font-weight: 400; font-size: 12px; opacity: 0.7; margin-top: 2px; }
+.header .sub { color: rgba(255,255,255,0.55); font-size: 12px; margin-top: 4px; letter-spacing: 1px; text-transform: uppercase; }
+.regiao-tag { display: inline-block; margin-top: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 4px 14px; font-size: 12px; color: rgba(255,255,255,0.85); }
+
+.wave { display: block; height: 36px; background: var(--creme); clip-path: ellipse(55% 100% at 50% 100%); margin-top: -1px; position: relative; z-index: 3; }
+
+.corpo { max-width: 420px; margin: 0 auto; padding: 16px 20px 40px; display: flex; flex-direction: column; gap: 12px; }
+
 .secao-titulo { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--cinza); padding: 4px 4px 0; }
+
+.btn-foto { background: linear-gradient(135deg, var(--verde-claro), var(--verde)); color: white; border: none; border-radius: 16px; padding: 18px 24px; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 12px; width: 100%; box-shadow: 0 4px 16px rgba(26,92,42,0.25); transition: transform 0.15s; }
+.btn-foto:active { transform: scale(0.97); }
+
+.btn-video { background: linear-gradient(135deg, #1565c0, #0d47a1); color: white; border: none; border-radius: 16px; padding: 18px 24px; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 12px; width: 100%; box-shadow: 0 4px 16px rgba(13,71,161,0.25); transition: transform 0.15s; }
+.btn-video:active { transform: scale(0.97); }
+
+.btn-galeria { background: white; color: var(--verde); border: 2px solid #c8ddc8; border-radius: 16px; padding: 14px 24px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; width: 100%; transition: transform 0.15s; }
+.btn-galeria:active { transform: scale(0.97); }
+
+.solo-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.btn-solo { background: linear-gradient(135deg, #795548, #4e342e); color: white; border: none; border-radius: 16px; padding: 16px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; box-shadow: 0 4px 16px rgba(78,52,46,0.25); transition: transform 0.15s; }
+.btn-solo:active { transform: scale(0.97); }
+
+.btn-solo-gal { background: white; color: #4e342e; border: 2px solid #d7c4bb; border-radius: 16px; padding: 16px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; transition: transform 0.15s; }
+.btn-solo-gal:active { transform: scale(0.97); }
+
+.btn-icon { font-size: 22px; flex-shrink: 0; }
+.btn-text { text-align: left; line-height: 1.3; }
+.btn-text small { display: block; font-weight: 400; font-size: 11px; opacity: 0.7; margin-top: 2px; }
+
 input { display: none; }
-.dica { background: white; border-radius: 14px; padding: 14px 16px; display: flex; align-items: flex-start; gap: 10px; border-left: 3px solid var(--verde-neon); }
-.dica-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
-.dica p { font-size: 13px; color: var(--cinza); line-height: 1.5; }
+
+.dica { background: white; border-radius: 14px; padding: 12px 14px; display: flex; align-items: flex-start; gap: 10px; border-left: 3px solid var(--verde-neon); }
+.dica-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.dica p { font-size: 12px; color: var(--cinza); line-height: 1.5; }
 .dica strong { color: var(--marrom); }
+
 #spinner { display: none; background: white; border-radius: 20px; padding: 32px 20px; text-align: center; box-shadow: 0 2px 16px rgba(0,0,0,0.07); }
 .spinner-folha { font-size: 40px; animation: spin-pulse 1.2s ease-in-out infinite; display: block; margin-bottom: 12px; }
 @keyframes spin-pulse { 0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; } 50% { transform: scale(1.15) rotate(10deg); opacity: 0.7; } }
 #spinner p { color: var(--verde); font-weight: 700; font-size: 16px; }
 #spinner small { color: var(--cinza); font-size: 12px; margin-top: 4px; display: block; }
+
 #resultado { display: none; }
 .card-resultado { background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.1); animation: slideUp 0.4s ease; }
 @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -91,13 +138,89 @@ canvas { display: none; }
 </style>
 </head>
 <body>
+
 <div class="header">
- <span class="logo-icon">🌿</span>
- <h1>Doutor <span>Café</span></h1>
- <div class="sub">O agrônomo no seu bolso</div>
- <div class="regiao-tag" id="regiaoTag">📍 Localizando...</div>
+ <svg class="header-bg" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+   <g transform="translate(20,10) rotate(-30)" opacity="0.25">
+     <ellipse cx="0" cy="0" rx="8" ry="22" fill="#5dde74"/>
+     <line x1="0" y1="-22" x2="0" y2="22" stroke="#2d8a3e" stroke-width="1"/>
+     <line x1="0" y1="-10" x2="6" y2="-4" stroke="#2d8a3e" stroke-width="0.6"/>
+     <line x1="0" y1="0" x2="-6" y2="6" stroke="#2d8a3e" stroke-width="0.6"/>
+     <line x1="0" y1="8" x2="5" y2="14" stroke="#2d8a3e" stroke-width="0.6"/>
+   </g>
+   <g transform="translate(45,15)" opacity="0.3">
+     <circle cx="0" cy="0" r="5" fill="#c0392b"/>
+     <circle cx="10" cy="-4" r="5" fill="#e74c3c"/>
+     <circle cx="5" cy="8" r="4.5" fill="#a93226"/>
+     <line x1="0" y1="-5" x2="2" y2="-10" stroke="#2d8a3e" stroke-width="1"/>
+     <line x1="10" y1="-9" x2="12" y2="-14" stroke="#2d8a3e" stroke-width="1"/>
+   </g>
+   <g transform="translate(180,5) rotate(15)" opacity="0.15">
+     <ellipse cx="0" cy="0" rx="6" ry="18" fill="#5dde74"/>
+     <line x1="0" y1="-18" x2="0" y2="18" stroke="#2d8a3e" stroke-width="1"/>
+   </g>
+   <g transform="translate(370,20) rotate(40)" opacity="0.2">
+     <ellipse cx="0" cy="0" rx="10" ry="28" fill="#4caf50"/>
+     <line x1="0" y1="-28" x2="0" y2="28" stroke="#2d8a3e" stroke-width="1.2"/>
+     <line x1="0" y1="-15" x2="8" y2="-8" stroke="#2d8a3e" stroke-width="0.7"/>
+     <line x1="0" y1="0" x2="-8" y2="7" stroke="#2d8a3e" stroke-width="0.7"/>
+     <line x1="0" y1="12" x2="7" y2="18" stroke="#2d8a3e" stroke-width="0.7"/>
+   </g>
+   <g transform="translate(345,8)" opacity="0.3">
+     <circle cx="0" cy="0" r="4.5" fill="#c0392b"/>
+     <circle cx="9" cy="3" r="5" fill="#e74c3c"/>
+     <circle cx="4" cy="10" r="4" fill="#922b21"/>
+     <circle cx="14" cy="11" r="3.5" fill="#c0392b"/>
+   </g>
+   <g transform="translate(8,90) rotate(-50)" opacity="0.18">
+     <ellipse cx="0" cy="0" rx="7" ry="20" fill="#66bb6a"/>
+     <line x1="0" y1="-20" x2="0" y2="20" stroke="#388e3c" stroke-width="1"/>
+   </g>
+   <g transform="translate(395,100) rotate(120)" opacity="0.18">
+     <ellipse cx="0" cy="0" rx="7" ry="20" fill="#66bb6a"/>
+     <line x1="0" y1="-20" x2="0" y2="20" stroke="#388e3c" stroke-width="1"/>
+   </g>
+   <g transform="translate(30,120)" opacity="0.2">
+     <circle cx="0" cy="0" r="4" fill="#e74c3c"/>
+     <circle cx="8" cy="-5" r="3.5" fill="#c0392b"/>
+   </g>
+   <g transform="translate(15,165) rotate(-20)" opacity="0.22">
+     <ellipse cx="0" cy="0" rx="9" ry="24" fill="#4caf50"/>
+     <line x1="0" y1="-24" x2="0" y2="24" stroke="#2d8a3e" stroke-width="1"/>
+     <line x1="0" y1="-12" x2="7" y2="-5" stroke="#2d8a3e" stroke-width="0.6"/>
+     <line x1="0" y1="5" x2="-6" y2="11" stroke="#2d8a3e" stroke-width="0.6"/>
+   </g>
+   <g transform="translate(360,155)" opacity="0.25">
+     <circle cx="0" cy="0" r="5" fill="#c0392b"/>
+     <circle cx="10" cy="-4" r="4.5" fill="#e74c3c"/>
+     <circle cx="5" cy="9" r="4" fill="#a93226"/>
+     <circle cx="15" cy="7" r="5" fill="#c0392b"/>
+   </g>
+   <g transform="translate(385,170) rotate(50)" opacity="0.2">
+     <ellipse cx="0" cy="0" rx="8" ry="22" fill="#5dde74"/>
+     <line x1="0" y1="-22" x2="0" y2="22" stroke="#2d8a3e" stroke-width="1"/>
+   </g>
+   <g transform="translate(290,0)" opacity="0.2">
+     <line x1="0" y1="0" x2="20" y2="40" stroke="#2d8a3e" stroke-width="1.5"/>
+     <ellipse cx="-5" cy="15" rx="5" ry="14" fill="#5dde74" transform="rotate(-40,-5,15)"/>
+     <ellipse cx="15" cy="25" rx="5" ry="14" fill="#4caf50" transform="rotate(20,15,25)"/>
+   </g>
+   <g transform="translate(80,160)" opacity="0.18">
+     <line x1="0" y1="0" x2="-15" y2="35" stroke="#2d8a3e" stroke-width="1.5"/>
+     <ellipse cx="8" cy="12" rx="5" ry="13" fill="#5dde74" transform="rotate(35,8,12)"/>
+     <ellipse cx="-8" cy="25" rx="4" ry="12" fill="#4caf50" transform="rotate(-20,-8,25)"/>
+   </g>
+ </svg>
+
+ <div class="header-content">
+   <span class="logo-icon">🌿</span>
+   <h1>Doutor <span>Café</span></h1>
+   <div class="sub">O agrônomo no seu bolso</div>
+   <div class="regiao-tag" id="regiaoTag">📍 Localizando...</div>
+ </div>
 </div>
 <div class="wave"></div>
+
 <div class="corpo">
  <input id="cam" type="file" accept="image/*" capture="environment">
  <input id="gal" type="file" accept="image/*">
@@ -115,7 +238,7 @@ canvas { display: none; }
 
  <button class="btn-video" id="btnVid">
    <span class="btn-icon">🎥</span>
-   <span class="btn-text">Gravar Vídeo da Folha<small>Mais preciso — mostra vários ângulos</small></span>
+   <span class="btn-text">Gravar Vídeo da Folha<small>Mais preciso — vários ângulos</small></span>
  </button>
 
  <button class="btn-galeria" id="btnGal">
@@ -123,21 +246,22 @@ canvas { display: none; }
    <span class="btn-text">Escolher da Galeria<small>Use uma foto já tirada</small></span>
  </button>
 
- <div class="secao-titulo" style="margin-top:6px">🌱 Análise de Solo</div>
+ <div class="secao-titulo" style="margin-top:4px">🌱 Análise de Solo</div>
 
- <button class="btn-solo" id="btnSolo">
-   <span class="btn-icon">🧪</span>
-   <span class="btn-text">Fotografar Laudo de Solo<small>Interpreta NPK, pH e recomenda calagem</small></span>
- </button>
-
- <button class="btn-galeria" id="btnSoloGal">
-   <span class="btn-icon">📄</span>
-   <span class="btn-text">Laudo da Galeria<small>Use uma foto já tirada do laudo</small></span>
- </button>
+ <div class="solo-row">
+   <button class="btn-solo" id="btnSolo">
+     <span class="btn-icon">🧪</span>
+     <span class="btn-text">Fotografar Laudo<small>Câmera</small></span>
+   </button>
+   <button class="btn-solo-gal" id="btnSoloGal">
+     <span class="btn-icon">📄</span>
+     <span class="btn-text">Laudo da Galeria<small>Foto já tirada</small></span>
+   </button>
+ </div>
 
  <div class="dica">
    <span class="dica-icon">💡</span>
-   <p><strong>Dica:</strong> Para o laudo de solo, fotografe a tabela completa com boa iluminação e sem reflexo.</p>
+   <p><strong>Dica:</strong> Fotografe a face inferior da folha também. A ferrugem aparece embaixo com pó alaranjado.</p>
  </div>
 
  <div id="spinner">
@@ -247,19 +371,11 @@ function processar(file, isVideo) {
    if (dadosGPS.regiao) body.regiao = dadosGPS.regiao;
    if (dadosGPS.altitude) body.altitude = dadosGPS.altitude;
    fetch("https://doutor-cafe-production.up.railway.app/diagnostico", {
-     method: "POST",
-     headers: {"Content-Type":"application/json"},
-     body: JSON.stringify(body)
+     method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(body)
    })
    .then(function(r) { return r.json(); })
-   .then(function(data) {
-     document.getElementById("spinner").style.display = "none";
-     mostrarResultado(data, isVideo);
-   })
-   .catch(function() {
-     document.getElementById("spinner").style.display = "none";
-     mostrarErro();
-   });
+   .then(function(data) { document.getElementById("spinner").style.display = "none"; mostrarResultado(data, isVideo); })
+   .catch(function() { document.getElementById("spinner").style.display = "none"; mostrarErro(); });
  };
  reader.readAsDataURL(file);
 }
@@ -275,19 +391,11 @@ function processarSolo(file) {
    var body = { imagem: b64, tipo: file.type };
    if (dadosGPS.regiao) body.regiao = dadosGPS.regiao;
    fetch("https://doutor-cafe-production.up.railway.app/analise-solo", {
-     method: "POST",
-     headers: {"Content-Type":"application/json"},
-     body: JSON.stringify(body)
+     method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(body)
    })
    .then(function(r) { return r.json(); })
-   .then(function(data) {
-     document.getElementById("spinner").style.display = "none";
-     mostrarResultadoSolo(data);
-   })
-   .catch(function() {
-     document.getElementById("spinner").style.display = "none";
-     mostrarErro();
-   });
+   .then(function(data) { document.getElementById("spinner").style.display = "none"; mostrarResultadoSolo(data); })
+   .catch(function() { document.getElementById("spinner").style.display = "none"; mostrarErro(); });
  };
  reader.readAsDataURL(file);
 }
@@ -301,8 +409,7 @@ function processarVideo(file) {
  var canvas = document.getElementById("canvas");
  var ctx = canvas.getContext("2d");
  var url = URL.createObjectURL(file);
- video.src = url;
- video.muted = true;
+ video.src = url; video.muted = true;
  video.addEventListener("loadedmetadata", function() {
    var duration = video.duration;
    var frames = [];
@@ -316,8 +423,7 @@ function processarVideo(file) {
      canvas.width = 640; canvas.height = 480;
      ctx.drawImage(video, 0, 0, 640, 480);
      frames.push(canvas.toDataURL("image/jpeg", 0.7).split(",")[1]);
-     idx++;
-     capturarFrame();
+     idx++; capturarFrame();
    });
    capturarFrame();
  });
@@ -331,19 +437,11 @@ function enviarFrames(frames) {
  if (dadosGPS.regiao) body.regiao = dadosGPS.regiao;
  if (dadosGPS.altitude) body.altitude = dadosGPS.altitude;
  fetch("https://doutor-cafe-production.up.railway.app/diagnostico-video", {
-   method: "POST",
-   headers: {"Content-Type":"application/json"},
-   body: JSON.stringify(body)
+   method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(body)
  })
  .then(function(r) { return r.json(); })
- .then(function(data) {
-   document.getElementById("spinner").style.display = "none";
-   mostrarResultado(data, true);
- })
- .catch(function() {
-   document.getElementById("spinner").style.display = "none";
-   mostrarErro();
- });
+ .then(function(data) { document.getElementById("spinner").style.display = "none"; mostrarResultado(data, true); })
+ .catch(function() { document.getElementById("spinner").style.display = "none"; mostrarErro(); });
 }
 
 function mostrarResultadoSolo(data) {
@@ -359,25 +457,18 @@ function mostrarResultadoSolo(data) {
  html += '</div>';
  if (data.valores) {
    html += '<div class="solo-grid">';
-   var itens = data.valores;
-   for (var k in itens) {
-     var v = itens[k];
-     var statusClass = v.status === "ok" ? "solo-ok" : v.status === "baixo" ? "solo-baixo" : "solo-alto";
-     var statusTexto = v.status === "ok" ? "✓ Adequado" : v.status === "baixo" ? "↓ Baixo" : "↑ Alto";
-     html += '<div class="solo-item">';
-     html += '<div class="solo-label">' + k + '</div>';
-     html += '<div class="solo-valor">' + v.valor + '</div>';
-     html += '<div class="solo-status ' + statusClass + '">' + statusTexto + '</div>';
-     html += '</div>';
+   for (var k in data.valores) {
+     var v = data.valores[k];
+     var sc = v.status === "ok" ? "solo-ok" : v.status === "baixo" ? "solo-baixo" : "solo-alto";
+     var st = v.status === "ok" ? "✓ Adequado" : v.status === "baixo" ? "↓ Baixo" : "↑ Alto";
+     html += '<div class="solo-item"><div class="solo-label">' + k + '</div><div class="solo-valor">' + v.valor + '</div><div class="solo-status ' + sc + '">' + st + '</div></div>';
    }
    html += '</div>';
  }
  html += '<div class="divisor"></div>';
  html += '<div class="acao-box"><h3>Recomendação</h3><p>' + acao + '</p></div>';
- html += '<div class="btns-resultado">';
- html += '<button class="btn-voz" onclick="falar(\'' + textoVoz.replace(/'/g, "\\'") + '\')">🔊 Ouvir</button>';
- html += '<button class="btn-nova" onclick="resetar()">📷 Nova análise</button>';
- html += '</div></div>';
+ html += '<div class="btns-resultado"><button class="btn-voz" onclick="falar(\'' + textoVoz.replace(/'/g, "\\'") + '\')">🔊 Ouvir</button>';
+ html += '<button class="btn-nova" onclick="resetar()">📷 Nova análise</button></div></div>';
  div.innerHTML = html;
  falar(textoVoz);
 }
@@ -398,15 +489,14 @@ function mostrarResultado(data, isVideo) {
  var badgeTexto = confianca === "alta" ? "✓ Alta confiança" : confianca === "media" ? "~ Média confiança" : "! Baixa confiança";
  var barras = "";
  for (var i = 1; i <= 5; i++) {
-   var cor = i <= estagio ? CORES_ESTAGIO[estagio - 1] : "#e8e8e8";
+   var cor = i <= estagio ? CORES_ESTAGIO[estagio-1] : "#e8e8e8";
    barras += '<div class="estagio-seg" style="background:' + cor + '"></div>';
  }
  var textoVoz = nomeVoz + ". " + acao;
  var html = '<div class="card-resultado">';
  html += '<div class="card-topo"><span class="card-emoji">' + emoji + '</span>';
  html += '<div class="card-titulo"><h2>' + nome + '</h2><div class="categoria">' + cat + '</div></div></div>';
- html += '<div class="badges">';
- html += '<span class="badge badge-estagio">📊 Estágio ' + estagio + '/5</span>';
+ html += '<div class="badges"><span class="badge badge-estagio">📊 Estágio ' + estagio + '/5</span>';
  html += '<span class="badge ' + badgeClass + '">' + badgeTexto + '</span>';
  if (dadosGPS.regiao) html += '<span class="badge badge-regiao">📍 ' + dadosGPS.regiao + '</span>';
  if (isVideo) html += '<span class="badge badge-video">🎥 Análise por vídeo</span>';
@@ -416,10 +506,8 @@ function mostrarResultado(data, isVideo) {
  html += '<div class="estagio-box" style="padding-top:16px"><h3>Gravidade</h3><div class="estagio-bar">' + barras + '</div></div>';
  html += '<div class="divisor"></div>';
  html += '<div class="acao-box"><h3>O que fazer agora</h3><p>' + acao + '</p></div>';
- html += '<div class="btns-resultado">';
- html += '<button class="btn-voz" onclick="falar(\'' + textoVoz.replace(/'/g, "\\'") + '\')">🔊 Ouvir</button>';
- html += '<button class="btn-nova" onclick="resetar()">📷 Nova análise</button>';
- html += '</div></div>';
+ html += '<div class="btns-resultado"><button class="btn-voz" onclick="falar(\'' + textoVoz.replace(/'/g, "\\'") + '\')">🔊 Ouvir</button>';
+ html += '<button class="btn-nova" onclick="resetar()">📷 Nova análise</button></div></div>';
  div.innerHTML = html;
  falar(textoVoz);
 }
@@ -434,8 +522,7 @@ function falar(texto) {
  if (window.speechSynthesis) {
    window.speechSynthesis.cancel();
    var msg = new SpeechSynthesisUtterance(texto);
-   msg.lang = "pt-BR";
-   msg.rate = 0.85;
+   msg.lang = "pt-BR"; msg.rate = 0.85;
    window.speechSynthesis.speak(msg);
  }
 }
