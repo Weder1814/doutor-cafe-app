@@ -17,85 +17,73 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'DM Sans', sans-serif; background: var(--creme); min-height: 100vh; overflow-x: hidden; }
 
-.header {
- width: 100%;
- position: relative;
- overflow: hidden;
- padding: 28px 24px 40px;
- text-align: center;
- display: flex;
- flex-direction: column;
- align-items: center;
- justify-content: center;
-}
-
-.header::before {
- content: '';
- position: absolute;
- inset: 0;
- background: linear-gradient(160deg, #0d3318 0%, #1a5c2a 40%, #0f2e14 70%, #0a1f0e 100%);
- z-index: 0;
-}
-
-.header-bg {
- position: absolute;
- inset: 0;
- z-index: 1;
- pointer-events: none;
- width: 100%;
- height: 100%;
-}
-
+.header { width: 100%; position: relative; overflow: hidden; padding: 28px 24px 40px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.header::before { content: ''; position: absolute; inset: 0; background: linear-gradient(160deg, #0d3318 0%, #1a5c2a 40%, #0f2e14 70%, #0a1f0e 100%); z-index: 0; }
+.header-bg { position: absolute; inset: 0; z-index: 1; pointer-events: none; width: 100%; height: 100%; }
 .header-content { position: relative; z-index: 2; }
-
 .logo-icon { font-size: 38px; display: block; margin-bottom: 6px; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5)); }
 @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-
 .header h1 { font-family: 'Playfair Display', serif; font-size: 34px; color: white; letter-spacing: -0.5px; text-shadow: 0 2px 16px rgba(0,0,0,0.5); }
 .header h1 span { color: var(--verde-neon); }
 .header .sub { color: rgba(255,255,255,0.55); font-size: 12px; margin-top: 4px; letter-spacing: 1px; text-transform: uppercase; }
 .regiao-tag { display: inline-block; margin-top: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 4px 14px; font-size: 12px; color: rgba(255,255,255,0.85); }
-
 .wave { display: block; height: 36px; background: var(--creme); clip-path: ellipse(55% 100% at 50% 100%); margin-top: -1px; position: relative; z-index: 3; }
 
 .corpo { max-width: 420px; margin: 0 auto; padding: 16px 20px 40px; display: flex; flex-direction: column; gap: 12px; }
-
 .secao-titulo { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--cinza); padding: 4px 4px 0; }
+
+/* CALENDÁRIO */
+.card-calendario { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
+.cal-header { padding: 16px 18px 12px; display: flex; align-items: center; justify-content: space-between; }
+.cal-mes { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--marrom); font-weight: 700; }
+.cal-fase { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+.fase-florada { background: #fff8e1; color: #f57f17; }
+.fase-granacao { background: #e8f5e9; color: #2e7d32; }
+.fase-maturacao { background: #fff3e0; color: #e65100; }
+.fase-colheita { background: #fce4ec; color: #c62828; }
+.fase-pos { background: #e8eaf6; color: #283593; }
+.fase-repouso { background: #f3e5f5; color: #6a1b9a; }
+
+.cal-divisor { height: 1px; background: #f0f0f0; margin: 0 18px; }
+
+.cal-alertas { padding: 12px 18px; }
+.cal-alertas h4 { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--cinza); margin-bottom: 8px; }
+.alerta-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
+.alerta-item:last-child { margin-bottom: 0; }
+.alerta-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.alerta-texto { font-size: 13px; color: var(--marrom); line-height: 1.4; }
+.alerta-alto { color: #c62828; font-weight: 600; }
+.alerta-medio { color: #e65100; font-weight: 600; }
+
+.cal-acoes { padding: 0 18px 14px; }
+.cal-acoes h4 { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--cinza); margin-bottom: 8px; }
+.acao-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 5px; font-size: 13px; color: #444; line-height: 1.4; }
+.acao-item:last-child { margin-bottom: 0; }
 
 .btn-foto { background: linear-gradient(135deg, var(--verde-claro), var(--verde)); color: white; border: none; border-radius: 16px; padding: 18px 24px; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 12px; width: 100%; box-shadow: 0 4px 16px rgba(26,92,42,0.25); transition: transform 0.15s; }
 .btn-foto:active { transform: scale(0.97); }
-
 .btn-video { background: linear-gradient(135deg, #1565c0, #0d47a1); color: white; border: none; border-radius: 16px; padding: 18px 24px; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 12px; width: 100%; box-shadow: 0 4px 16px rgba(13,71,161,0.25); transition: transform 0.15s; }
 .btn-video:active { transform: scale(0.97); }
-
 .btn-galeria { background: white; color: var(--verde); border: 2px solid #c8ddc8; border-radius: 16px; padding: 14px 24px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; width: 100%; transition: transform 0.15s; }
 .btn-galeria:active { transform: scale(0.97); }
-
 .solo-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
 .btn-solo { background: linear-gradient(135deg, #795548, #4e342e); color: white; border: none; border-radius: 16px; padding: 16px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; box-shadow: 0 4px 16px rgba(78,52,46,0.25); transition: transform 0.15s; }
 .btn-solo:active { transform: scale(0.97); }
-
 .btn-solo-gal { background: white; color: #4e342e; border: 2px solid #d7c4bb; border-radius: 16px; padding: 16px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; transition: transform 0.15s; }
 .btn-solo-gal:active { transform: scale(0.97); }
-
 .btn-icon { font-size: 22px; flex-shrink: 0; }
 .btn-text { text-align: left; line-height: 1.3; }
 .btn-text small { display: block; font-weight: 400; font-size: 11px; opacity: 0.7; margin-top: 2px; }
-
 input { display: none; }
-
 .dica { background: white; border-radius: 14px; padding: 12px 14px; display: flex; align-items: flex-start; gap: 10px; border-left: 3px solid var(--verde-neon); }
 .dica-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
 .dica p { font-size: 12px; color: var(--cinza); line-height: 1.5; }
 .dica strong { color: var(--marrom); }
-
 #spinner { display: none; background: white; border-radius: 20px; padding: 32px 20px; text-align: center; box-shadow: 0 2px 16px rgba(0,0,0,0.07); }
 .spinner-folha { font-size: 40px; animation: spin-pulse 1.2s ease-in-out infinite; display: block; margin-bottom: 12px; }
 @keyframes spin-pulse { 0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; } 50% { transform: scale(1.15) rotate(10deg); opacity: 0.7; } }
 #spinner p { color: var(--verde); font-weight: 700; font-size: 16px; }
 #spinner small { color: var(--cinza); font-size: 12px; margin-top: 4px; display: block; }
-
 #resultado { display: none; }
 .card-resultado { background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.1); animation: slideUp 0.4s ease; }
 @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -141,77 +129,20 @@ canvas { display: none; }
 
 <div class="header">
  <svg class="header-bg" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-   <g transform="translate(20,10) rotate(-30)" opacity="0.25">
-     <ellipse cx="0" cy="0" rx="8" ry="22" fill="#5dde74"/>
-     <line x1="0" y1="-22" x2="0" y2="22" stroke="#2d8a3e" stroke-width="1"/>
-     <line x1="0" y1="-10" x2="6" y2="-4" stroke="#2d8a3e" stroke-width="0.6"/>
-     <line x1="0" y1="0" x2="-6" y2="6" stroke="#2d8a3e" stroke-width="0.6"/>
-     <line x1="0" y1="8" x2="5" y2="14" stroke="#2d8a3e" stroke-width="0.6"/>
-   </g>
-   <g transform="translate(45,15)" opacity="0.3">
-     <circle cx="0" cy="0" r="5" fill="#c0392b"/>
-     <circle cx="10" cy="-4" r="5" fill="#e74c3c"/>
-     <circle cx="5" cy="8" r="4.5" fill="#a93226"/>
-     <line x1="0" y1="-5" x2="2" y2="-10" stroke="#2d8a3e" stroke-width="1"/>
-     <line x1="10" y1="-9" x2="12" y2="-14" stroke="#2d8a3e" stroke-width="1"/>
-   </g>
-   <g transform="translate(180,5) rotate(15)" opacity="0.15">
-     <ellipse cx="0" cy="0" rx="6" ry="18" fill="#5dde74"/>
-     <line x1="0" y1="-18" x2="0" y2="18" stroke="#2d8a3e" stroke-width="1"/>
-   </g>
-   <g transform="translate(370,20) rotate(40)" opacity="0.2">
-     <ellipse cx="0" cy="0" rx="10" ry="28" fill="#4caf50"/>
-     <line x1="0" y1="-28" x2="0" y2="28" stroke="#2d8a3e" stroke-width="1.2"/>
-     <line x1="0" y1="-15" x2="8" y2="-8" stroke="#2d8a3e" stroke-width="0.7"/>
-     <line x1="0" y1="0" x2="-8" y2="7" stroke="#2d8a3e" stroke-width="0.7"/>
-     <line x1="0" y1="12" x2="7" y2="18" stroke="#2d8a3e" stroke-width="0.7"/>
-   </g>
-   <g transform="translate(345,8)" opacity="0.3">
-     <circle cx="0" cy="0" r="4.5" fill="#c0392b"/>
-     <circle cx="9" cy="3" r="5" fill="#e74c3c"/>
-     <circle cx="4" cy="10" r="4" fill="#922b21"/>
-     <circle cx="14" cy="11" r="3.5" fill="#c0392b"/>
-   </g>
-   <g transform="translate(8,90) rotate(-50)" opacity="0.18">
-     <ellipse cx="0" cy="0" rx="7" ry="20" fill="#66bb6a"/>
-     <line x1="0" y1="-20" x2="0" y2="20" stroke="#388e3c" stroke-width="1"/>
-   </g>
-   <g transform="translate(395,100) rotate(120)" opacity="0.18">
-     <ellipse cx="0" cy="0" rx="7" ry="20" fill="#66bb6a"/>
-     <line x1="0" y1="-20" x2="0" y2="20" stroke="#388e3c" stroke-width="1"/>
-   </g>
-   <g transform="translate(30,120)" opacity="0.2">
-     <circle cx="0" cy="0" r="4" fill="#e74c3c"/>
-     <circle cx="8" cy="-5" r="3.5" fill="#c0392b"/>
-   </g>
-   <g transform="translate(15,165) rotate(-20)" opacity="0.22">
-     <ellipse cx="0" cy="0" rx="9" ry="24" fill="#4caf50"/>
-     <line x1="0" y1="-24" x2="0" y2="24" stroke="#2d8a3e" stroke-width="1"/>
-     <line x1="0" y1="-12" x2="7" y2="-5" stroke="#2d8a3e" stroke-width="0.6"/>
-     <line x1="0" y1="5" x2="-6" y2="11" stroke="#2d8a3e" stroke-width="0.6"/>
-   </g>
-   <g transform="translate(360,155)" opacity="0.25">
-     <circle cx="0" cy="0" r="5" fill="#c0392b"/>
-     <circle cx="10" cy="-4" r="4.5" fill="#e74c3c"/>
-     <circle cx="5" cy="9" r="4" fill="#a93226"/>
-     <circle cx="15" cy="7" r="5" fill="#c0392b"/>
-   </g>
-   <g transform="translate(385,170) rotate(50)" opacity="0.2">
-     <ellipse cx="0" cy="0" rx="8" ry="22" fill="#5dde74"/>
-     <line x1="0" y1="-22" x2="0" y2="22" stroke="#2d8a3e" stroke-width="1"/>
-   </g>
-   <g transform="translate(290,0)" opacity="0.2">
-     <line x1="0" y1="0" x2="20" y2="40" stroke="#2d8a3e" stroke-width="1.5"/>
-     <ellipse cx="-5" cy="15" rx="5" ry="14" fill="#5dde74" transform="rotate(-40,-5,15)"/>
-     <ellipse cx="15" cy="25" rx="5" ry="14" fill="#4caf50" transform="rotate(20,15,25)"/>
-   </g>
-   <g transform="translate(80,160)" opacity="0.18">
-     <line x1="0" y1="0" x2="-15" y2="35" stroke="#2d8a3e" stroke-width="1.5"/>
-     <ellipse cx="8" cy="12" rx="5" ry="13" fill="#5dde74" transform="rotate(35,8,12)"/>
-     <ellipse cx="-8" cy="25" rx="4" ry="12" fill="#4caf50" transform="rotate(-20,-8,25)"/>
-   </g>
+   <g transform="translate(20,10) rotate(-30)" opacity="0.25"><ellipse cx="0" cy="0" rx="8" ry="22" fill="#5dde74"/><line x1="0" y1="-22" x2="0" y2="22" stroke="#2d8a3e" stroke-width="1"/><line x1="0" y1="-10" x2="6" y2="-4" stroke="#2d8a3e" stroke-width="0.6"/><line x1="0" y1="0" x2="-6" y2="6" stroke="#2d8a3e" stroke-width="0.6"/><line x1="0" y1="8" x2="5" y2="14" stroke="#2d8a3e" stroke-width="0.6"/></g>
+   <g transform="translate(45,15)" opacity="0.3"><circle cx="0" cy="0" r="5" fill="#c0392b"/><circle cx="10" cy="-4" r="5" fill="#e74c3c"/><circle cx="5" cy="8" r="4.5" fill="#a93226"/><line x1="0" y1="-5" x2="2" y2="-10" stroke="#2d8a3e" stroke-width="1"/><line x1="10" y1="-9" x2="12" y2="-14" stroke="#2d8a3e" stroke-width="1"/></g>
+   <g transform="translate(180,5) rotate(15)" opacity="0.15"><ellipse cx="0" cy="0" rx="6" ry="18" fill="#5dde74"/><line x1="0" y1="-18" x2="0" y2="18" stroke="#2d8a3e" stroke-width="1"/></g>
+   <g transform="translate(370,20) rotate(40)" opacity="0.2"><ellipse cx="0" cy="0" rx="10" ry="28" fill="#4caf50"/><line x1="0" y1="-28" x2="0" y2="28" stroke="#2d8a3e" stroke-width="1.2"/><line x1="0" y1="-15" x2="8" y2="-8" stroke="#2d8a3e" stroke-width="0.7"/><line x1="0" y1="0" x2="-8" y2="7" stroke="#2d8a3e" stroke-width="0.7"/><line x1="0" y1="12" x2="7" y2="18" stroke="#2d8a3e" stroke-width="0.7"/></g>
+   <g transform="translate(345,8)" opacity="0.3"><circle cx="0" cy="0" r="4.5" fill="#c0392b"/><circle cx="9" cy="3" r="5" fill="#e74c3c"/><circle cx="4" cy="10" r="4" fill="#922b21"/><circle cx="14" cy="11" r="3.5" fill="#c0392b"/></g>
+   <g transform="translate(8,90) rotate(-50)" opacity="0.18"><ellipse cx="0" cy="0" rx="7" ry="20" fill="#66bb6a"/><line x1="0" y1="-20" x2="0" y2="20" stroke="#388e3c" stroke-width="1"/></g>
+   <g transform="translate(395,100) rotate(120)" opacity="0.18"><ellipse cx="0" cy="0" rx="7" ry="20" fill="#66bb6a"/><line x1="0" y1="-20" x2="0" y2="20" stroke="#388e3c" stroke-width="1"/></g>
+   <g transform="translate(30,120)" opacity="0.2"><circle cx="0" cy="0" r="4" fill="#e74c3c"/><circle cx="8" cy="-5" r="3.5" fill="#c0392b"/></g>
+   <g transform="translate(15,165) rotate(-20)" opacity="0.22"><ellipse cx="0" cy="0" rx="9" ry="24" fill="#4caf50"/><line x1="0" y1="-24" x2="0" y2="24" stroke="#2d8a3e" stroke-width="1"/><line x1="0" y1="-12" x2="7" y2="-5" stroke="#2d8a3e" stroke-width="0.6"/><line x1="0" y1="5" x2="-6" y2="11" stroke="#2d8a3e" stroke-width="0.6"/></g>
+   <g transform="translate(360,155)" opacity="0.25"><circle cx="0" cy="0" r="5" fill="#c0392b"/><circle cx="10" cy="-4" r="4.5" fill="#e74c3c"/><circle cx="5" cy="9" r="4" fill="#a93226"/><circle cx="15" cy="7" r="5" fill="#c0392b"/></g>
+   <g transform="translate(385,170) rotate(50)" opacity="0.2"><ellipse cx="0" cy="0" rx="8" ry="22" fill="#5dde74"/><line x1="0" y1="-22" x2="0" y2="22" stroke="#2d8a3e" stroke-width="1"/></g>
+   <g transform="translate(290,0)" opacity="0.2"><line x1="0" y1="0" x2="20" y2="40" stroke="#2d8a3e" stroke-width="1.5"/><ellipse cx="-5" cy="15" rx="5" ry="14" fill="#5dde74" transform="rotate(-40,-5,15)"/><ellipse cx="15" cy="25" rx="5" ry="14" fill="#4caf50" transform="rotate(20,15,25)"/></g>
+   <g transform="translate(80,160)" opacity="0.18"><line x1="0" y1="0" x2="-15" y2="35" stroke="#2d8a3e" stroke-width="1.5"/><ellipse cx="8" cy="12" rx="5" ry="13" fill="#5dde74" transform="rotate(35,8,12)"/><ellipse cx="-8" cy="25" rx="4" ry="12" fill="#4caf50" transform="rotate(-20,-8,25)"/></g>
  </svg>
-
  <div class="header-content">
    <span class="logo-icon">🌿</span>
    <h1>Doutor <span>Café</span></h1>
@@ -229,7 +160,11 @@ canvas { display: none; }
  <input id="soloGal" type="file" accept="image/*">
  <canvas id="canvas"></canvas>
 
- <div class="secao-titulo">🌿 Diagnóstico de Folhas</div>
+ <!-- CALENDÁRIO FITOSSANITÁRIO -->
+ <div class="secao-titulo">📅 Calendário Fitossanitário</div>
+ <div class="card-calendario" id="cardCalendario"></div>
+
+ <div class="secao-titulo" style="margin-top:4px">🌿 Diagnóstico de Folhas</div>
 
  <button class="btn-foto" id="btnCam">
    <span class="btn-icon">📷</span>
@@ -316,6 +251,146 @@ var CATEGORIAS = {
 };
 var CORES_ESTAGIO = ["#4caf50","#8bc34a","#ffc107","#ff9800","#f44336"];
 
+// ============ CALENDÁRIO FITOSSANITÁRIO ============
+var MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+
+var CALENDARIO = {
+ // [fase, alertas[], acoes[]]
+ 0: { // Janeiro
+   fase: "granacao", faseTxt: "🟢 Granação",
+   alertas: [
+     { nivel: "alto", txt: "🟠 Ferrugem — alta umidade favorece infecção" },
+     { nivel: "alto", txt: "🪲 Bicho-mineiro — pico populacional" },
+     { nivel: "medio", txt: "🟣 Mancha aureolada — ventos e chuvas" }
+   ],
+   acoes: ["✅ Aplicar fungicida preventivo para ferrugem","✅ Monitorar folhas para trilhas de bicho-mineiro","✅ Adubação de cobertura — N e K parcelados"]
+ },
+ 1: { // Fevereiro
+   fase: "granacao", faseTxt: "🟢 Granação",
+   alertas: [
+     { nivel: "alto", txt: "🟠 Ferrugem — período crítico de infecção" },
+     { nivel: "alto", txt: "🪲 Bicho-mineiro — alta incidência" },
+     { nivel: "medio", txt: "🫙 Antracnose — chuvas intensas" }
+   ],
+   acoes: ["✅ Reaplicar fungicida (21 dias após última aplicação)","✅ Controle de bicho-mineiro se >30% de folhas com minas","✅ Verificar necessidade de adubação fosfatada"]
+ },
+ 2: { // Março
+   fase: "maturacao", faseTxt: "🔴 Maturação",
+   alertas: [
+     { nivel: "alto", txt: "🟠 Ferrugem — frutos pesados reduzem resistência" },
+     { nivel: "medio", txt: "🕳️ Broca — monitorar frutos" },
+     { nivel: "medio", txt: "🪲 Bicho-mineiro — continua ativo" }
+   ],
+   acoes: ["✅ Monitorar broca nos frutos (furos circulares)","✅ Aplicar fungicida se necessário","✅ Preparar equipamentos para colheita"]
+ },
+ 3: { // Abril
+   fase: "colheita", faseTxt: "☕ Colheita",
+   alertas: [
+     { nivel: "medio", txt: "🕳️ Broca — pico de infestação nos frutos maduros" },
+     { nivel: "medio", txt: "🟠 Ferrugem — desfolha pós-colheita" }
+   ],
+   acoes: ["✅ Colheita seletiva — cereja e passa separados","✅ Controle biológico da broca (Beauveria bassiana)","✅ Processar café rapidamente após colheita"]
+ },
+ 4: { // Maio
+   fase: "colheita", faseTxt: "☕ Colheita",
+   alertas: [
+     { nivel: "medio", txt: "🕳️ Broca — reinfestação em frutos remanescentes" },
+     { nivel: "medio", txt: "🟠 Ferrugem — lesões visíveis pós-colheita" }
+   ],
+   acoes: ["✅ Recolher todos os frutos caídos (repasse)","✅ Aplicar fungicida curativo pós-colheita","✅ Iniciar poda de formação e limpeza"]
+ },
+ 5: { // Junho
+   fase: "pos", faseTxt: "🌿 Pós-colheita",
+   alertas: [
+     { nivel: "medio", txt: "🟠 Ferrugem — lesões tardias" },
+     { nivel: "medio", txt: "🟡 Deficiência de Mg — período seco" }
+   ],
+   acoes: ["✅ Realizar poda e esqueletamento se necessário","✅ Calagem e adubação de solo","✅ Análise de solo para planejar próxima safra"]
+ },
+ 6: { // Julho
+   fase: "pos", faseTxt: "🌿 Pós-colheita",
+   alertas: [
+     { nivel: "medio", txt: "🟫 Ácaro vermelho — período seco favorece" },
+     { nivel: "medio", txt: "🟡 Deficiências nutricionais — solo seco" }
+   ],
+   acoes: ["✅ Monitorar ácaros (folha bronzeada)","✅ Adubação fosfatada e potássica","✅ Irrigação se disponível — período crítico"]
+ },
+ 7: { // Agosto
+   fase: "repouso", faseTxt: "😴 Repouso vegetativo",
+   alertas: [
+     { nivel: "medio", txt: "🟫 Ácaro vermelho — pico em período seco" },
+     { nivel: "medio", txt: "🤍 Cochonilha — favorecida pelo estresse hídrico" }
+   ],
+   acoes: ["✅ Aplicar acaricida se necessário","✅ Adubação foliar de micronutrientes","✅ Revisar sistema de irrigação"]
+ },
+ 8: { // Setembro
+   fase: "florada", faseTxt: "🌸 Florada",
+   alertas: [
+     { nivel: "alto", txt: "🌸 Período crítico — não aplicar inseticidas na florada" },
+     { nivel: "medio", txt: "🟠 Ferrugem — início das chuvas" },
+     { nivel: "medio", txt: "⚫ Phoma — regiões acima de 900m" }
+   ],
+   acoes: ["⚠️ EVITAR agrotóxicos durante a florada — proteger abelhas","✅ Aplicar fungicida preventivo ANTES da florada","✅ Adubação nitrogenada de cobertura"]
+ },
+ 9: { // Outubro
+   fase: "florada", faseTxt: "🌸 Florada/Chumbinho",
+   alertas: [
+     { nivel: "alto", txt: "🟠 Ferrugem — chuvas reiniciadas, risco alto" },
+     { nivel: "alto", txt: "🪲 Bicho-mineiro — nova geração" },
+     { nivel: "medio", txt: "🟣 Aureolada — ventos e chuvas" }
+   ],
+   acoes: ["✅ Aplicar fungicida sistêmico para ferrugem","✅ Monitorar bicho-mineiro nas folhas novas","✅ Adubação NPK completa"]
+ },
+ 10: { // Novembro
+   fase: "granacao", faseTxt: "🟢 Chumbinho/Granação",
+   alertas: [
+     { nivel: "alto", txt: "🟠 Ferrugem — período de máximo risco" },
+     { nivel: "alto", txt: "🪲 Bicho-mineiro — alta infestação" },
+     { nivel: "medio", txt: "⚫ Phoma — em regiões altas" }
+   ],
+   acoes: ["✅ Reaplicar fungicida (intervalo 21 dias)","✅ Controle de bicho-mineiro","✅ Monitorar deficiência de boro nos ponteiros"]
+ },
+ 11: { // Dezembro
+   fase: "granacao", faseTxt: "🟢 Granação",
+   alertas: [
+     { nivel: "alto", txt: "🟠 Ferrugem — frutos em desenvolvimento" },
+     { nivel: "alto", txt: "🪲 Bicho-mineiro — pico" },
+     { nivel: "medio", txt: "🟣 Aureolada — ventos de verão" }
+   ],
+   acoes: ["✅ Fungicida preventivo — não deixar passar intervalo","✅ Adubação potássica para granação","✅ Monitorar broca nos primeiros frutos"]
+ }
+};
+
+function renderCalendario(regiao) {
+ var mes = new Date().getMonth();
+ var cal = CALENDARIO[mes];
+ var faseClass = "fase-" + cal.fase;
+
+ var html = '<div class="cal-header">';
+ html += '<div class="cal-mes">📅 ' + MESES[mes] + '</div>';
+ html += '<div class="cal-fase ' + faseClass + '">' + cal.faseTxt + '</div>';
+ html += '</div>';
+ html += '<div class="cal-divisor"></div>';
+
+ html += '<div class="cal-alertas">';
+ html += '<h4>⚠️ Alertas deste mês</h4>';
+ cal.alertas.forEach(function(a) {
+   html += '<div class="alerta-item"><span class="alerta-' + a.nivel + '">' + a.txt + '</span></div>';
+ });
+ html += '</div>';
+
+ html += '<div class="cal-divisor"></div>';
+ html += '<div class="cal-acoes">';
+ html += '<h4>📋 O que fazer agora</h4>';
+ cal.acoes.forEach(function(a) {
+   html += '<div class="acao-item">' + a + '</div>';
+ });
+ html += '</div>';
+
+ document.getElementById("cardCalendario").innerHTML = html;
+}
+
+// ============ GPS ============
 var dadosGPS = { lat: null, lon: null, regiao: null, altitude: null };
 function identificarRegiao(lat, lon) {
  if (lat >= -20.5 && lat <= -15.0 && lon >= -50.0 && lon <= -44.0) return "Cerrado Mineiro";
@@ -331,7 +406,7 @@ function identificarRegiao(lat, lon) {
  return "Região Cafeeira";
 }
 function obterGPS() {
- if (!navigator.geolocation) { document.getElementById("regiaoTag").textContent = "📍 GPS não disponível"; return; }
+ if (!navigator.geolocation) { document.getElementById("regiaoTag").textContent = "📍 GPS não disponível"; renderCalendario(null); return; }
  navigator.geolocation.getCurrentPosition(
    function(pos) {
      dadosGPS.lat = pos.coords.latitude;
@@ -341,13 +416,16 @@ function obterGPS() {
      var tag = "📍 " + dadosGPS.regiao;
      if (dadosGPS.altitude) tag += " · " + dadosGPS.altitude + "m";
      document.getElementById("regiaoTag").textContent = tag;
+     renderCalendario(dadosGPS.regiao);
    },
-   function() { document.getElementById("regiaoTag").textContent = "📍 Localização não obtida"; },
+   function() { document.getElementById("regiaoTag").textContent = "📍 Localização não obtida"; renderCalendario(null); },
    { timeout: 8000, enableHighAccuracy: false }
  );
 }
+renderCalendario(null);
 obterGPS();
 
+// ============ EVENTOS ============
 document.getElementById("btnCam").addEventListener("click", function() { document.getElementById("cam").click(); });
 document.getElementById("btnGal").addEventListener("click", function() { document.getElementById("gal").click(); });
 document.getElementById("btnVid").addEventListener("click", function() { document.getElementById("vid").click(); });
@@ -449,8 +527,7 @@ function mostrarResultadoSolo(data) {
  div.style.display = "block";
  var acao = data.acao || "Consulte um agrônomo para mais detalhes.";
  var textoVoz = "Análise de solo. " + acao;
- var html = '<div class="card-resultado">';
- html += '<div class="card-topo"><span class="card-emoji">🧪</span>';
+ var html = '<div class="card-resultado"><div class="card-topo"><span class="card-emoji">🧪</span>';
  html += '<div class="card-titulo"><h2>Análise de Solo</h2><div class="categoria">Recomendação para Café</div></div></div>';
  html += '<div class="badges"><span class="badge badge-solo">🌱 Laudo Interpretado</span>';
  if (dadosGPS.regiao) html += '<span class="badge badge-regiao">📍 ' + dadosGPS.regiao + '</span>';
@@ -465,12 +542,10 @@ function mostrarResultadoSolo(data) {
    }
    html += '</div>';
  }
- html += '<div class="divisor"></div>';
- html += '<div class="acao-box"><h3>Recomendação</h3><p>' + acao + '</p></div>';
+ html += '<div class="divisor"></div><div class="acao-box"><h3>Recomendação</h3><p>' + acao + '</p></div>';
  html += '<div class="btns-resultado"><button class="btn-voz" onclick="falar(\'' + textoVoz.replace(/'/g, "\\'") + '\')">🔊 Ouvir</button>';
  html += '<button class="btn-nova" onclick="resetar()">📷 Nova análise</button></div></div>';
- div.innerHTML = html;
- falar(textoVoz);
+ div.innerHTML = html; falar(textoVoz);
 }
 
 function mostrarResultado(data, isVideo) {
@@ -493,8 +568,7 @@ function mostrarResultado(data, isVideo) {
    barras += '<div class="estagio-seg" style="background:' + cor + '"></div>';
  }
  var textoVoz = nomeVoz + ". " + acao;
- var html = '<div class="card-resultado">';
- html += '<div class="card-topo"><span class="card-emoji">' + emoji + '</span>';
+ var html = '<div class="card-resultado"><div class="card-topo"><span class="card-emoji">' + emoji + '</span>';
  html += '<div class="card-titulo"><h2>' + nome + '</h2><div class="categoria">' + cat + '</div></div></div>';
  html += '<div class="badges"><span class="badge badge-estagio">📊 Estágio ' + estagio + '/5</span>';
  html += '<span class="badge ' + badgeClass + '">' + badgeTexto + '</span>';
@@ -508,8 +582,7 @@ function mostrarResultado(data, isVideo) {
  html += '<div class="acao-box"><h3>O que fazer agora</h3><p>' + acao + '</p></div>';
  html += '<div class="btns-resultado"><button class="btn-voz" onclick="falar(\'' + textoVoz.replace(/'/g, "\\'") + '\')">🔊 Ouvir</button>';
  html += '<button class="btn-nova" onclick="resetar()">📷 Nova análise</button></div></div>';
- div.innerHTML = html;
- falar(textoVoz);
+ div.innerHTML = html; falar(textoVoz);
 }
 
 function mostrarErro() {
