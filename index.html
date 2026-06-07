@@ -31,6 +31,27 @@ body { font-family: 'DM Sans', sans-serif; background: var(--creme); min-height:
 .corpo { max-width: 420px; margin: 0 auto; padding: 16px 20px 40px; display: flex; flex-direction: column; gap: 12px; }
 .secao-titulo { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--cinza); padding: 4px 4px 0; }
 
+.card-clima { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
+.clima-topo { padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
+.clima-dados { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; border-top: 1px solid #f0f0f0; }
+.clima-item { padding: 12px 14px; text-align: center; border-right: 1px solid #f0f0f0; }
+.clima-item:last-child { border-right: none; }
+.clima-valor { font-size: 20px; font-weight: 700; color: var(--marrom); }
+.clima-label { font-size: 10px; color: var(--cinza); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+.risco-box { margin: 0 18px 14px; border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
+.risco-baixo { background: #e8f5e9; }
+.risco-medio { background: #fff8e1; }
+.risco-alto { background: #fff3e0; }
+.risco-critico { background: #fce4ec; }
+.risco-icon { font-size: 20px; flex-shrink: 0; }
+.risco-info { flex: 1; }
+.risco-titulo { font-size: 13px; font-weight: 700; }
+.risco-baixo .risco-titulo { color: #2e7d32; }
+.risco-medio .risco-titulo { color: #f57f17; }
+.risco-alto .risco-titulo { color: #e65100; }
+.risco-critico .risco-titulo { color: #c62828; }
+.risco-desc { font-size: 11px; color: #666; margin-top: 2px; line-height: 1.4; }
+
 .card-calendario { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
 .cal-header { padding: 16px 18px 12px; display: flex; align-items: center; justify-content: space-between; }
 .cal-mes { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--marrom); font-weight: 700; }
@@ -162,7 +183,12 @@ canvas { display: none; }
  <input id="soloGal" type="file" accept="image/*">
  <canvas id="canvas"></canvas>
 
- <div class="secao-titulo">📅 Calendário Fitossanitário</div>
+ <div class="secao-titulo">🌤️ Clima e Risco Agora</div>
+ <div class="card-clima" id="cardClima">
+   <div class="clima-topo"><span style="font-size:13px;color:var(--cinza)">Obtendo clima...</span></div>
+ </div>
+
+ <div class="secao-titulo" style="margin-top:4px">📅 Calendário Fitossanitário</div>
  <div class="card-calendario" id="cardCalendario"></div>
 
  <div class="secao-titulo" style="margin-top:4px">🌿 Diagnóstico de Folhas e Frutos</div>
@@ -237,6 +263,47 @@ var CATEGORIAS = {
 var CORES_ESTAGIO = ["#4caf50","#8bc34a","#ffc107","#ff9800","#f44336"];
 var MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 
+function calcularRiscoFerrugem(temp, umidade, chuva) {
+ var pontos = 0;
+ if (temp >= 18 && temp <= 22) pontos += 3;
+ else if (temp >= 15 && temp <= 25) pontos += 1;
+ if (umidade >= 80) pontos += 3;
+ else if (umidade >= 70) pontos += 2;
+ else if (umidade >= 60) pontos += 1;
+ if (chuva > 5) pontos += 2;
+ else if (chuva > 0) pontos += 1;
+ if (pontos >= 7) return { nivel:"critico", txt:"Risco Crítico de Ferrugem", desc:"Condições ideais para infecção. Aplique fungicida imediatamente.", icon:"🔴" };
+ if (pontos >= 5) return { nivel:"alto", txt:"Risco Alto de Ferrugem", desc:"Alta umidade e temperatura favorável. Aplique fungicida preventivo.", icon:"🟠" };
+ if (pontos >= 3) return { nivel:"medio", txt:"Risco Médio de Ferrugem", desc:"Condições parcialmente favoráveis. Monitore as folhas.", icon:"🟡" };
+ return { nivel:"baixo", txt:"Risco Baixo de Ferrugem", desc:"Condições desfavoráveis para ferrugem hoje.", icon:"🟢" };
+}
+
+function obterClima(lat, lon) {
+ var url = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon + "&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&timezone=America/Sao_Paulo";
+ fetch(url)
+   .then(function(r) { return r.json(); })
+   .then(function(d) {
+     var c = d.current;
+     var temp = Math.round(c.temperature_2m);
+     var umidade = Math.round(c.relative_humidity_2m);
+     var chuva = c.precipitation || 0;
+     var wcode = c.weather_code;
+     var climaIcon = wcode <= 1 ? "☀️" : wcode <= 3 ? "⛅" : wcode <= 49 ? "🌫️" : wcode <= 67 ? "🌧️" : wcode <= 77 ? "❄️" : wcode <= 82 ? "🌦️" : "⛈️";
+     var risco = calcularRiscoFerrugem(temp, umidade, chuva);
+     var html = '<div class="clima-topo"><span style="font-size:13px;font-weight:600;color:var(--marrom)">' + climaIcon + ' Agora</span><span style="font-size:11px;color:var(--cinza)">Atualizado agora</span></div>';
+     html += '<div class="clima-dados">';
+     html += '<div class="clima-item"><div class="clima-valor">' + temp + '°C</div><div class="clima-label">Temperatura</div></div>';
+     html += '<div class="clima-item"><div class="clima-valor">' + umidade + '%</div><div class="clima-label">Umidade</div></div>';
+     html += '<div class="clima-item"><div class="clima-valor">' + chuva.toFixed(1) + 'mm</div><div class="clima-label">Chuva</div></div>';
+     html += '</div>';
+     html += '<div class="risco-box risco-' + risco.nivel + '"><span class="risco-icon">' + risco.icon + '</span><div class="risco-info"><div class="risco-titulo">' + risco.txt + '</div><div class="risco-desc">' + risco.desc + '</div></div></div>';
+     document.getElementById("cardClima").innerHTML = html;
+   })
+   .catch(function() {
+     document.getElementById("cardClima").innerHTML = '<div class="clima-topo"><span style="font-size:13px;color:var(--cinza)">Clima não disponível</span></div>';
+   });
+}
+
 var CALENDARIO = {
  0:{fase:"granacao",faseTxt:"🟢 Granação",alertas:[{nivel:"alto",txt:"🟠 Ferrugem — alta umidade favorece infecção"},{nivel:"alto",txt:"🪲 Bicho-mineiro — pico populacional"},{nivel:"medio",txt:"🟣 Mancha aureolada — ventos e chuvas"}],acoes:["✅ Aplicar fungicida preventivo para ferrugem","✅ Monitorar folhas para trilhas de bicho-mineiro","✅ Adubação de cobertura — N e K parcelados"]},
  1:{fase:"granacao",faseTxt:"🟢 Granação",alertas:[{nivel:"alto",txt:"🟠 Ferrugem — período crítico"},{nivel:"alto",txt:"🪲 Bicho-mineiro — alta incidência"},{nivel:"medio",txt:"🫙 Antracnose — chuvas intensas"}],acoes:["✅ Reaplicar fungicida (21 dias após última aplicação)","✅ Controle de bicho-mineiro se >30% folhas com minas","✅ Verificar adubação fosfatada"]},
@@ -309,6 +376,7 @@ function identificarRegiao(lat, lon) {
  if (lat >= -21.0 && lat <= -17.0 && lon >= -41.5 && lon <= -39.0) return "Espírito Santo";
  return "Região Cafeeira";
 }
+
 function obterGPS() {
  if (!navigator.geolocation) { document.getElementById("regiaoTag").textContent = "📍 GPS não disponível"; return; }
  navigator.geolocation.getCurrentPosition(
@@ -319,8 +387,12 @@ function obterGPS() {
      var tag = "📍 " + dadosGPS.regiao;
      if (dadosGPS.altitude) tag += " · " + dadosGPS.altitude + "m";
      document.getElementById("regiaoTag").textContent = tag;
+     obterClima(dadosGPS.lat, dadosGPS.lon);
    },
-   function() { document.getElementById("regiaoTag").textContent = "📍 Localização não obtida"; },
+   function() {
+     document.getElementById("regiaoTag").textContent = "📍 Localização não obtida";
+     document.getElementById("cardClima").innerHTML = '<div class="clima-topo"><span style="font-size:13px;color:var(--cinza)">Ative o GPS para ver o clima</span></div>';
+   },
    { timeout: 8000, enableHighAccuracy: false }
  );
 }
