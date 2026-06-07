@@ -103,6 +103,7 @@ canvas { display: none; }
  <input id="gal" type="file" accept="image/*">
  <input id="vid" type="file" accept="video/*" capture="environment">
  <input id="solo" type="file" accept="image/*" capture="environment">
+ <input id="soloGal" type="file" accept="image/*">
  <canvas id="canvas"></canvas>
 
  <div class="secao-titulo">🌿 Diagnóstico de Folhas</div>
@@ -127,6 +128,11 @@ canvas { display: none; }
  <button class="btn-solo" id="btnSolo">
    <span class="btn-icon">🧪</span>
    <span class="btn-text">Fotografar Laudo de Solo<small>Interpreta NPK, pH e recomenda calagem</small></span>
+ </button>
+
+ <button class="btn-galeria" id="btnSoloGal">
+   <span class="btn-icon">📄</span>
+   <span class="btn-text">Laudo da Galeria<small>Use uma foto já tirada do laudo</small></span>
  </button>
 
  <div class="dica">
@@ -222,10 +228,12 @@ document.getElementById("btnCam").addEventListener("click", function() { documen
 document.getElementById("btnGal").addEventListener("click", function() { document.getElementById("gal").click(); });
 document.getElementById("btnVid").addEventListener("click", function() { document.getElementById("vid").click(); });
 document.getElementById("btnSolo").addEventListener("click", function() { document.getElementById("solo").click(); });
+document.getElementById("btnSoloGal").addEventListener("click", function() { document.getElementById("soloGal").click(); });
 document.getElementById("cam").addEventListener("change", function(e) { if (e.target.files[0]) processar(e.target.files[0], false); });
 document.getElementById("gal").addEventListener("change", function(e) { if (e.target.files[0]) processar(e.target.files[0], false); });
 document.getElementById("vid").addEventListener("change", function(e) { if (e.target.files[0]) processarVideo(e.target.files[0]); });
 document.getElementById("solo").addEventListener("change", function(e) { if (e.target.files[0]) processarSolo(e.target.files[0]); });
+document.getElementById("soloGal").addEventListener("change", function(e) { if (e.target.files[0]) processarSolo(e.target.files[0]); });
 
 function processar(file, isVideo) {
  document.getElementById("spinner").style.display = "block";
@@ -341,18 +349,14 @@ function enviarFrames(frames) {
 function mostrarResultadoSolo(data) {
  var div = document.getElementById("resultado");
  div.style.display = "block";
-
  var acao = data.acao || "Consulte um agrônomo para mais detalhes.";
  var textoVoz = "Análise de solo. " + acao;
-
  var html = '<div class="card-resultado">';
  html += '<div class="card-topo"><span class="card-emoji">🧪</span>';
  html += '<div class="card-titulo"><h2>Análise de Solo</h2><div class="categoria">Recomendação para Café</div></div></div>';
  html += '<div class="badges"><span class="badge badge-solo">🌱 Laudo Interpretado</span>';
  if (dadosGPS.regiao) html += '<span class="badge badge-regiao">📍 ' + dadosGPS.regiao + '</span>';
  html += '</div>';
-
- // Valores do solo
  if (data.valores) {
    html += '<div class="solo-grid">';
    var itens = data.valores;
@@ -368,14 +372,12 @@ function mostrarResultadoSolo(data) {
    }
    html += '</div>';
  }
-
  html += '<div class="divisor"></div>';
  html += '<div class="acao-box"><h3>Recomendação</h3><p>' + acao + '</p></div>';
  html += '<div class="btns-resultado">';
  html += '<button class="btn-voz" onclick="falar(\'' + textoVoz.replace(/'/g, "\\'") + '\')">🔊 Ouvir</button>';
  html += '<button class="btn-nova" onclick="resetar()">📷 Nova análise</button>';
  html += '</div></div>';
-
  div.innerHTML = html;
  falar(textoVoz);
 }
@@ -444,6 +446,7 @@ function resetar() {
  document.getElementById("gal").value = "";
  document.getElementById("vid").value = "";
  document.getElementById("solo").value = "";
+ document.getElementById("soloGal").value = "";
  window.scrollTo(0, 0);
 }
 </script>
