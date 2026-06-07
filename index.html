@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -29,6 +29,8 @@ body { font-family: 'DM Sans', sans-serif; background: var(--creme); min-height:
 .corpo { max-width: 420px; margin: 0 auto; padding: 24px 20px 40px; display: flex; flex-direction: column; gap: 14px; }
 .btn-foto { background: linear-gradient(135deg, var(--verde-claro), var(--verde)); color: white; border: none; border-radius: 18px; padding: 22px 28px; font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 4px 20px rgba(26,92,42,0.3); width: 100%; }
 .btn-foto:active { transform: scale(0.97); }
+.btn-video { background: linear-gradient(135deg, #1565c0, #0d47a1); color: white; border: none; border-radius: 18px; padding: 22px 28px; font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 4px 20px rgba(13,71,161,0.3); width: 100%; }
+.btn-video:active { transform: scale(0.97); }
 .btn-galeria { background: white; color: var(--verde); border: 2px solid #c8ddc8; border-radius: 18px; padding: 16px 28px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: transform 0.15s; width: 100%; }
 .btn-galeria:active { transform: scale(0.97); }
 .btn-icon { font-size: 26px; flex-shrink: 0; }
@@ -58,6 +60,7 @@ input { display: none; }
 .badge-confianca-media { background: #fff8e1; color: #f57f17; }
 .badge-confianca-baixa { background: #fce4ec; color: #c62828; }
 .badge-regiao { background: #e3f2fd; color: #1565c0; }
+.badge-video { background: #e8eaf6; color: #283593; }
 .visto-box { margin: 0 20px 16px; background: var(--creme); border-radius: 12px; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start; }
 .visto-box .visto-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
 .visto-box p { font-size: 13px; color: #555; line-height: 1.5; font-style: italic; }
@@ -72,6 +75,7 @@ input { display: none; }
 .btns-resultado { padding: 0 20px 20px; display: flex; gap: 10px; }
 .btn-voz { flex: 1; background: var(--verde); color: white; border: none; border-radius: 14px; padding: 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
 .btn-nova { flex: 1; background: var(--creme); color: var(--verde); border: 2px solid #c8ddc8; border-radius: 14px; padding: 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+canvas { display: none; }
 </style>
 </head>
 <body>
@@ -85,25 +89,37 @@ input { display: none; }
 <div class="corpo">
   <input id="cam" type="file" accept="image/*" capture="environment">
   <input id="gal" type="file" accept="image/*">
+  <input id="vid" type="file" accept="video/*" capture="environment">
+  <canvas id="canvas"></canvas>
+
   <button class="btn-foto" id="btnCam">
     <span class="btn-icon">📷</span>
-    <span class="btn-text">Fotografar a Folha<small>Abra a câmera e fotografe</small></span>
+    <span class="btn-text">Fotografar a Folha<small>Análise por foto única</small></span>
   </button>
+
+  <button class="btn-video" id="btnVid">
+    <span class="btn-icon">🎥</span>
+    <span class="btn-text">Gravar Vídeo da Folha<small>Mais preciso — mostra vários ângulos</small></span>
+  </button>
+
   <button class="btn-galeria" id="btnGal">
     <span class="btn-icon">🖼️</span>
     <span class="btn-text">Escolher da Galeria<small>Use uma foto já tirada</small></span>
   </button>
+
   <div class="dica">
     <span class="dica-icon">💡</span>
-    <p><strong>Dica:</strong> Fotografe a face inferior da folha também. A ferrugem aparece embaixo com pó alaranjado.</p>
+    <p><strong>Dica:</strong> Use o vídeo para mostrar a face inferior da folha também. A ferrugem aparece embaixo com pó alaranjado.</p>
   </div>
+
   <div id="spinner">
     <span class="spinner-folha">🔬</span>
-    <p>Analisando a folha...</p>
-    <small>Identificando sintomas e comparando padrões</small>
+    <p id="spinnerTexto">Analisando a folha...</p>
+    <small id="spinnerSub">Identificando sintomas e comparando padrões</small>
   </div>
   <div id="resultado"></div>
 </div>
+
 <script>
 var EMOJIS = {
   ferrugem:"🟠",bicho:"🪲",cercosporiose:"🔵",aureolada:"🟣",
@@ -113,7 +129,8 @@ var EMOJIS = {
   nematoide:"🪱",nitrogenio:"🌿",magnesio:"🟡",potassio:"🔥",
   fosforo:"💜",calcio:"🦴",enxofre:"🌕",boro:"🟦",
   zinco:"🫧",ferro:"🫨",manganes:"🟤",cobre:"🧡",
-  estresse_hidrico:"💧",fitotoxicidade:"⚗️",escaldadura:"☀️",saudavel:"✅"
+  estresse_hidrico:"💧",fitotoxicidade:"⚗️",escaldadura:"☀️",
+  fruto_verde:"🟢",fruto_maduro:"🔴",fruto_passado:"⚫",saudavel:"✅"
 };
 var NOMES_VOZ = {
   ferrugem:"Ferrugem do café",bicho:"Bicho mineiro",cercosporiose:"Cercosporiose",
@@ -126,7 +143,8 @@ var NOMES_VOZ = {
   calcio:"Deficiência de cálcio",enxofre:"Deficiência de enxofre",boro:"Deficiência de boro",
   zinco:"Deficiência de zinco",ferro:"Deficiência de ferro",manganes:"Deficiência de manganês",
   cobre:"Deficiência de cobre",estresse_hidrico:"Estresse hídrico",fitotoxicidade:"Fitotoxicidade",
-  escaldadura:"Escaldadura solar",saudavel:"Planta saudável"
+  escaldadura:"Escaldadura solar",fruto_verde:"Fruto verde saudável",fruto_maduro:"Fruto maduro para colheita",
+  fruto_passado:"Fruto passado do ponto",saudavel:"Planta saudável"
 };
 var CATEGORIAS = {
   ferrugem:"Doença Fúngica",bicho:"Praga",cercosporiose:"Doença Fúngica",
@@ -141,7 +159,8 @@ var CATEGORIAS = {
   zinco:"Deficiência Nutricional",ferro:"Deficiência Nutricional",
   manganes:"Deficiência Nutricional",cobre:"Deficiência Nutricional",
   estresse_hidrico:"Estresse Ambiental",fitotoxicidade:"Estresse Ambiental",
-  escaldadura:"Estresse Ambiental",saudavel:"Planta Saudável"
+  escaldadura:"Estresse Ambiental",fruto_verde:"Fruto",fruto_maduro:"Fruto",
+  fruto_passado:"Fruto",saudavel:"Planta Saudável"
 };
 var CORES_ESTAGIO = ["#4caf50","#8bc34a","#ffc107","#ff9800","#f44336"];
 
@@ -179,12 +198,16 @@ obterGPS();
 
 document.getElementById("btnCam").addEventListener("click", function() { document.getElementById("cam").click(); });
 document.getElementById("btnGal").addEventListener("click", function() { document.getElementById("gal").click(); });
-document.getElementById("cam").addEventListener("change", function(e) { if (e.target.files[0]) processar(e.target.files[0]); });
-document.getElementById("gal").addEventListener("change", function(e) { if (e.target.files[0]) processar(e.target.files[0]); });
+document.getElementById("btnVid").addEventListener("click", function() { document.getElementById("vid").click(); });
+document.getElementById("cam").addEventListener("change", function(e) { if (e.target.files[0]) processar(e.target.files[0], false); });
+document.getElementById("gal").addEventListener("change", function(e) { if (e.target.files[0]) processar(e.target.files[0], false); });
+document.getElementById("vid").addEventListener("change", function(e) { if (e.target.files[0]) processarVideo(e.target.files[0]); });
 
-function processar(file) {
+function processar(file, isVideo) {
   document.getElementById("spinner").style.display = "block";
   document.getElementById("resultado").style.display = "none";
+  document.getElementById("spinnerTexto").textContent = "Analisando a folha...";
+  document.getElementById("spinnerSub").textContent = "Identificando sintomas e comparando padrões";
   var reader = new FileReader();
   reader.onload = function(e) {
     var b64 = e.target.result.split(",")[1];
@@ -199,7 +222,7 @@ function processar(file) {
     .then(function(r) { return r.json(); })
     .then(function(data) {
       document.getElementById("spinner").style.display = "none";
-      mostrarResultado(data);
+      mostrarResultado(data, isVideo);
     })
     .catch(function() {
       document.getElementById("spinner").style.display = "none";
@@ -211,7 +234,82 @@ function processar(file) {
   reader.readAsDataURL(file);
 }
 
-function mostrarResultado(data) {
+function processarVideo(file) {
+  document.getElementById("spinner").style.display = "block";
+  document.getElementById("resultado").style.display = "none";
+  document.getElementById("spinnerTexto").textContent = "Extraindo frames do vídeo...";
+  document.getElementById("spinnerSub").textContent = "Analisando múltiplos ângulos para maior precisão";
+
+  var video = document.createElement("video");
+  var canvas = document.getElementById("canvas");
+  var ctx = canvas.getContext("2d");
+  var url = URL.createObjectURL(file);
+  video.src = url;
+  video.muted = true;
+
+  video.addEventListener("loadedmetadata", function() {
+    var duration = video.duration;
+    var frames = [];
+    var tempos = [
+      duration * 0.15,
+      duration * 0.35,
+      duration * 0.60,
+      duration * 0.85
+    ];
+    var idx = 0;
+
+    function capturarFrame() {
+      if (idx >= tempos.length) {
+        URL.revokeObjectURL(url);
+        enviarFrames(frames);
+        return;
+      }
+      video.currentTime = tempos[idx];
+    }
+
+    video.addEventListener("seeked", function() {
+      canvas.width = 640;
+      canvas.height = 480;
+      ctx.drawImage(video, 0, 0, 640, 480);
+      var b64 = canvas.toDataURL("image/jpeg", 0.7).split(",")[1];
+      frames.push(b64);
+      idx++;
+      capturarFrame();
+    });
+
+    capturarFrame();
+  });
+
+  video.load();
+}
+
+function enviarFrames(frames) {
+  document.getElementById("spinnerTexto").textContent = "Analisando " + frames.length + " ângulos...";
+  document.getElementById("spinnerSub").textContent = "Comparando padrões para diagnóstico preciso";
+
+  var body = { frames: frames, tipo: "image/jpeg" };
+  if (dadosGPS.regiao) body.regiao = dadosGPS.regiao;
+  if (dadosGPS.altitude) body.altitude = dadosGPS.altitude;
+
+  fetch("https://doutor-cafe-production.up.railway.app/diagnostico-video", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify(body)
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    document.getElementById("spinner").style.display = "none";
+    mostrarResultado(data, true);
+  })
+  .catch(function() {
+    document.getElementById("spinner").style.display = "none";
+    var div = document.getElementById("resultado");
+    div.style.display = "block";
+    div.innerHTML = '<div class="card-resultado"><div class="acao-box"><p>⚠️ Erro ao analisar. Verifique sua conexão e tente novamente.</p></div><div class="btns-resultado"><button class="btn-nova" onclick="resetar()">📷 Tentar novamente</button></div></div>';
+  });
+}
+
+function mostrarResultado(data, isVideo) {
   var div = document.getElementById("resultado");
   div.style.display = "block";
   var diag = data.diagnostico || "saudavel";
@@ -238,6 +336,7 @@ function mostrarResultado(data) {
   html += '<span class="badge badge-estagio">📊 Estágio ' + estagio + '/5</span>';
   html += '<span class="badge ' + badgeClass + '">' + badgeTexto + '</span>';
   if (dadosGPS.regiao) html += '<span class="badge badge-regiao">📍 ' + dadosGPS.regiao + '</span>';
+  if (isVideo) html += '<span class="badge badge-video">🎥 Análise por vídeo</span>';
   html += '</div>';
   if (visto) html += '<div class="visto-box"><span class="visto-icon">👁️</span><p>"' + visto + '"</p></div>';
   html += '<div class="divisor"></div>';
@@ -266,6 +365,7 @@ function resetar() {
   document.getElementById("resultado").style.display = "none";
   document.getElementById("cam").value = "";
   document.getElementById("gal").value = "";
+  document.getElementById("vid").value = "";
   window.scrollTo(0, 0);
 }
 </script>
