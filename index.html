@@ -172,22 +172,13 @@ canvas { display: none; }
  <input id="soloGal" type="file" accept="image/*">
  <canvas id="canvas"></canvas>
 
+ <!-- 1. DIAGNÓSTICO -->
  <div class="secao-titulo">🌿 Diagnóstico de Folhas e Frutos</div>
  <button class="btn-foto" id="btnCam"><span class="btn-icon">📷</span><span class="btn-text">Fotografar a Folha<small>Análise por foto única</small></span></button>
  <button class="btn-video" id="btnVid"><span class="btn-icon">🎥</span><span class="btn-text">Gravar Vídeo da Folha<small>Mais preciso — vários ângulos</small></span></button>
  <button class="btn-galeria" id="btnGal"><span class="btn-icon">🖼️</span><span class="btn-text">Escolher da Galeria<small>Use uma foto já tirada</small></span></button>
 
- <div class="secao-titulo" style="margin-top:4px">🌱 Análise de Solo</div>
- <div class="solo-row">
-   <button class="btn-solo" id="btnSolo"><span class="btn-icon">🧪</span><span class="btn-text">Fotografar Laudo<small>Câmera</small></span></button>
-   <button class="btn-solo-gal" id="btnSoloGal"><span class="btn-icon">📄</span><span class="btn-text">Laudo da Galeria<small>Foto já tirada</small></span></button>
- </div>
-
- <div class="dica">
-   <span style="font-size:16px;flex-shrink:0;margin-top:1px">💡</span>
-   <p><strong>Dica:</strong> Fotografe a face inferior da folha também. A ferrugem aparece embaixo com pó alaranjado.</p>
- </div>
-
+ <!-- SPINNER E RESULTADO AQUI -->
  <div id="spinner">
    <span class="spinner-folha">🔬</span>
    <p id="spinnerTexto">Analisando...</p>
@@ -195,14 +186,30 @@ canvas { display: none; }
  </div>
  <div id="resultado"></div>
 
+ <!-- 2. SOLO -->
+ <div class="secao-titulo" style="margin-top:4px">🌱 Análise de Solo</div>
+ <div class="solo-row">
+   <button class="btn-solo" id="btnSolo"><span class="btn-icon">🧪</span><span class="btn-text">Fotografar Laudo<small>Câmera</small></span></button>
+   <button class="btn-solo-gal" id="btnSoloGal"><span class="btn-icon">📄</span><span class="btn-text">Laudo da Galeria<small>Foto já tirada</small></span></button>
+ </div>
+
+ <!-- 3. DICA -->
+ <div class="dica">
+   <span style="font-size:16px;flex-shrink:0;margin-top:1px">💡</span>
+   <p><strong>Dica:</strong> Fotografe a face inferior da folha também. A ferrugem aparece embaixo com pó alaranjado.</p>
+ </div>
+
+ <!-- 4. CLIMA -->
  <div class="secao-titulo" style="margin-top:4px">🌤️ Clima e Risco Agora</div>
  <div class="card-clima" id="cardClima">
    <div class="clima-topo"><span style="font-size:13px;color:var(--cinza)">Obtendo clima...</span></div>
  </div>
 
+ <!-- 5. CALENDÁRIO -->
  <div class="secao-titulo" style="margin-top:4px">📅 Calendário Fitossanitário</div>
  <div class="card-calendario" id="cardCalendario"></div>
 
+ <!-- 6. HISTÓRICO -->
  <div class="secao-titulo" style="margin-top:4px">📋 Histórico de Análises</div>
  <div class="card-historico" id="cardHistorico"></div>
 </div>
@@ -213,7 +220,7 @@ var ultimaFotoBase64 = null;
 var EMOJIS = {
  ferrugem:"🟠",bicho:"🪲",cercosporiose:"🔵",aureolada:"🟣",
  phoma:"⚫",antracnose:"🫙",ascochyta:"🟤",manteigosa:"🫧",
- roseliniose:"💀",helmintosporiose:"🔴",broca:"🕳",acaro:"🟫",
+ roseliniose:"💀",helmintosporiose:"🔴",broca:"🕳️",acaro:"🟫",
  acaro_ferrugem:"🟥",cigarra:"🦗",cochonilha:"🤍",lagarta:"🐛",
  nematoide:"🪱",nitrogenio:"🌿",magnesio:"🟡",potassio:"🔥",
  fosforo:"💜",calcio:"🦴",enxofre:"🌕",boro:"🟦",
@@ -398,7 +405,12 @@ document.getElementById("btnVid").addEventListener("click", function() { documen
 document.getElementById("btnSolo").addEventListener("click", function() { document.getElementById("solo").click(); });
 document.getElementById("btnSoloGal").addEventListener("click", function() { document.getElementById("soloGal").click(); });
 document.getElementById("cam").addEventListener("change", function(e) { if (e.target.files[0]) processar(e.target.files[0], false); });
-document.getElementById("gal").addEventListener("change", function(e) { if (e.target.files[0]) processar(e.target.files[0], false); });
+document.getElementById("gal").addEventListener("change", function(e) {
+ if (!e.target.files[0]) return;
+ var file = e.target.files[0];
+ if (file.type.startsWith("video/")) { processarVideo(file); }
+ else { processar(file, false); }
+});
 document.getElementById("vid").addEventListener("change", function(e) { if (e.target.files[0]) processarVideo(e.target.files[0]); });
 document.getElementById("solo").addEventListener("change", function(e) { if (e.target.files[0]) processarSolo(e.target.files[0]); });
 document.getElementById("soloGal").addEventListener("change", function(e) { if (e.target.files[0]) processarSolo(e.target.files[0]); });
@@ -521,11 +533,9 @@ function mostrarResultado(data, isVideo) {
  var regiao = dadosGPS.regiao || "";
  var fotoB64 = ultimaFotoBase64;
  salvarHistorico(diag, emoji, acao, regiao, fotoB64);
-
  var thumbHtml = fotoB64
    ? '<img class="card-foto-thumb" src="data:image/jpeg;base64,' + fotoB64 + '" alt="foto analisada">'
    : '<div class="card-foto-thumb-placeholder">' + emoji + '</div>';
-
  var html = '<div class="card-resultado">';
  html += '<div class="card-topo">' + thumbHtml;
  html += '<div class="card-titulo"><h2>' + nome + '</h2><div class="categoria">' + cat + '</div></div></div>';
@@ -555,11 +565,9 @@ function mostrarResultadoSolo(data) {
  var acao = data.acao || "Consulte um agrônomo para mais detalhes.";
  var textoVoz = "Análise de solo. " + acao;
  var fotoB64 = ultimaFotoBase64;
-
  var thumbHtml = fotoB64
    ? '<img class="card-foto-thumb" src="data:image/jpeg;base64,' + fotoB64 + '" alt="laudo">'
    : '<div class="card-foto-thumb-placeholder">🧪</div>';
-
  var html = '<div class="card-resultado"><div class="card-topo">' + thumbHtml;
  html += '<div class="card-titulo"><h2>Análise de Solo</h2><div class="categoria">Recomendação para Café</div></div></div>';
  html += '<div class="badges"><span class="badge badge-solo">🌱 Laudo Interpretado</span>';
