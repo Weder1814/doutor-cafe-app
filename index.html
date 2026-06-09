@@ -1,128 +1,656 @@
-var express = require("express");
-var cors = require("cors");
-var app = express();
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doutor Café</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --verde: #1a5c2a;
+  --verde-claro: #2d8a3e;
+  --verde-neon: #5dde74;
+  --creme: #f5f0e8;
+  --marrom: #3d2b1a;
+  --cinza: #7a8a7c;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--creme); min-height: 100vh; overflow-x: hidden; }
 
-app.use(cors());
-app.use(express.json({ limit: "50mb" }));
+.header { width: 100%; position: relative; overflow: hidden; padding: 28px 24px 40px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.header-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+.header-overlay { position: absolute; inset: 0; background: linear-gradient(160deg, rgba(8,25,12,0.85) 0%, rgba(20,70,35,0.72) 50%, rgba(8,20,10,0.88) 100%); z-index: 1; }
+.header-content { position: relative; z-index: 2; }
+.logo-icon { font-size: 38px; display: block; margin-bottom: 6px; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5)); }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+.header h1 { font-family: 'Playfair Display', serif; font-size: 34px; color: white; letter-spacing: -0.5px; text-shadow: 0 2px 16px rgba(0,0,0,0.5); }
+.header h1 span { color: var(--verde-neon); }
+.header .sub { color: rgba(255,255,255,0.55); font-size: 12px; margin-top: 4px; letter-spacing: 1px; text-transform: uppercase; }
+.regiao-tag { display: inline-block; margin-top: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 4px 14px; font-size: 12px; color: rgba(255,255,255,0.85); }
+.wave { display: block; height: 36px; background: var(--creme); clip-path: ellipse(55% 100% at 50% 100%); margin-top: -1px; position: relative; z-index: 3; }
+.corpo { max-width: 420px; margin: 0 auto; padding: 16px 20px 40px; display: flex; flex-direction: column; gap: 12px; }
+.secao-titulo { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--cinza); padding: 4px 4px 0; }
 
-app.get("/", function(req, res) {
-  res.json({ status: "online", app: "Doutor Cafe API" });
-});
+.card-clima { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
+.clima-topo { padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
+.clima-dados { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; border-top: 1px solid #f0f0f0; }
+.clima-item { padding: 12px 14px; text-align: center; border-right: 1px solid #f0f0f0; }
+.clima-item:last-child { border-right: none; }
+.clima-valor { font-size: 20px; font-weight: 700; color: var(--marrom); }
+.clima-label { font-size: 10px; color: var(--cinza); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+.risco-box { margin: 0 18px 14px; border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
+.risco-baixo { background: #e8f5e9; }
+.risco-medio { background: #fff8e1; }
+.risco-alto { background: #fff3e0; }
+.risco-critico { background: #fce4ec; }
+.risco-icon { font-size: 20px; flex-shrink: 0; }
+.risco-info { flex: 1; }
+.risco-titulo { font-size: 13px; font-weight: 700; }
+.risco-baixo .risco-titulo { color: #2e7d32; }
+.risco-medio .risco-titulo { color: #f57f17; }
+.risco-alto .risco-titulo { color: #e65100; }
+.risco-critico .risco-titulo { color: #c62828; }
+.risco-desc { font-size: 11px; color: #666; margin-top: 2px; line-height: 1.4; }
 
-app.post("/diagnostico", function(req, res) {
-  var imagem = req.body.imagem;
-  var tipo = req.body.tipo || "image/jpeg";
-  var regiao = req.body.regiao || null;
-  var altitude = req.body.altitude || null;
-  var KEY = process.env.ANTHROPIC_API_KEY;
-  var prompt = buildPrompt(regiao, altitude, false);
-  fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "x-api-key": KEY, "anthropic-version": "2023-06-01" },
-    body: JSON.stringify({
-      model: "claude-opus-4-5",
-      max_tokens: 800,
-      messages: [{ role: "user", content: [
-        { type: "image", source: { type: "base64", media_type: tipo, data: imagem }},
-        { type: "text", text: prompt }
-      ]}]
-    })
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(d) {
-    var txt = d.content && d.content[0] ? d.content[0].text : "";
-    var m = txt.match(/\{[\s\S]*\}/);
-    if (m) { res.json(JSON.parse(m[0])); }
-    else { res.json({ diagnosticos: [{ diagnostico: "saudavel", estagio: 1, confianca: "media", visto: "", acao: "Nao foi possivel analisar. Tente novamente." }] }); }
-  })
-  .catch(function(e) { res.status(500).json({ erro: e.message }); });
-});
+.card-calendario { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
+.cal-header { padding: 16px 18px 12px; display: flex; align-items: center; justify-content: space-between; }
+.cal-mes { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--marrom); font-weight: 700; }
+.cal-fase { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+.fase-florada { background: #fff8e1; color: #f57f17; }
+.fase-granacao { background: #e8f5e9; color: #2e7d32; }
+.fase-maturacao { background: #fff3e0; color: #e65100; }
+.fase-colheita { background: #fce4ec; color: #c62828; }
+.fase-pos { background: #e8eaf6; color: #283593; }
+.fase-repouso { background: #f3e5f5; color: #6a1b9a; }
+.cal-divisor { height: 1px; background: #f0f0f0; margin: 0 18px; }
+.cal-alertas { padding: 12px 18px; }
+.cal-alertas h4 { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--cinza); margin-bottom: 8px; }
+.alerta-item { margin-bottom: 6px; }
+.alerta-alto { color: #c62828; font-weight: 600; font-size: 13px; }
+.alerta-medio { color: #e65100; font-weight: 600; font-size: 13px; }
+.cal-acoes { padding: 0 18px 14px; }
+.cal-acoes h4 { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--cinza); margin-bottom: 8px; }
+.acao-item { font-size: 13px; color: #444; line-height: 1.4; margin-bottom: 5px; }
 
-app.post("/diagnostico-video", function(req, res) {
-  var frames = req.body.frames;
-  var regiao = req.body.regiao || null;
-  var altitude = req.body.altitude || null;
-  var KEY = process.env.ANTHROPIC_API_KEY;
-  if (!frames || frames.length === 0) return res.status(400).json({ erro: "Nenhum frame recebido." });
-  var prompt = buildPrompt(regiao, altitude, true);
-  var content = [];
-  frames.forEach(function(frame, i) {
-    content.push({ type: "text", text: "Frame " + (i+1) + " de " + frames.length + ":" });
-    content.push({ type: "image", source: { type: "base64", media_type: "image/jpeg", data: frame }});
-  });
-  content.push({ type: "text", text: prompt });
-  fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "x-api-key": KEY, "anthropic-version": "2023-06-01" },
-    body: JSON.stringify({ model: "claude-opus-4-5", max_tokens: 800, messages: [{ role: "user", content: content }] })
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(d) {
-    var txt = d.content && d.content[0] ? d.content[0].text : "";
-    var m = txt.match(/\{[\s\S]*\}/);
-    if (m) { res.json(JSON.parse(m[0])); }
-    else { res.json({ diagnosticos: [{ diagnostico: "saudavel", estagio: 1, confianca: "media", visto: "", acao: "Nao foi possivel analisar. Tente novamente." }] }); }
-  })
-  .catch(function(e) { res.status(500).json({ erro: e.message }); });
-});
+.btn-foto { background: linear-gradient(135deg, var(--verde-claro), var(--verde)); color: white; border: none; border-radius: 16px; padding: 18px 24px; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 12px; width: 100%; box-shadow: 0 4px 16px rgba(26,92,42,0.25); transition: transform 0.15s; }
+.btn-foto:active { transform: scale(0.97); }
+.btn-video { background: linear-gradient(135deg, #1565c0, #0d47a1); color: white; border: none; border-radius: 16px; padding: 18px 24px; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 12px; width: 100%; box-shadow: 0 4px 16px rgba(13,71,161,0.25); transition: transform 0.15s; }
+.btn-video:active { transform: scale(0.97); }
+.btn-galeria { background: white; color: var(--verde); border: 2px solid #c8ddc8; border-radius: 16px; padding: 14px 24px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; width: 100%; transition: transform 0.15s; }
+.btn-galeria:active { transform: scale(0.97); }
+.solo-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn-solo { background: linear-gradient(135deg, #795548, #4e342e); color: white; border: none; border-radius: 16px; padding: 16px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; box-shadow: 0 4px 16px rgba(78,52,46,0.25); transition: transform 0.15s; }
+.btn-solo:active { transform: scale(0.97); }
+.btn-solo-gal { background: white; color: #4e342e; border: 2px solid #d7c4bb; border-radius: 16px; padding: 16px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; transition: transform 0.15s; }
+.btn-solo-gal:active { transform: scale(0.97); }
+.btn-icon { font-size: 22px; flex-shrink: 0; }
+.btn-text { text-align: left; line-height: 1.3; }
+.btn-text small { display: block; font-weight: 400; font-size: 11px; opacity: 0.7; margin-top: 2px; }
+input { display: none; }
+.dica { background: white; border-radius: 14px; padding: 12px 14px; display: flex; align-items: flex-start; gap: 10px; border-left: 3px solid var(--verde-neon); }
+.dica p { font-size: 12px; color: var(--cinza); line-height: 1.5; }
+.dica strong { color: var(--marrom); }
+#spinner { display: none; background: white; border-radius: 20px; padding: 32px 20px; text-align: center; box-shadow: 0 2px 16px rgba(0,0,0,0.07); }
+.spinner-folha { font-size: 40px; animation: spin-pulse 1.2s ease-in-out infinite; display: block; margin-bottom: 12px; }
+@keyframes spin-pulse { 0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; } 50% { transform: scale(1.15) rotate(10deg); opacity: 0.7; } }
+#spinner p { color: var(--verde); font-weight: 700; font-size: 16px; }
+#spinner small { color: var(--cinza); font-size: 12px; margin-top: 4px; display: block; }
+#resultado { display: none; }
 
-app.post("/analise-solo", function(req, res) {
-  var imagem = req.body.imagem;
-  var tipo = req.body.tipo || "image/jpeg";
-  var regiao = req.body.regiao || null;
-  var KEY = process.env.ANTHROPIC_API_KEY;
-  var contexto = regiao ? " O produtor esta na regiao " + regiao + "." : "";
-  var prompt = "Voce e o Doutor Cafe, agronomista especialista em cafeicultura brasileira." + contexto + "\n\nAnalise este laudo de analise de solo e faca recomendacoes especificas para o cultivo de cafe arabica.\n\nPARAMETROS IDEAIS PARA CAFE ARABICA:\npH CaCl2: 5.5 a 6.0\nMateria Organica: acima de 3%\nFosforo P: acima de 20 mg/dm3\nPotassio K: acima de 3.0 mmolc/dm3\nCalcio Ca: acima de 15 mmolc/dm3\nMagnesio Mg: acima de 5 mmolc/dm3\nSaturacao de Bases V%: acima de 50%\nBoro B: acima de 0.5 mg/dm3\nZinco Zn: acima de 1.5 mg/dm3\n\nSe houver mais de uma amostra use os valores da primeira.\n\nRESPONDA SOMENTE JSON sem texto extra:\n{\"acao\":\"recomendacao completa em linguagem simples para o produtor incluindo se precisa de calagem e quanto de NPK por hectare\",\"valores\":{\"pH\":{\"valor\":\"valor\",\"status\":\"ok|baixo|alto\"},\"MO\":{\"valor\":\"valor\",\"status\":\"ok|baixo|alto\"},\"P\":{\"valor\":\"valor\",\"status\":\"ok|baixo|alto\"},\"K\":{\"valor\":\"valor\",\"status\":\"ok|baixo|alto\"},\"Ca\":{\"valor\":\"valor\",\"status\":\"ok|baixo|alto\"},\"Mg\":{\"valor\":\"valor\",\"status\":\"ok|baixo|alto\"},\"V%\":{\"valor\":\"valor\",\"status\":\"ok|baixo|alto\"}}}";
-  fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "x-api-key": KEY, "anthropic-version": "2023-06-01" },
-    body: JSON.stringify({
-      model: "claude-opus-4-5",
-      max_tokens: 1200,
-      messages: [{ role: "user", content: [
-        { type: "image", source: { type: "base64", media_type: tipo, data: imagem }},
-        { type: "text", text: prompt }
-      ]}]
-    })
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(d) {
-    var txt = d.content && d.content[0] ? d.content[0].text : "";
-    var m = txt.match(/\{[\s\S]*\}/);
-    if (m) { res.json(JSON.parse(m[0])); }
-    else { res.json({ acao: "Nao foi possivel ler o laudo. Verifique a foto e tente novamente.", valores: {} }); }
-  })
-  .catch(function(e) { res.status(500).json({ erro: e.message }); });
-});
+/* MÚLTIPLOS DIAGNÓSTICOS */
+.card-resultado { background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.1); animation: slideUp 0.4s ease; }
+.multi-header { padding: 16px 20px 8px; display: flex; align-items: center; gap: 12px; }
+.multi-foto { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; flex-shrink: 0; border: 2px solid #f0f0f0; }
+.multi-foto-placeholder { width: 60px; height: 60px; border-radius: 12px; background: var(--creme); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+.multi-titulo { flex: 1; }
+.multi-titulo h3 { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--marrom); }
+.multi-titulo p { font-size: 11px; color: var(--cinza); margin-top: 2px; }
+.diag-item { border-top: 1px solid #f0f0f0; padding: 14px 20px; }
+.diag-item-topo { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.diag-emoji { font-size: 28px; flex-shrink: 0; }
+.diag-nome { font-family: 'Playfair Display', serif; font-size: 17px; color: var(--marrom); text-transform: capitalize; font-weight: 700; }
+.diag-cat { font-size: 10px; color: var(--cinza); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+.diag-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.diag-visto { background: var(--creme); border-radius: 10px; padding: 8px 12px; font-size: 12px; color: #555; font-style: italic; line-height: 1.4; margin-bottom: 8px; }
+.diag-acao { font-size: 13px; color: var(--marrom); line-height: 1.5; font-weight: 500; }
+.diag-bar { display: flex; gap: 3px; margin-bottom: 8px; }
+.diag-seg { flex: 1; height: 6px; border-radius: 3px; background: #e8e8e8; }
 
-function buildPrompt(regiao, altitude, isVideo) {
-  var contextoRegional = "";
-  if (regiao) {
-    var deficienciasRegiao = {
-      "Cerrado Mineiro": "solos acidos com deficiencia frequente de Calcio, Magnesio e Boro. Alta incidencia de ferrugem em anos umidos.",
-      "Sul de Minas": "altitudes acima de 800m favorecem Phoma e Cercosporiose. Solos com boa fertilidade mas risco de deficiencia de Zinco.",
-      "Mogiana": "regiao quente com risco de acaro vermelho em periodos secos. Deficiencia de Potassio comum.",
-      "Matas de Minas": "alta umidade favorece ferrugem e bicho-mineiro. Solos com deficiencia de Fosforo e Magnesio.",
-      "Chapada Diamantina": "altitude elevada favorece Phoma. Solos rasos com deficiencia de Nitrogenio e Boro.",
-      "Planalto da Bahia": "clima seco favorece acaro e estresse hidrico. Deficiencia de Ferro em solos alcalinos.",
-      "Rondonia": "alta umidade e temperatura favorecem ferrugem e antracnose. Solos acidos com deficiencia de Calcio.",
-      "Norte do Parana": "geadas podem causar fitotoxicidade. Solos ferteis mas risco de deficiencia de Manganes.",
-      "Espirito Santo": "cafeeiros conillon predominantes. Alta umidade favorece cercosporiose e cochonilha.",
-      "Alta Paulista": "clima quente e seco favorece acaro vermelho. Deficiencia de Zinco frequente."
-    };
-    var info = deficienciasRegiao[regiao] || "regiao cafeeira brasileira.";
-    contextoRegional = "\n\nCONTEXTO REGIONAL: Produtor na regiao " + regiao + ". " + info;
-    if (altitude) {
-      contextoRegional += " Altitude: " + altitude + "m.";
-      if (altitude > 900) contextoRegional += " Altitude alta aumenta risco de Phoma.";
-      if (altitude < 600) contextoRegional += " Altitude baixa aumenta risco de ferrugem e acaro.";
-    }
-  }
-  var introVideo = isVideo ? "Voce recebeu multiplos frames de um video da mesma planta. Analise TODOS os frames em conjunto para um diagnostico mais preciso.\n\n" : "";
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.card-topo { padding: 20px 20px 16px; display: flex; align-items: center; gap: 14px; }
+.card-foto-thumb { width: 72px; height: 72px; border-radius: 14px; object-fit: cover; flex-shrink: 0; border: 2px solid #f0f0f0; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+.card-foto-thumb-placeholder { width: 72px; height: 72px; border-radius: 14px; background: var(--creme); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+.card-titulo h2 { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--marrom); text-transform: capitalize; }
+.card-titulo .categoria { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--cinza); margin-top: 2px; }
+.badges { padding: 0 20px 16px; display: flex; gap: 8px; flex-wrap: wrap; }
+.badge { border-radius: 30px; padding: 5px 12px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+.badge-estagio { background: #fff3e0; color: #e65100; }
+.badge-confianca-alta { background: #e8f5e9; color: #2e7d32; }
+.badge-confianca-media { background: #fff8e1; color: #f57f17; }
+.badge-confianca-baixa { background: #fce4ec; color: #c62828; }
+.badge-regiao { background: #e3f2fd; color: #1565c0; }
+.badge-video { background: #e8eaf6; color: #283593; }
+.badge-solo { background: #efebe9; color: #4e342e; }
+.visto-box { margin: 0 20px 16px; background: var(--creme); border-radius: 12px; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start; }
+.visto-box .visto-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.visto-box p { font-size: 13px; color: #555; line-height: 1.5; font-style: italic; }
+.divisor { height: 1px; background: #f0f0f0; margin: 0 20px; }
+.acao-box { padding: 16px 20px; }
+.acao-box h3 { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--cinza); margin-bottom: 8px; }
+.acao-box p { font-size: 15px; color: var(--marrom); line-height: 1.6; font-weight: 500; }
+.estagio-box { padding: 0 20px 16px; }
+.estagio-box h3 { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--cinza); margin-bottom: 8px; }
+.estagio-bar { display: flex; gap: 4px; }
+.estagio-seg { flex: 1; height: 8px; border-radius: 4px; background: #e8e8e8; transition: background 0.3s; }
+.btns-resultado { padding: 12px 20px 20px; display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-voz { flex: 1; min-width: 80px; background: var(--verde); color: white; border: none; border-radius: 14px; padding: 13px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.btn-nova { flex: 1; min-width: 80px; background: var(--creme); color: var(--verde); border: 2px solid #c8ddc8; border-radius: 14px; padding: 13px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.btn-share { flex: 1; min-width: 80px; background: #25D366; color: white; border: none; border-radius: 14px; padding: 13px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.solo-grid { padding: 0 20px 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.solo-item { background: var(--creme); border-radius: 10px; padding: 10px 12px; }
+.solo-item .solo-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--cinza); }
+.solo-item .solo-valor { font-size: 16px; font-weight: 700; color: var(--marrom); margin-top: 2px; }
+.solo-item .solo-status { font-size: 11px; margin-top: 2px; }
+.solo-ok { color: #2e7d32; }
+.solo-baixo { color: #c62828; }
+.solo-alto { color: #e65100; }
+.card-historico { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
+.hist-header { padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
+.hist-titulo { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--marrom); font-weight: 700; }
+.hist-limpar { font-size: 11px; color: var(--cinza); cursor: pointer; text-decoration: underline; background: none; border: none; font-family: 'DM Sans', sans-serif; }
+.hist-lista { padding: 0 18px 14px; display: flex; flex-direction: column; gap: 8px; }
+.hist-item { display: flex; align-items: center; gap: 10px; background: var(--creme); border-radius: 12px; padding: 10px 12px; }
+.hist-thumb { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+.hist-thumb-placeholder { width: 44px; height: 44px; border-radius: 10px; background: #e8e8e8; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+.hist-info { flex: 1; }
+.hist-nome { font-size: 13px; font-weight: 700; color: var(--marrom); text-transform: capitalize; }
+.hist-data { font-size: 11px; color: var(--cinza); margin-top: 2px; }
+.hist-vazio { padding: 16px 18px; font-size: 13px; color: var(--cinza); text-align: center; }
+canvas { display: none; }
+</style>
+</head>
+<body>
 
-  return "Voce e o Doutor Cafe, fitopatologista especialista em cafeicultura brasileira com 20 anos de experiencia." + contextoRegional + "\n\n" + introVideo + "Analise esta imagem com MAXIMA ATENCAO. Pode ser folha OU fruto de cafe.\n\nSE FOR FOLHA - CRITERIOS OBRIGATORIOS:\nferrugem=po ou pustulas ALARANJADAS na face INFERIOR.\nbicho=TRILHAS SERPENTINAS ou galerias dentro da folha.\ncercosporiose=manchas CIRCULARES PEQUENAS centro cinza halo amarelo FINO uniforme.\naureolada=manchas GRANDES ESCURAS HALO AMARELO GRANDE irregular SECA DE RAMOS.\nphoma=manchas escuras necroticas SEM halo grande em FOLHAS NOVAS no TOPO da planta.\nantracnose=lesoes escuras afundadas quase pretas necrose definida.\ncalcio=folhas NOVAS deformadas ENCURVADAS ponteiros mortos morte de apices.\nnitrogenio=folha TODA AMARELA UNIFORME clorose em folhas VELHAS primeiro.\nmagnesio=nervuras VERDES tecido AMARELO internerval clorose entre nervuras folhas VELHAS.\npotassio=QUEIMA bordas e PONTAS folhas VELHAS amarelamento marginal.\nfosforo=folhas ESCURECIDAS cor verde-escura a preta brilho opaco folhas VELHAS.\ncobre=manchas NECROTICAS folhas pequenas deformadas bordas cloroticas folhas NOVAS.\nmanganes=PONTUACOES ou manchas cloroticas pequenas dispersas folhas NOVAS.\nboro=folhas NOVAS pequenas QUEBRADICAS DEFORMADAS ponteiros mortos.\nzinco=folhas NOVAS pequenas ESTREITAS aspecto ROSETA entrenós curtos.\nferro=folhas NOVAS amarelo-claras a ESBRANQUICADAS NERVURAS VERDES clorose internerval intensa.\nenxofre=folhas NOVAS amarelas UNIFORMES com nervuras verdes.\nmolibdenio=AMARELAMENTO nas MARGENS das folhas velhas.\nniquel=NECROSE DO APICE folhas novas ponta da folha morre primeiro.\nacaro=folha BRONZEADA acinzentada sem brilho.\nestresse_hidrico=folha MURCHA opaca bordas secas enrolamento.\n\nSE FOR FRUTO:\nbroca=FURO CIRCULAR no fruto orificio central.\nantracnose=lesoes escuras AFUNDADAS necroticas nos frutos.\nfruto_verde=fruto verde saudavel.\nfruto_maduro=fruto cereja vermelho ou amarelo pronto colheita.\nfruto_passado=fruto seco mumificado apos ponto ideal.\n\nIMPORTANTE: Se houver MULTIPLOS problemas visiveis na imagem, liste TODOS. Retorne ate 3 diagnosticos ordenados por gravidade.\n\nResponda SOMENTE JSON:\n{\"diagnosticos\":[{\"diagnostico\":\"nome\",\"estagio\":1,\"confianca\":\"alta|media|baixa\",\"visto\":\"descreva em 1 frase o sinal visual\",\"acao\":\"o que fazer agora em linguagem simples\"},{\"diagnostico\":\"nome2\",\"estagio\":1,\"confianca\":\"alta|media|baixa\",\"visto\":\"sinal visual\",\"acao\":\"acao\"}]}";
+<div class="header">
+  <img class="header-img" src="cafe.jpg.jpeg" alt="Café">
+  <div class="header-overlay"></div>
+  <div class="header-content">
+    <span class="logo-icon">🌿</span>
+    <h1>Doutor <span>Café</span></h1>
+    <div class="sub">O agrônomo no seu bolso</div>
+    <div class="regiao-tag" id="regiaoTag">📍 Localizando...</div>
+  </div>
+</div>
+<div class="wave"></div>
+
+<div class="corpo">
+  <input id="cam" type="file" accept="image/*" capture="environment">
+  <input id="gal" type="file" accept="image/*,video/*">
+  <input id="vid" type="file" accept="video/*" capture="environment">
+  <input id="solo" type="file" accept="image/*" capture="environment">
+  <input id="soloGal" type="file" accept="image/*">
+  <canvas id="canvas"></canvas>
+
+  <div class="secao-titulo">🌿 Diagnóstico de Folhas e Frutos</div>
+  <button class="btn-foto" id="btnCam"><span class="btn-icon">📷</span><span class="btn-text">Fotografar a Folha<small>Análise por foto única</small></span></button>
+  <button class="btn-video" id="btnVid"><span class="btn-icon">🎥</span><span class="btn-text">Gravar Vídeo da Folha<small>Mais preciso — vários ângulos</small></span></button>
+  <button class="btn-galeria" id="btnGal"><span class="btn-icon">🖼️</span><span class="btn-text">Escolher da Galeria<small>Use uma foto já tirada</small></span></button>
+
+  <div id="spinner">
+    <span class="spinner-folha">🔬</span>
+    <p id="spinnerTexto">Analisando...</p>
+    <small id="spinnerSub">Identificando sintomas e comparando padrões</small>
+  </div>
+  <div id="resultado"></div>
+
+  <div class="secao-titulo" style="margin-top:4px">🌱 Análise de Solo</div>
+  <div class="solo-row">
+    <button class="btn-solo" id="btnSolo"><span class="btn-icon">🧪</span><span class="btn-text">Fotografar Laudo<small>Câmera</small></span></button>
+    <button class="btn-solo-gal" id="btnSoloGal"><span class="btn-icon">📄</span><span class="btn-text">Laudo da Galeria<small>Foto já tirada</small></span></button>
+  </div>
+
+  <div class="dica">
+    <span style="font-size:16px;flex-shrink:0;margin-top:1px">💡</span>
+    <p><strong>Dica:</strong> Fotografe a face inferior da folha também. A ferrugem aparece embaixo com pó alaranjado.</p>
+  </div>
+
+  <div class="secao-titulo" style="margin-top:4px">🌤️ Clima e Risco Agora</div>
+  <div class="card-clima" id="cardClima">
+    <div class="clima-topo"><span style="font-size:13px;color:var(--cinza)">Obtendo clima...</span></div>
+  </div>
+
+  <div class="secao-titulo" style="margin-top:4px">📅 Calendário Fitossanitário</div>
+  <div class="card-calendario" id="cardCalendario"></div>
+
+  <div class="secao-titulo" style="margin-top:4px">📋 Histórico de Análises</div>
+  <div class="card-historico" id="cardHistorico"></div>
+</div>
+
+<script>
+var ultimaFotoBase64 = null;
+
+var EMOJIS = {
+  ferrugem:"🟠",bicho:"🪲",cercosporiose:"🔵",aureolada:"🟣",
+  phoma:"⚫",antracnose:"🫙",ascochyta:"🟤",manteigosa:"🫧",
+  roseliniose:"💀",helmintosporiose:"🔴",broca:"🕳️",acaro:"🟫",
+  acaro_ferrugem:"🟥",cigarra:"🦗",cochonilha:"🤍",lagarta:"🐛",
+  nematoide:"🪱",nitrogenio:"🌿",magnesio:"🟡",potassio:"🔥",
+  fosforo:"💜",calcio:"🦴",enxofre:"🌕",boro:"🟦",
+  zinco:"🫧",ferro:"🫨",manganes:"🟤",cobre:"🧡",
+  estresse_hidrico:"💧",fitotoxicidade:"⚗️",escaldadura:"☀️",
+  fruto_verde:"🟢",fruto_maduro:"🔴",fruto_passado:"⚫",saudavel:"✅"
+};
+var NOMES_VOZ = {
+  ferrugem:"Ferrugem do café",bicho:"Bicho mineiro",cercosporiose:"Cercosporiose",
+  aureolada:"Mancha aureolada",phoma:"Phoma",antracnose:"Antracnose",
+  ascochyta:"Mancha Ascochyta",manteigosa:"Mancha manteigosa",roseliniose:"Roseliniose",
+  helmintosporiose:"Helmintosporiose",broca:"Broca do café",acaro:"Ácaro vermelho",
+  acaro_ferrugem:"Ácaro ferrugem falsa",cigarra:"Cigarra do cafeeiro",cochonilha:"Cochonilha",
+  lagarta:"Lagarta das rosetas",nematoide:"Nematoide das galhas",nitrogenio:"Deficiência de nitrogênio",
+  magnesio:"Deficiência de magnésio",potassio:"Deficiência de potássio",fosforo:"Deficiência de fósforo",
+  calcio:"Deficiência de cálcio",enxofre:"Deficiência de enxofre",boro:"Deficiência de boro",
+  zinco:"Deficiência de zinco",ferro:"Deficiência de ferro",manganes:"Deficiência de manganês",
+  cobre:"Deficiência de cobre",estresse_hidrico:"Estresse hídrico",fitotoxicidade:"Fitotoxicidade",
+  escaldadura:"Escaldadura solar",fruto_verde:"Fruto verde saudável",fruto_maduro:"Fruto maduro para colheita",
+  fruto_passado:"Fruto passado do ponto",saudavel:"Planta saudável"
+};
+var CATEGORIAS = {
+  ferrugem:"Doença Fúngica",bicho:"Praga",cercosporiose:"Doença Fúngica",
+  aureolada:"Doença Bacteriana",phoma:"Doença Fúngica",antracnose:"Doença Fúngica",
+  ascochyta:"Doença Fúngica",manteigosa:"Doença Fúngica",roseliniose:"Doença Fúngica",
+  helmintosporiose:"Doença Fúngica",broca:"Praga",acaro:"Praga",
+  acaro_ferrugem:"Praga",cigarra:"Praga",cochonilha:"Praga",
+  lagarta:"Praga",nematoide:"Praga",nitrogenio:"Deficiência Nutricional",
+  magnesio:"Deficiência Nutricional",potassio:"Deficiência Nutricional",
+  fosforo:"Deficiência Nutricional",calcio:"Deficiência Nutricional",
+  enxofre:"Deficiência Nutricional",boro:"Deficiência Nutricional",
+  zinco:"Deficiência Nutricional",ferro:"Deficiência Nutricional",
+  manganes:"Deficiência Nutricional",cobre:"Deficiência Nutricional",
+  estresse_hidrico:"Estresse Ambiental",fitotoxicidade:"Estresse Ambiental",
+  escaldadura:"Estresse Ambiental",fruto_verde:"Fruto",fruto_maduro:"Fruto",
+  fruto_passado:"Fruto",saudavel:"Planta Saudável"
+};
+var CORES_ESTAGIO = ["#4caf50","#8bc34a","#ffc107","#ff9800","#f44336"];
+var MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+
+function calcularRiscoFerrugem(temp, umidade, chuva) {
+  var pontos = 0;
+  if (temp >= 18 && temp <= 22) pontos += 3;
+  else if (temp >= 15 && temp <= 25) pontos += 1;
+  if (umidade >= 80) pontos += 3;
+  else if (umidade >= 70) pontos += 2;
+  else if (umidade >= 60) pontos += 1;
+  if (chuva > 5) pontos += 2;
+  else if (chuva > 0) pontos += 1;
+  if (pontos >= 7) return { nivel:"critico", txt:"Risco Crítico de Ferrugem", desc:"Condições ideais para infecção. Aplique fungicida imediatamente.", icon:"🔴" };
+  if (pontos >= 5) return { nivel:"alto", txt:"Risco Alto de Ferrugem", desc:"Alta umidade e temperatura favorável. Aplique fungicida preventivo.", icon:"🟠" };
+  if (pontos >= 3) return { nivel:"medio", txt:"Risco Médio de Ferrugem", desc:"Condições parcialmente favoráveis. Monitore as folhas.", icon:"🟡" };
+  return { nivel:"baixo", txt:"Risco Baixo de Ferrugem", desc:"Condições desfavoráveis para ferrugem hoje.", icon:"🟢" };
 }
 
-app.listen(process.env.PORT || 8080, function() {
-  console.log("Servidor ok");
+function obterClima(lat, lon) {
+  var url = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon + "&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&timezone=America/Sao_Paulo";
+  fetch(url)
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      var c = d.current;
+      var temp = Math.round(c.temperature_2m);
+      var umidade = Math.round(c.relative_humidity_2m);
+      var chuva = c.precipitation || 0;
+      var wcode = c.weather_code;
+      var climaIcon = wcode <= 1 ? "☀️" : wcode <= 3 ? "⛅" : wcode <= 49 ? "🌫️" : wcode <= 67 ? "🌧️" : wcode <= 77 ? "❄️" : wcode <= 82 ? "🌦️" : "⛈️";
+      var risco = calcularRiscoFerrugem(temp, umidade, chuva);
+      var html = '<div class="clima-topo"><span style="font-size:13px;font-weight:600;color:var(--marrom)">' + climaIcon + ' Agora</span><span style="font-size:11px;color:var(--cinza)">Atualizado agora</span></div>';
+      html += '<div class="clima-dados"><div class="clima-item"><div class="clima-valor">' + temp + '°C</div><div class="clima-label">Temperatura</div></div>';
+      html += '<div class="clima-item"><div class="clima-valor">' + umidade + '%</div><div class="clima-label">Umidade</div></div>';
+      html += '<div class="clima-item"><div class="clima-valor">' + chuva.toFixed(1) + 'mm</div><div class="clima-label">Chuva</div></div></div>';
+      html += '<div class="risco-box risco-' + risco.nivel + '"><span class="risco-icon">' + risco.icon + '</span><div class="risco-info"><div class="risco-titulo">' + risco.txt + '</div><div class="risco-desc">' + risco.desc + '</div></div></div>';
+      document.getElementById("cardClima").innerHTML = html;
+    })
+    .catch(function() {
+      document.getElementById("cardClima").innerHTML = '<div class="clima-topo"><span style="font-size:13px;color:var(--cinza)">Clima não disponível</span></div>';
+    });
+}
+
+var CALENDARIO = {
+  0:{fase:"granacao",faseTxt:"🟢 Granação",alertas:[{nivel:"alto",txt:"🟠 Ferrugem — alta umidade favorece infecção"},{nivel:"alto",txt:"🪲 Bicho-mineiro — pico populacional"},{nivel:"medio",txt:"🟣 Mancha aureolada — ventos e chuvas"}],acoes:["✅ Aplicar fungicida preventivo para ferrugem","✅ Monitorar folhas para trilhas de bicho-mineiro","✅ Adubação de cobertura — N e K parcelados"]},
+  1:{fase:"granacao",faseTxt:"🟢 Granação",alertas:[{nivel:"alto",txt:"🟠 Ferrugem — período crítico"},{nivel:"alto",txt:"🪲 Bicho-mineiro — alta incidência"},{nivel:"medio",txt:"🫙 Antracnose — chuvas intensas"}],acoes:["✅ Reaplicar fungicida (21 dias após última aplicação)","✅ Controle de bicho-mineiro se >30% folhas com minas","✅ Verificar adubação fosfatada"]},
+  2:{fase:"maturacao",faseTxt:"🔴 Maturação",alertas:[{nivel:"alto",txt:"🟠 Ferrugem — frutos pesados reduzem resistência"},{nivel:"medio",txt:"🕳️ Broca — monitorar frutos"},{nivel:"medio",txt:"🪲 Bicho-mineiro — continua ativo"}],acoes:["✅ Monitorar broca nos frutos","✅ Aplicar fungicida se necessário","✅ Preparar equipamentos para colheita"]},
+  3:{fase:"colheita",faseTxt:"☕ Colheita",alertas:[{nivel:"medio",txt:"🕳️ Broca — pico nos frutos maduros"},{nivel:"medio",txt:"🟠 Ferrugem — desfolha pós-colheita"}],acoes:["✅ Colheita seletiva — cereja e passa separados","✅ Controle biológico da broca (Beauveria bassiana)","✅ Processar café rapidamente após colheita"]},
+  4:{fase:"colheita",faseTxt:"☕ Colheita",alertas:[{nivel:"medio",txt:"🕳️ Broca — reinfestação em frutos remanescentes"},{nivel:"medio",txt:"🟠 Ferrugem — lesões visíveis pós-colheita"}],acoes:["✅ Recolher todos os frutos caídos (repasse)","✅ Aplicar fungicida curativo pós-colheita","✅ Iniciar poda de formação e limpeza"]},
+  5:{fase:"pos",faseTxt:"🌿 Pós-colheita",alertas:[{nivel:"medio",txt:"🟠 Ferrugem — lesões tardias"},{nivel:"medio",txt:"🟡 Deficiência de Mg — período seco"}],acoes:["✅ Realizar poda e esqueletamento se necessário","✅ Calagem e adubação de solo","✅ Análise de solo para planejar próxima safra"]},
+  6:{fase:"pos",faseTxt:"🌿 Pós-colheita",alertas:[{nivel:"medio",txt:"🟫 Ácaro vermelho — período seco favorece"},{nivel:"medio",txt:"🟡 Deficiências nutricionais — solo seco"}],acoes:["✅ Monitorar ácaros (folha bronzeada)","✅ Adubação fosfatada e potássica","✅ Irrigação se disponível"]},
+  7:{fase:"repouso",faseTxt:"😴 Repouso vegetativo",alertas:[{nivel:"medio",txt:"🟫 Ácaro vermelho — pico em período seco"},{nivel:"medio",txt:"🤍 Cochonilha — favorecida pelo estresse hídrico"}],acoes:["✅ Aplicar acaricida se necessário","✅ Adubação foliar de micronutrientes","✅ Revisar sistema de irrigação"]},
+  8:{fase:"florada",faseTxt:"🌸 Florada",alertas:[{nivel:"alto",txt:"🌸 NÃO aplicar inseticidas na florada — proteger abelhas"},{nivel:"medio",txt:"🟠 Ferrugem — início das chuvas"},{nivel:"medio",txt:"⚫ Phoma — regiões acima de 900m"}],acoes:["⚠️ EVITAR agrotóxicos durante a florada","✅ Fungicida preventivo ANTES da florada","✅ Adubação nitrogenada de cobertura"]},
+  9:{fase:"florada",faseTxt:"🌸 Florada/Chumbinho",alertas:[{nivel:"alto",txt:"🟠 Ferrugem — chuvas reiniciadas, risco alto"},{nivel:"alto",txt:"🪲 Bicho-mineiro — nova geração"},{nivel:"medio",txt:"🟣 Aureolada — ventos e chuvas"}],acoes:["✅ Aplicar fungicida sistêmico para ferrugem","✅ Monitorar bicho-mineiro nas folhas novas","✅ Adubação NPK completa"]},
+  10:{fase:"granacao",faseTxt:"🟢 Granação",alertas:[{nivel:"alto",txt:"🟠 Ferrugem — período de máximo risco"},{nivel:"alto",txt:"🪲 Bicho-mineiro — alta infestação"},{nivel:"medio",txt:"⚫ Phoma — em regiões altas"}],acoes:["✅ Reaplicar fungicida (intervalo 21 dias)","✅ Controle de bicho-mineiro","✅ Monitorar deficiência de boro nos ponteiros"]},
+  11:{fase:"granacao",faseTxt:"🟢 Granação",alertas:[{nivel:"alto",txt:"🟠 Ferrugem — frutos em desenvolvimento"},{nivel:"alto",txt:"🪲 Bicho-mineiro — pico"},{nivel:"medio",txt:"🟣 Aureolada — ventos de verão"}],acoes:["✅ Fungicida preventivo — não deixar passar intervalo","✅ Adubação potássica para granação","✅ Monitorar broca nos primeiros frutos"]}
+};
+
+function renderCalendario() {
+  var mes = new Date().getMonth();
+  var cal = CALENDARIO[mes];
+  var html = '<div class="cal-header"><div class="cal-mes">📅 ' + MESES[mes] + '</div><div class="cal-fase fase-' + cal.fase + '">' + cal.faseTxt + '</div></div>';
+  html += '<div class="cal-divisor"></div><div class="cal-alertas"><h4>⚠️ Alertas deste mês</h4>';
+  cal.alertas.forEach(function(a) { html += '<div class="alerta-item"><span class="alerta-' + a.nivel + '">' + a.txt + '</span></div>'; });
+  html += '</div><div class="cal-divisor"></div><div class="cal-acoes"><h4>📋 O que fazer agora</h4>';
+  cal.acoes.forEach(function(a) { html += '<div class="acao-item">' + a + '</div>'; });
+  html += '</div>';
+  document.getElementById("cardCalendario").innerHTML = html;
+}
+
+function salvarHistorico(diags, fotoBase64, regiao) {
+  try {
+    var hist = JSON.parse(localStorage.getItem("doutorcafe_hist") || "[]");
+    var agora = new Date();
+    var data = agora.getDate() + "/" + (agora.getMonth()+1) + "/" + agora.getFullYear() + " " + agora.getHours() + ":" + String(agora.getMinutes()).padStart(2,"0");
+    var primeiro = diags[0];
+    hist.unshift({
+      diag: primeiro.diagnostico,
+      emoji: EMOJIS[primeiro.diagnostico] || "🌿",
+      diags: diags,
+      data: data,
+      regiao: regiao || "",
+      foto: fotoBase64 || null
+    });
+    if (hist.length > 10) hist = hist.slice(0, 10);
+    localStorage.setItem("doutorcafe_hist", JSON.stringify(hist));
+  } catch(e) {}
+  renderHistorico();
+}
+
+function renderHistorico() {
+  try {
+    var hist = JSON.parse(localStorage.getItem("doutorcafe_hist") || "[]");
+    var card = document.getElementById("cardHistorico");
+    if (hist.length === 0) { card.innerHTML = '<div class="hist-vazio">Nenhuma análise ainda. Fotografe uma folha!</div>'; return; }
+    var html = '<div class="hist-header"><div class="hist-titulo">📋 Últimas análises</div><button class="hist-limpar" onclick="limparHistorico()">Limpar</button></div><div class="hist-lista">';
+    hist.forEach(function(h) {
+      var thumbHtml = h.foto
+        ? '<img class="hist-thumb" src="data:image/jpeg;base64,' + h.foto + '" alt="foto">'
+        : '<div class="hist-thumb-placeholder">' + (h.emoji || "🌿") + '</div>';
+      var nomes = h.diags ? h.diags.map(function(d) { return d.diagnostico.replace(/_/g," "); }).join(", ") : h.diag.replace(/_/g," ");
+      html += '<div class="hist-item">' + thumbHtml + '<div class="hist-info"><div class="hist-nome">' + nomes + '</div><div class="hist-data">' + h.data + (h.regiao ? " · " + h.regiao : "") + '</div></div></div>';
+    });
+    html += '</div>';
+    card.innerHTML = html;
+  } catch(e) { document.getElementById("cardHistorico").innerHTML = '<div class="hist-vazio">Histórico não disponível.</div>'; }
+}
+
+function limparHistorico() {
+  try { localStorage.removeItem("doutorcafe_hist"); } catch(e) {}
+  renderHistorico();
+}
+
+var dadosGPS = { lat: null, lon: null, regiao: null, altitude: null };
+function identificarRegiao(lat, lon) {
+  if (lat >= -20.5 && lat <= -15.0 && lon >= -50.0 && lon <= -44.0) return "Cerrado Mineiro";
+  if (lat >= -22.5 && lat <= -19.5 && lon >= -46.5 && lon <= -43.5) return "Sul de Minas";
+  if (lat >= -21.5 && lat <= -19.0 && lon >= -48.5 && lon <= -46.0) return "Mogiana";
+  if (lat >= -20.0 && lat <= -17.0 && lon >= -42.5 && lon <= -40.0) return "Matas de Minas";
+  if (lat >= -15.0 && lat <= -10.0 && lon >= -41.5 && lon <= -38.5) return "Chapada Diamantina";
+  if (lat >= -12.0 && lat <= -8.0  && lon >= -40.0 && lon <= -36.0) return "Planalto da Bahia";
+  if (lat >= -12.0 && lat <= -6.0  && lon >= -62.0 && lon <= -56.0) return "Rondônia";
+  if (lat >= -22.0 && lat <= -19.0 && lon >= -52.0 && lon <= -48.0) return "Alta Paulista";
+  if (lat >= -25.0 && lat <= -21.0 && lon >= -54.0 && lon <= -49.0) return "Norte do Paraná";
+  if (lat >= -21.0 && lat <= -17.0 && lon >= -41.5 && lon <= -39.0) return "Espírito Santo";
+  return "Região Cafeeira";
+}
+
+function obterGPS() {
+  if (!navigator.geolocation) { document.getElementById("regiaoTag").textContent = "📍 GPS não disponível"; return; }
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      dadosGPS.lat = pos.coords.latitude; dadosGPS.lon = pos.coords.longitude;
+      dadosGPS.altitude = pos.coords.altitude ? Math.round(pos.coords.altitude) : null;
+      dadosGPS.regiao = identificarRegiao(dadosGPS.lat, dadosGPS.lon);
+      var tag = "📍 " + dadosGPS.regiao;
+      if (dadosGPS.altitude) tag += " · " + dadosGPS.altitude + "m";
+      document.getElementById("regiaoTag").textContent = tag;
+      obterClima(dadosGPS.lat, dadosGPS.lon);
+    },
+    function() {
+      document.getElementById("regiaoTag").textContent = "📍 Localização não obtida";
+      document.getElementById("cardClima").innerHTML = '<div class="clima-topo"><span style="font-size:13px;color:var(--cinza)">Ative o GPS para ver o clima</span></div>';
+    },
+    { timeout: 8000, enableHighAccuracy: false }
+  );
+}
+
+renderCalendario();
+renderHistorico();
+obterGPS();
+
+document.getElementById("btnCam").addEventListener("click", function() { document.getElementById("cam").click(); });
+document.getElementById("btnGal").addEventListener("click", function() { document.getElementById("gal").click(); });
+document.getElementById("btnVid").addEventListener("click", function() { document.getElementById("vid").click(); });
+document.getElementById("btnSolo").addEventListener("click", function() { document.getElementById("solo").click(); });
+document.getElementById("btnSoloGal").addEventListener("click", function() { document.getElementById("soloGal").click(); });
+document.getElementById("cam").addEventListener("change", function(e) { if (e.target.files[0]) processar(e.target.files[0], false); });
+document.getElementById("gal").addEventListener("change", function(e) {
+  if (!e.target.files[0]) return;
+  var file = e.target.files[0];
+  if (file.type.startsWith("video/")) { processarVideo(file); }
+  else { processar(file, false); }
 });
+document.getElementById("vid").addEventListener("change", function(e) { if (e.target.files[0]) processarVideo(e.target.files[0]); });
+document.getElementById("solo").addEventListener("change", function(e) { if (e.target.files[0]) processarSolo(e.target.files[0]); });
+document.getElementById("soloGal").addEventListener("change", function(e) { if (e.target.files[0]) processarSolo(e.target.files[0]); });
+
+function processar(file, isVideo) {
+  document.getElementById("spinner").style.display = "block";
+  document.getElementById("resultado").style.display = "none";
+  document.getElementById("spinnerTexto").textContent = "Analisando...";
+  document.getElementById("spinnerSub").textContent = "Identificando sintomas e comparando padrões";
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var b64 = e.target.result.split(",")[1];
+    ultimaFotoBase64 = b64;
+    var body = { imagem: b64, tipo: file.type };
+    if (dadosGPS.regiao) body.regiao = dadosGPS.regiao;
+    if (dadosGPS.altitude) body.altitude = dadosGPS.altitude;
+    fetch("https://doutor-cafe-production.up.railway.app/diagnostico", {
+      method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(body)
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) { document.getElementById("spinner").style.display = "none"; mostrarResultado(data, isVideo); })
+    .catch(function() { document.getElementById("spinner").style.display = "none"; mostrarErro(); });
+  };
+  reader.readAsDataURL(file);
+}
+
+function processarSolo(file) {
+  document.getElementById("spinner").style.display = "block";
+  document.getElementById("resultado").style.display = "none";
+  document.getElementById("spinnerTexto").textContent = "Lendo laudo de solo...";
+  document.getElementById("spinnerSub").textContent = "Interpretando valores e calculando recomendações";
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var b64 = e.target.result.split(",")[1];
+    ultimaFotoBase64 = b64;
+    var body = { imagem: b64, tipo: file.type };
+    if (dadosGPS.regiao) body.regiao = dadosGPS.regiao;
+    fetch("https://doutor-cafe-production.up.railway.app/analise-solo", {
+      method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(body)
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) { document.getElementById("spinner").style.display = "none"; mostrarResultadoSolo(data); })
+    .catch(function() { document.getElementById("spinner").style.display = "none"; mostrarErro(); });
+  };
+  reader.readAsDataURL(file);
+}
+
+function processarVideo(file) {
+  document.getElementById("spinner").style.display = "block";
+  document.getElementById("resultado").style.display = "none";
+  document.getElementById("spinnerTexto").textContent = "Extraindo frames do vídeo...";
+  document.getElementById("spinnerSub").textContent = "Analisando múltiplos ângulos";
+  var video = document.createElement("video");
+  var canvas = document.getElementById("canvas");
+  var ctx = canvas.getContext("2d");
+  var url = URL.createObjectURL(file);
+  video.src = url; video.muted = true;
+  video.addEventListener("loadedmetadata", function() {
+    var duration = video.duration;
+    var frames = [];
+    var tempos = [duration*0.15, duration*0.35, duration*0.60, duration*0.85];
+    var idx = 0;
+    function capturarFrame() { if (idx >= tempos.length) { URL.revokeObjectURL(url); enviarFrames(frames); return; } video.currentTime = tempos[idx]; }
+    video.addEventListener("seeked", function() {
+      canvas.width = 640; canvas.height = 480;
+      ctx.drawImage(video, 0, 0, 640, 480);
+      var frameB64 = canvas.toDataURL("image/jpeg", 0.7).split(",")[1];
+      if (idx === 0) ultimaFotoBase64 = frameB64;
+      frames.push(frameB64);
+      idx++; capturarFrame();
+    });
+    capturarFrame();
+  });
+  video.load();
+}
+
+function enviarFrames(frames) {
+  document.getElementById("spinnerTexto").textContent = "Analisando " + frames.length + " ângulos...";
+  var body = { frames: frames, tipo: "image/jpeg" };
+  if (dadosGPS.regiao) body.regiao = dadosGPS.regiao;
+  if (dadosGPS.altitude) body.altitude = dadosGPS.altitude;
+  fetch("https://doutor-cafe-production.up.railway.app/diagnostico-video", {
+    method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(body)
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) { document.getElementById("spinner").style.display = "none"; mostrarResultado(data, true); })
+  .catch(function() { document.getElementById("spinner").style.display = "none"; mostrarErro(); });
+}
+
+function compartilhar(diagsJson, regiao) {
+  var diags = JSON.parse(diagsJson);
+  var texto = "🌿 *Doutor Café — Diagnóstico*\n\n";
+  if (regiao) texto += "📍 " + regiao + "\n\n";
+  diags.forEach(function(d, i) {
+    var emoji = EMOJIS[d.diagnostico] || "🌿";
+    var nome = NOMES_VOZ[d.diagnostico] || d.diagnostico;
+    texto += emoji + " *" + nome + "*\n";
+    texto += "📋 " + d.acao + "\n\n";
+  });
+  texto += "_Diagnóstico realizado pelo app Doutor Café_";
+  window.open("https://wa.me/?text=" + encodeURIComponent(texto), "_blank");
+}
+
+function mostrarResultado(data, isVideo) {
+  var div = document.getElementById("resultado");
+  div.style.display = "block";
+
+  // Suporte a múltiplos diagnósticos e diagnóstico único
+  var diags = data.diagnosticos || [{ diagnostico: data.diagnostico || "saudavel", estagio: data.estagio || 1, confianca: data.confianca || "media", visto: data.visto || "", acao: data.acao || "Tente novamente." }];
+
+  var regiao = dadosGPS.regiao || "";
+  var fotoB64 = ultimaFotoBase64;
+  salvarHistorico(diags, fotoB64, regiao);
+
+  var thumbHtml = fotoB64
+    ? '<img class="multi-foto" src="data:image/jpeg;base64,' + fotoB64 + '" alt="foto">'
+    : '<div class="multi-foto-placeholder">🌿</div>';
+
+  var qtd = diags.length > 1 ? diags.length + " problemas detectados" : "1 diagnóstico";
+  var html = '<div class="card-resultado">';
+  html += '<div class="multi-header">' + thumbHtml;
+  html += '<div class="multi-titulo"><h3>Resultado da Análise</h3><p>' + qtd;
+  if (regiao) html += ' · 📍 ' + regiao;
+  if (isVideo) html += ' · 🎥 Vídeo';
+  html += '</p></div></div>';
+
+  diags.forEach(function(d, idx) {
+    var diag = d.diagnostico || "saudavel";
+    var emoji = EMOJIS[diag] || "🌿";
+    var cat = CATEGORIAS[diag] || "Análise";
+    var nome = diag.replace(/_/g, " ");
+    var estagio = d.estagio || 1;
+    var confianca = d.confianca || "media";
+    var badgeClass = "badge-confianca-" + confianca;
+    var badgeTexto = confianca === "alta" ? "✓ Alta" : confianca === "media" ? "~ Média" : "! Baixa";
+    var barras = "";
+    for (var i = 1; i <= 5; i++) {
+      var cor = i <= estagio ? CORES_ESTAGIO[estagio-1] : "#e8e8e8";
+      barras += '<div class="diag-seg" style="background:' + cor + '"></div>';
+    }
+    html += '<div class="diag-item">';
+    html += '<div class="diag-item-topo"><span style="font-size:28px">' + emoji + '</span><div><div class="diag-nome">' + nome + '</div><div class="diag-cat">' + cat + '</div></div></div>';
+    html += '<div class="diag-badges"><span class="badge badge-estagio">📊 Estágio ' + estagio + '/5</span><span class="badge ' + badgeClass + '">' + badgeTexto + ' confiança</span></div>';
+    html += '<div class="diag-bar">' + barras + '</div>';
+    if (d.visto) html += '<div class="diag-visto">"' + d.visto + '"</div>';
+    html += '<div class="diag-acao">' + (d.acao || "") + '</div>';
+    html += '</div>';
+  });
+
+  var textoVoz = diags.map(function(d) { return (NOMES_VOZ[d.diagnostico] || d.diagnostico) + ". " + d.acao; }).join(". ");
+  html += '<div class="btns-resultado">';
+  html += '<button class="btn-voz" onclick="falar(\'' + textoVoz.replace(/'/g,"\\'").replace(/\n/g," ") + '\')">🔊 Ouvir</button>';
+  html += '<button class="btn-share" onclick="compartilhar(\'' + JSON.stringify(diags).replace(/'/g,"\\'") + '\',\'' + regiao + '\')">📤 WhatsApp</button>';
+  html += '<button class="btn-nova" onclick="resetar()">📷 Nova</button>';
+  html += '</div></div>';
+
+  div.innerHTML = html;
+  falar(textoVoz);
+  div.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function mostrarResultadoSolo(data) {
+  var div = document.getElementById("resultado");
+  div.style.display = "block";
+  var acao = data.acao || "Consulte um agrônomo para mais detalhes.";
+  var textoVoz = "Análise de solo. " + acao;
+  var fotoB64 = ultimaFotoBase64;
+  var thumbHtml = fotoB64
+    ? '<img class="card-foto-thumb" src="data:image/jpeg;base64,' + fotoB64 + '" alt="laudo">'
+    : '<div class="card-foto-thumb-placeholder">🧪</div>';
+  var html = '<div class="card-resultado"><div class="card-topo">' + thumbHtml;
+  html += '<div class="card-titulo"><h2>Análise de Solo</h2><div class="categoria">Recomendação para Café</div></div></div>';
+  html += '<div class="badges"><span class="badge badge-solo">🌱 Laudo Interpretado</span>';
+  if (dadosGPS.regiao) html += '<span class="badge badge-regiao">📍 ' + dadosGPS.regiao + '</span>';
+  html += '</div>';
+  if (data.valores) {
+    html += '<div class="solo-grid">';
+    for (var k in data.valores) {
+      var v = data.valores[k];
+      var sc = v.status === "ok" ? "solo-ok" : v.status === "baixo" ? "solo-baixo" : "solo-alto";
+      var st = v.status === "ok" ? "✓ Adequado" : v.status === "baixo" ? "↓ Baixo" : "↑ Alto";
+      html += '<div class="solo-item"><div class="solo-label">' + k + '</div><div class="solo-valor">' + v.valor + '</div><div class="solo-status ' + sc + '">' + st + '</div></div>';
+    }
+    html += '</div>';
+  }
+  html += '<div class="divisor"></div><div class="acao-box"><h3>Recomendação</h3><p>' + acao + '</p></div>';
+  html += '<div class="btns-resultado"><button class="btn-voz" onclick="falar(\'' + textoVoz.replace(/'/g,"\\'") + '\')">🔊 Ouvir</button>';
+  html += '<button class="btn-nova" onclick="resetar()">📷 Nova análise</button></div></div>';
+  div.innerHTML = html;
+  falar(textoVoz);
+  div.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function mostrarErro() {
+  var div = document.getElementById("resultado");
+  div.style.display = "block";
+  div.innerHTML = '<div class="card-resultado"><div class="acao-box"><p>⚠️ Erro ao analisar. Verifique sua conexão e tente novamente.</p></div><div class="btns-resultado"><button class="btn-nova" onclick="resetar()">📷 Tentar novamente</button></div></div>';
+}
+
+function falar(texto) {
+  if (window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+    var msg = new SpeechSynthesisUtterance(texto);
+    msg.lang = "pt-BR"; msg.rate = 0.85;
+    window.speechSynthesis.speak(msg);
+  }
+}
+
+function resetar() {
+  ultimaFotoBase64 = null;
+  document.getElementById("resultado").style.display = "none";
+  document.getElementById("cam").value = "";
+  document.getElementById("gal").value = "";
+  document.getElementById("vid").value = "";
+  document.getElementById("solo").value = "";
+  document.getElementById("soloGal").value = "";
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
