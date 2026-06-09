@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -99,9 +98,10 @@ input { display: none; }
 #resultado { display: none; }
 .card-resultado { background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.1); animation: slideUp 0.4s ease; }
 @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-.card-topo { padding: 24px 20px 20px; display: flex; align-items: center; gap: 16px; }
-.card-emoji { font-size: 52px; flex-shrink: 0; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
-.card-titulo h2 { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--marrom); text-transform: capitalize; }
+.card-topo { padding: 20px 20px 16px; display: flex; align-items: center; gap: 14px; }
+.card-foto-thumb { width: 72px; height: 72px; border-radius: 14px; object-fit: cover; flex-shrink: 0; border: 2px solid #f0f0f0; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+.card-foto-thumb-placeholder { width: 72px; height: 72px; border-radius: 14px; background: var(--creme); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+.card-titulo h2 { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--marrom); text-transform: capitalize; }
 .card-titulo .categoria { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--cinza); margin-top: 2px; }
 .badges { padding: 0 20px 16px; display: flex; gap: 8px; flex-wrap: wrap; }
 .badge { border-radius: 30px; padding: 5px 12px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
@@ -141,7 +141,8 @@ input { display: none; }
 .hist-limpar { font-size: 11px; color: var(--cinza); cursor: pointer; text-decoration: underline; background: none; border: none; font-family: 'DM Sans', sans-serif; }
 .hist-lista { padding: 0 18px 14px; display: flex; flex-direction: column; gap: 8px; }
 .hist-item { display: flex; align-items: center; gap: 10px; background: var(--creme); border-radius: 12px; padding: 10px 12px; }
-.hist-emoji { font-size: 24px; flex-shrink: 0; }
+.hist-thumb { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+.hist-thumb-placeholder { width: 44px; height: 44px; border-radius: 10px; background: #e8e8e8; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; }
 .hist-info { flex: 1; }
 .hist-nome { font-size: 13px; font-weight: 700; color: var(--marrom); text-transform: capitalize; }
 .hist-data { font-size: 11px; color: var(--cinza); margin-top: 2px; }
@@ -152,8 +153,7 @@ canvas { display: none; }
 <body>
 
 <div class="header">
- <img class="header-img" src="https://images.unsplash.com/photo-1504630083234-14187a9df0f5?w=900&q=80&auto=format&fit=crop"
- alt="Café">
+ <img class="header-img" src="https://images.unsplash.com/photo-1611080626919-7cf5a9dbab12?w=900&q=80&auto=format&fit=crop" alt="Café">
  <div class="header-overlay"></div>
  <div class="header-content">
    <span class="logo-icon">🌿</span>
@@ -208,10 +208,12 @@ canvas { display: none; }
 </div>
 
 <script>
+var ultimaFotoBase64 = null;
+
 var EMOJIS = {
  ferrugem:"🟠",bicho:"🪲",cercosporiose:"🔵",aureolada:"🟣",
  phoma:"⚫",antracnose:"🫙",ascochyta:"🟤",manteigosa:"🫧",
- roseliniose:"💀",helmintosporiose:"🔴",broca:"🕳️",acaro:"🟫",
+ roseliniose:"💀",helmintosporiose:"🔴",broca:"🕳",acaro:"🟫",
  acaro_ferrugem:"🟥",cigarra:"🦗",cochonilha:"🤍",lagarta:"🐛",
  nematoide:"🪱",nitrogenio:"🌿",magnesio:"🟡",potassio:"🔥",
  fosforo:"💜",calcio:"🦴",enxofre:"🌕",boro:"🟦",
@@ -318,12 +320,12 @@ function renderCalendario() {
  document.getElementById("cardCalendario").innerHTML = html;
 }
 
-function salvarHistorico(diag, emoji, acao, regiao) {
+function salvarHistorico(diag, emoji, acao, regiao, fotoBase64) {
  try {
    var hist = JSON.parse(localStorage.getItem("doutorcafe_hist") || "[]");
    var agora = new Date();
    var data = agora.getDate() + "/" + (agora.getMonth()+1) + "/" + agora.getFullYear() + " " + agora.getHours() + ":" + String(agora.getMinutes()).padStart(2,"0");
-   hist.unshift({ diag: diag, emoji: emoji, acao: acao, data: data, regiao: regiao || "" });
+   hist.unshift({ diag: diag, emoji: emoji, acao: acao, data: data, regiao: regiao || "", foto: fotoBase64 || null });
    if (hist.length > 10) hist = hist.slice(0, 10);
    localStorage.setItem("doutorcafe_hist", JSON.stringify(hist));
  } catch(e) {}
@@ -337,7 +339,10 @@ function renderHistorico() {
    if (hist.length === 0) { card.innerHTML = '<div class="hist-vazio">Nenhuma análise ainda. Fotografe uma folha!</div>'; return; }
    var html = '<div class="hist-header"><div class="hist-titulo">📋 Últimas análises</div><button class="hist-limpar" onclick="limparHistorico()">Limpar</button></div><div class="hist-lista">';
    hist.forEach(function(h) {
-     html += '<div class="hist-item"><span class="hist-emoji">' + h.emoji + '</span><div class="hist-info"><div class="hist-nome">' + h.diag.replace(/_/g," ") + '</div><div class="hist-data">' + h.data + (h.regiao ? " · " + h.regiao : "") + '</div></div></div>';
+     var thumbHtml = h.foto
+       ? '<img class="hist-thumb" src="data:image/jpeg;base64,' + h.foto + '" alt="foto">'
+       : '<div class="hist-thumb-placeholder">' + (h.emoji || "🌿") + '</div>';
+     html += '<div class="hist-item">' + thumbHtml + '<div class="hist-info"><div class="hist-nome">' + h.diag.replace(/_/g," ") + '</div><div class="hist-data">' + h.data + (h.regiao ? " · " + h.regiao : "") + '</div></div></div>';
    });
    html += '</div>';
    card.innerHTML = html;
@@ -406,6 +411,7 @@ function processar(file, isVideo) {
  var reader = new FileReader();
  reader.onload = function(e) {
    var b64 = e.target.result.split(",")[1];
+   ultimaFotoBase64 = b64;
    var body = { imagem: b64, tipo: file.type };
    if (dadosGPS.regiao) body.regiao = dadosGPS.regiao;
    if (dadosGPS.altitude) body.altitude = dadosGPS.altitude;
@@ -427,6 +433,7 @@ function processarSolo(file) {
  var reader = new FileReader();
  reader.onload = function(e) {
    var b64 = e.target.result.split(",")[1];
+   ultimaFotoBase64 = b64;
    var body = { imagem: b64, tipo: file.type };
    if (dadosGPS.regiao) body.regiao = dadosGPS.regiao;
    fetch("https://doutor-cafe-production.up.railway.app/analise-solo", {
@@ -458,7 +465,9 @@ function processarVideo(file) {
    video.addEventListener("seeked", function() {
      canvas.width = 640; canvas.height = 480;
      ctx.drawImage(video, 0, 0, 640, 480);
-     frames.push(canvas.toDataURL("image/jpeg", 0.7).split(",")[1]);
+     var frameB64 = canvas.toDataURL("image/jpeg", 0.7).split(",")[1];
+     if (idx === 0) ultimaFotoBase64 = frameB64;
+     frames.push(frameB64);
      idx++; capturarFrame();
    });
    capturarFrame();
@@ -482,9 +491,9 @@ function enviarFrames(frames) {
 function compartilhar(diag, acao, regiao) {
  var nomeVoz = NOMES_VOZ[diag] || diag;
  var emoji = EMOJIS[diag] || "🌿";
- var texto = emoji + " Doutor Café — Diagnóstico\n\n🔍 " + nomeVoz + "\n";
+ var texto = emoji + " *Doutor Café — Diagnóstico*\n\n🔍 *" + nomeVoz + "*\n";
  if (regiao) texto += "📍 " + regiao + "\n";
- texto += "\n📋 Recomendação:\n" + acao;
+ texto += "\n📋 *Recomendação:*\n" + acao;
  texto += "\n\n_Diagnóstico realizado pelo app Doutor Café_";
  window.open("https://wa.me/?text=" + encodeURIComponent(texto), "_blank");
 }
@@ -510,9 +519,15 @@ function mostrarResultado(data, isVideo) {
  }
  var textoVoz = nomeVoz + ". " + acao;
  var regiao = dadosGPS.regiao || "";
- salvarHistorico(diag, emoji, acao, regiao);
+ var fotoB64 = ultimaFotoBase64;
+ salvarHistorico(diag, emoji, acao, regiao, fotoB64);
+
+ var thumbHtml = fotoB64
+   ? '<img class="card-foto-thumb" src="data:image/jpeg;base64,' + fotoB64 + '" alt="foto analisada">'
+   : '<div class="card-foto-thumb-placeholder">' + emoji + '</div>';
+
  var html = '<div class="card-resultado">';
- html += '<div class="card-topo"><span class="card-emoji">' + emoji + '</span>';
+ html += '<div class="card-topo">' + thumbHtml;
  html += '<div class="card-titulo"><h2>' + nome + '</h2><div class="categoria">' + cat + '</div></div></div>';
  html += '<div class="badges"><span class="badge badge-estagio">📊 Estágio ' + estagio + '/5</span>';
  html += '<span class="badge ' + badgeClass + '">' + badgeTexto + '</span>';
@@ -539,7 +554,13 @@ function mostrarResultadoSolo(data) {
  div.style.display = "block";
  var acao = data.acao || "Consulte um agrônomo para mais detalhes.";
  var textoVoz = "Análise de solo. " + acao;
- var html = '<div class="card-resultado"><div class="card-topo"><span class="card-emoji">🧪</span>';
+ var fotoB64 = ultimaFotoBase64;
+
+ var thumbHtml = fotoB64
+   ? '<img class="card-foto-thumb" src="data:image/jpeg;base64,' + fotoB64 + '" alt="laudo">'
+   : '<div class="card-foto-thumb-placeholder">🧪</div>';
+
+ var html = '<div class="card-resultado"><div class="card-topo">' + thumbHtml;
  html += '<div class="card-titulo"><h2>Análise de Solo</h2><div class="categoria">Recomendação para Café</div></div></div>';
  html += '<div class="badges"><span class="badge badge-solo">🌱 Laudo Interpretado</span>';
  if (dadosGPS.regiao) html += '<span class="badge badge-regiao">📍 ' + dadosGPS.regiao + '</span>';
@@ -578,6 +599,7 @@ function falar(texto) {
 }
 
 function resetar() {
+ ultimaFotoBase64 = null;
  document.getElementById("resultado").style.display = "none";
  document.getElementById("cam").value = "";
  document.getElementById("gal").value = "";
