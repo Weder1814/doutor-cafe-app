@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -18,8 +19,8 @@
 body { font-family: 'DM Sans', sans-serif; background: var(--creme); min-height: 100vh; overflow-x: hidden; }
 
 .header { width: 100%; position: relative; overflow: hidden; padding: 28px 24px 40px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.header::before { content: ''; position: absolute; inset: 0; background: linear-gradient(160deg, #0d3318 0%, #1a5c2a 40%, #0f2e14 70%, #0a1f0e 100%); z-index: 0; }
-.header-bg { position: absolute; inset: 0; z-index: 1; pointer-events: none; width: 100%; height: 100%; }
+.header-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+.header-overlay { position: absolute; inset: 0; background: linear-gradient(160deg, rgba(8,25,12,0.85) 0%, rgba(20,70,35,0.72) 50%, rgba(8,20,10,0.88) 100%); z-index: 1; }
 .header-content { position: relative; z-index: 2; }
 .logo-icon { font-size: 38px; display: block; margin-bottom: 6px; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5)); }
 @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
@@ -151,17 +152,8 @@ canvas { display: none; }
 <body>
 
 <div class="header">
- <svg class="header-bg" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-   <g transform="translate(20,10) rotate(-30)" opacity="0.25"><ellipse cx="0" cy="0" rx="8" ry="22" fill="#5dde74"/><line x1="0" y1="-22" x2="0" y2="22" stroke="#2d8a3e" stroke-width="1"/><line x1="0" y1="-10" x2="6" y2="-4" stroke="#2d8a3e" stroke-width="0.6"/><line x1="0" y1="0" x2="-6" y2="6" stroke="#2d8a3e" stroke-width="0.6"/></g>
-   <g transform="translate(45,15)" opacity="0.3"><circle cx="0" cy="0" r="5" fill="#c0392b"/><circle cx="10" cy="-4" r="5" fill="#e74c3c"/><circle cx="5" cy="8" r="4.5" fill="#a93226"/></g>
-   <g transform="translate(370,20) rotate(40)" opacity="0.2"><ellipse cx="0" cy="0" rx="10" ry="28" fill="#4caf50"/><line x1="0" y1="-28" x2="0" y2="28" stroke="#2d8a3e" stroke-width="1.2"/></g>
-   <g transform="translate(345,8)" opacity="0.3"><circle cx="0" cy="0" r="4.5" fill="#c0392b"/><circle cx="9" cy="3" r="5" fill="#e74c3c"/><circle cx="4" cy="10" r="4" fill="#922b21"/><circle cx="14" cy="11" r="3.5" fill="#c0392b"/></g>
-   <g transform="translate(8,90) rotate(-50)" opacity="0.18"><ellipse cx="0" cy="0" rx="7" ry="20" fill="#66bb6a"/><line x1="0" y1="-20" x2="0" y2="20" stroke="#388e3c" stroke-width="1"/></g>
-   <g transform="translate(15,165) rotate(-20)" opacity="0.22"><ellipse cx="0" cy="0" rx="9" ry="24" fill="#4caf50"/><line x1="0" y1="-24" x2="0" y2="24" stroke="#2d8a3e" stroke-width="1"/></g>
-   <g transform="translate(360,155)" opacity="0.25"><circle cx="0" cy="0" r="5" fill="#c0392b"/><circle cx="10" cy="-4" r="4.5" fill="#e74c3c"/><circle cx="5" cy="9" r="4" fill="#a93226"/><circle cx="15" cy="7" r="5" fill="#c0392b"/></g>
-   <g transform="translate(385,170) rotate(50)" opacity="0.2"><ellipse cx="0" cy="0" rx="8" ry="22" fill="#5dde74"/><line x1="0" y1="-22" x2="0" y2="22" stroke="#2d8a3e" stroke-width="1"/></g>
-   <g transform="translate(290,0)" opacity="0.2"><line x1="0" y1="0" x2="20" y2="40" stroke="#2d8a3e" stroke-width="1.5"/><ellipse cx="-5" cy="15" rx="5" ry="14" fill="#5dde74" transform="rotate(-40,-5,15)"/><ellipse cx="15" cy="25" rx="5" ry="14" fill="#4caf50" transform="rotate(20,15,25)"/></g>
- </svg>
+ <img class="header-img" src="https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=900&q=80&auto=format&fit=crop" alt="Café">
+ <div class="header-overlay"></div>
  <div class="header-content">
    <span class="logo-icon">🌿</span>
    <h1>Doutor <span>Café</span></h1>
@@ -179,13 +171,11 @@ canvas { display: none; }
  <input id="soloGal" type="file" accept="image/*">
  <canvas id="canvas"></canvas>
 
- <!-- 1. DIAGNÓSTICO -->
  <div class="secao-titulo">🌿 Diagnóstico de Folhas e Frutos</div>
  <button class="btn-foto" id="btnCam"><span class="btn-icon">📷</span><span class="btn-text">Fotografar a Folha<small>Análise por foto única</small></span></button>
  <button class="btn-video" id="btnVid"><span class="btn-icon">🎥</span><span class="btn-text">Gravar Vídeo da Folha<small>Mais preciso — vários ângulos</small></span></button>
  <button class="btn-galeria" id="btnGal"><span class="btn-icon">🖼️</span><span class="btn-text">Escolher da Galeria<small>Use uma foto já tirada</small></span></button>
 
- <!-- 2. SOLO -->
  <div class="secao-titulo" style="margin-top:4px">🌱 Análise de Solo</div>
  <div class="solo-row">
    <button class="btn-solo" id="btnSolo"><span class="btn-icon">🧪</span><span class="btn-text">Fotografar Laudo<small>Câmera</small></span></button>
@@ -204,17 +194,14 @@ canvas { display: none; }
  </div>
  <div id="resultado"></div>
 
- <!-- 3. CLIMA -->
  <div class="secao-titulo" style="margin-top:4px">🌤️ Clima e Risco Agora</div>
  <div class="card-clima" id="cardClima">
    <div class="clima-topo"><span style="font-size:13px;color:var(--cinza)">Obtendo clima...</span></div>
  </div>
 
- <!-- 4. CALENDÁRIO -->
  <div class="secao-titulo" style="margin-top:4px">📅 Calendário Fitossanitário</div>
  <div class="card-calendario" id="cardCalendario"></div>
 
- <!-- 5. HISTÓRICO -->
  <div class="secao-titulo" style="margin-top:4px">📋 Histórico de Análises</div>
  <div class="card-historico" id="cardHistorico"></div>
 </div>
