@@ -177,9 +177,7 @@ input[type="file"] { display: none; }
 .fila-contagem { display: inline-flex; align-items: center; justify-content: center; background: #e65100; color: white; border-radius: 20px; padding: 2px 9px; font-size: 11px; font-weight: 700; }
 .fila-limpar { font-size: 11px; color: var(--cinza); cursor: pointer; text-decoration: underline; background: none; border: none; font-family: 'DM Sans', sans-serif; white-space: nowrap; padding-top: 2px; }
 .fila-divisor { height: 1px; background: #ffe0b2; margin: 0 18px; }
-
-/* Grid de fotos — 2 colunas, fotos grandes */
-.fila-grid { padding: 14px 18px 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fila-grid { padding: 14px 18px 16px; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; }
 .fila-item {
   position: relative;
   border-radius: 14px;
@@ -203,30 +201,30 @@ input[type="file"] { display: none; }
   padding: 10px 10px 9px;
   gap: 2px;
 }
-.fila-item-hora { font-size: 11px; color: rgba(255,255,255,0.85); font-weight: 600; line-height: 1.2; }
-.fila-item-tap { font-size: 12px; color: #ffd54f; font-weight: 800; letter-spacing: 0.2px; }
+.fila-item-hora { font-size: 9px; color: rgba(255,255,255,0.85); font-weight: 600; line-height: 1.2; }
+.fila-item-tap { font-size: 9px; color: #ffd54f; font-weight: 800; letter-spacing: 0.1px; }
 .fila-item-num {
   position: absolute;
-  top: 8px;
-  left: 8px;
+  top: 5px;
+  left: 5px;
   background: rgba(0,0,0,0.55);
   color: white;
   border-radius: 20px;
-  padding: 2px 8px;
-  font-size: 10px;
+  padding: 1px 6px;
+  font-size: 9px;
   font-weight: 700;
 }
 .fila-item-del {
   position: absolute;
-  top: 7px;
-  right: 7px;
+  top: 5px;
+  right: 5px;
   background: rgba(0,0,0,0.5);
   color: white;
   border: none;
   border-radius: 50%;
-  width: 26px;
-  height: 26px;
-  font-size: 13px;
+  width: 22px;
+  height: 22px;
+  font-size: 11px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -235,8 +233,6 @@ input[type="file"] { display: none; }
   padding: 0;
   font-family: 'DM Sans', sans-serif;
 }
-
-/* banner aviso sem sinal */
 .offline-banner {
   margin: 0 18px 12px;
   background: #fff3e0;
@@ -368,16 +364,18 @@ function salvarFila(arr) {
   try { localStorage.setItem(FILA_KEY, JSON.stringify(arr)); } catch(e) {}
 }
 
-function adicionarNaFila(fotoBase64) {
+function adicionarNaFila(fotoBase64, frames) {
   var fila = lerFila();
   if (fila.length >= FILA_MAX) {
-    alert("A fila já tem " + FILA_MAX + " fotos. Limpe algumas antes de tirar mais.");
+    alert("A fila já tem " + FILA_MAX + " itens. Limpe alguns antes de continuar.");
     return false;
   }
   var agora = new Date();
   var hora = agora.getHours() + ":" + String(agora.getMinutes()).padStart(2,"0");
   var data = agora.getDate() + "/" + (agora.getMonth()+1) + "/" + agora.getFullYear();
-  fila.push({ id: Date.now(), foto: fotoBase64, hora: hora, data: data });
+  var item = { id: Date.now(), foto: fotoBase64, hora: hora, data: data };
+  if (frames) { item.frames = frames; item.isVideo = true; }
+  fila.push(item);
   salvarFila(fila);
   return true;
 }
@@ -404,19 +402,34 @@ function analisarDaFila(id) {
   salvarFila(fila.filter(function(f) { return f.id !== id; }));
   document.getElementById("spinner").style.display = "block";
   document.getElementById("resultado").style.display = "none";
-  document.getElementById("spinnerTexto").textContent = "Analisando...";
-  document.getElementById("spinnerSub").textContent = "Identificando sintomas e comparando padrões";
   renderAreaHistorico();
-  var body = { imagem: item.foto, tipo: "image/jpeg" };
-  if (dadosGPS.regiao) body.regiao = dadosGPS.regiao;
-  if (dadosGPS.altitude) body.altitude = dadosGPS.altitude;
-  fetch("https://doutor-cafe-production.up.railway.app/diagnostico", {
-    method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(body)
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(data) { document.getElementById("spinner").style.display = "none"; mostrarResultado(data, false); })
-  .catch(function() { document.getElementById("spinner").style.display = "none"; mostrarErro(); });
   document.getElementById("spinner").scrollIntoView({ behavior: "smooth", block: "start" });
+
+  if (item.isVideo && item.frames) {
+    document.getElementById("spinnerTexto").textContent = "Analisando " + item.frames.length + " ângulos...";
+    document.getElementById("spinnerSub").textContent = "Processando vídeo da fila offline";
+    var bodyV = { frames: item.frames, tipo: "image/jpeg" };
+    if (dadosGPS.regiao) bodyV.regiao = dadosGPS.regiao;
+    if (dadosGPS.altitude) bodyV.altitude = dadosGPS.altitude;
+    fetch("https://doutor-cafe-production.up.railway.app/diagnostico-video", {
+      method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(bodyV)
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) { document.getElementById("spinner").style.display = "none"; mostrarResultado(data, true); })
+    .catch(function() { document.getElementById("spinner").style.display = "none"; mostrarErro(); });
+  } else {
+    document.getElementById("spinnerTexto").textContent = "Analisando...";
+    document.getElementById("spinnerSub").textContent = "Identificando sintomas e comparando padrões";
+    var bodyF = { imagem: item.foto, tipo: "image/jpeg" };
+    if (dadosGPS.regiao) bodyF.regiao = dadosGPS.regiao;
+    if (dadosGPS.altitude) bodyF.altitude = dadosGPS.altitude;
+    fetch("https://doutor-cafe-production.up.railway.app/diagnostico", {
+      method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(bodyF)
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) { document.getElementById("spinner").style.display = "none"; mostrarResultado(data, false); })
+    .catch(function() { document.getElementById("spinner").style.display = "none"; mostrarErro(); });
+  }
 }
 
 /* ── RENDERIZAÇÃO DA ÁREA (fila OU histórico) ─── */
@@ -437,19 +450,11 @@ function renderAreaHistorico() {
     html += '</div>';
     html += '<button class="fila-limpar" onclick="limparFila()">Limpar tudo</button>';
     html += '</div>';
-
     if (!online) {
-      html += '<div class="offline-banner">';
-      html += '<span class="offline-banner-icon">📵</span>';
-      html += '<span class="offline-banner-txt">Sem internet. As fotos ficam salvas aqui. Quando chegar no sinal, toque na foto para analisar.</span>';
-      html += '</div>';
+      html += '<div class="offline-banner"><span class="offline-banner-icon">📵</span><span class="offline-banner-txt">Sem internet. As fotos ficam salvas aqui. Quando chegar no sinal, toque na foto para analisar.</span></div>';
     } else {
-      html += '<div class="offline-banner" style="background:#e8f5e9;margin-bottom:0">';
-      html += '<span class="offline-banner-icon">✅</span>';
-      html += '<span class="offline-banner-txt" style="color:#1b5e20">Internet disponível! Toque em uma foto para analisar agora.</span>';
-      html += '</div>';
+      html += '<div class="offline-banner" style="background:#e8f5e9;margin-bottom:0"><span class="offline-banner-icon">✅</span><span class="offline-banner-txt" style="color:#1b5e20">Internet disponível! Toque em uma foto para analisar agora.</span></div>';
     }
-
     html += '<div class="fila-divisor" style="margin-top:12px"></div>';
     html += '<div class="fila-grid">';
     fila.forEach(function(item, idx) {
@@ -459,13 +464,12 @@ function renderAreaHistorico() {
       html += '<div class="fila-item-hora">📅 ' + item.data + ' ' + item.hora + '</div>';
       html += '<div class="fila-item-tap">' + (online ? '▶ Toque para analisar' : '⏳ Aguardando sinal') + '</div>';
       html += '</div>';
-      html += '<div class="fila-item-num">' + (idx+1) + '</div>';
-      html += '<button class="fila-item-del" onclick="event.stopPropagation();removerDaFila(' + item.id + ')" title="Remover foto">✕</button>';
+      html += '<div class="fila-item-num">' + (item.isVideo ? '🎥' : (idx+1)) + '</div>';
+      html += '<button class="fila-item-del" onclick="event.stopPropagation();removerDaFila(' + item.id + ')" title="Remover">✕</button>';
       html += '</div>';
     });
     html += '</div></div>';
     areaEl.innerHTML = html;
-
   } else {
     tituloEl.textContent = "📋 Histórico de Análises";
     renderHistoricoNaArea(areaEl);
@@ -641,7 +645,6 @@ function processar(file, isVideo) {
   reader.onload = function(e) {
     var b64 = e.target.result.split(",")[1];
     ultimaFotoBase64 = b64;
-
     if (!navigator.onLine) {
       document.getElementById("spinner").style.display = "none";
       var ok = adicionarNaFila(b64);
@@ -651,7 +654,6 @@ function processar(file, isVideo) {
       }
       return;
     }
-
     var body = { imagem: b64, tipo: file.type };
     if (dadosGPS.regiao) body.regiao = dadosGPS.regiao;
     if (dadosGPS.altitude) body.altitude = dadosGPS.altitude;
@@ -724,6 +726,15 @@ function processarVideo(file) {
 }
 
 function enviarFrames(frames) {
+  if (!navigator.onLine) {
+    document.getElementById("spinner").style.display = "none";
+    var ok = adicionarNaFila(frames[0], frames);
+    if (ok) {
+      renderAreaHistorico();
+      document.getElementById("areaHistorico").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    return;
+  }
   document.getElementById("spinnerTexto").textContent = "Analisando " + frames.length + " ângulos...";
   var body = { frames: frames, tipo: "image/jpeg" };
   if (dadosGPS.regiao) body.regiao = dadosGPS.regiao;
@@ -733,7 +744,15 @@ function enviarFrames(frames) {
   })
   .then(function(r) { return r.json(); })
   .then(function(data) { document.getElementById("spinner").style.display = "none"; mostrarResultado(data, true); })
-  .catch(function() { document.getElementById("spinner").style.display = "none"; mostrarErro(); });
+  .catch(function() {
+    document.getElementById("spinner").style.display = "none";
+    var ok = adicionarNaFila(frames[0], frames);
+    if (ok) {
+      renderAreaHistorico();
+      document.getElementById("areaHistorico").scrollIntoView({ behavior: "smooth", block: "start" });
+      alert("Sem conexão. Vídeo salvo na fila — analise quando tiver sinal.");
+    }
+  });
 }
 
 /* ── RESULTADOS ─────────────────────────────────── */
@@ -852,31 +871,68 @@ function falar(texto) {
 function resetar() {
   ultimaFotoBase64 = null;
   document.getElementById("resultado").style.display = "none";
-  document.getElementById("cam").value = "";
-  document.getElementById("gal").value = "";
-  document.getElementById("vid").value = "";
-  document.getElementById("solo").value = "";
-  document.getElementById("soloGal").value = "";
   window.scrollTo(0, 0);
 }
 
 /* ── EVENTOS ────────────────────────────────────── */
+
+function criarInput(id, accept, capture) {
+  var old = document.getElementById(id);
+  var novo = document.createElement("input");
+  novo.type = "file";
+  novo.id = id;
+  novo.accept = accept;
+  if (capture) novo.setAttribute("capture", capture);
+  novo.style.display = "none";
+  old.parentNode.replaceChild(novo, old);
+  return novo;
+}
+
+function bindCam() {
+  var inp = criarInput("cam", "image/*", "environment");
+  inp.addEventListener("change", function(e) {
+    if (e.target.files[0]) { processar(e.target.files[0], false); }
+    bindCam();
+  });
+}
+function bindGal() {
+  var inp = criarInput("gal", "image/*,video/*", null);
+  inp.addEventListener("change", function(e) {
+    if (!e.target.files[0]) { bindGal(); return; }
+    var file = e.target.files[0];
+    if (file.type.startsWith("video/")) { processarVideo(file); } else { processar(file, false); }
+    bindGal();
+  });
+}
+function bindVid() {
+  var inp = criarInput("vid", "video/*", "environment");
+  inp.addEventListener("change", function(e) {
+    if (e.target.files[0]) { processarVideo(e.target.files[0]); }
+    bindVid();
+  });
+}
+function bindSolo() {
+  var inp = criarInput("solo", "image/*", "environment");
+  inp.addEventListener("change", function(e) {
+    if (e.target.files[0]) { processarSolo(e.target.files[0]); }
+    bindSolo();
+  });
+}
+function bindSoloGal() {
+  var inp = criarInput("soloGal", "image/*", null);
+  inp.addEventListener("change", function(e) {
+    if (e.target.files[0]) { processarSolo(e.target.files[0]); }
+    bindSoloGal();
+  });
+}
 
 document.getElementById("btnCam").addEventListener("click", function() { document.getElementById("cam").click(); });
 document.getElementById("btnGal").addEventListener("click", function() { document.getElementById("gal").click(); });
 document.getElementById("btnVid").addEventListener("click", function() { document.getElementById("vid").click(); });
 document.getElementById("btnSolo").addEventListener("click", function() { document.getElementById("solo").click(); });
 document.getElementById("btnSoloGal").addEventListener("click", function() { document.getElementById("soloGal").click(); });
-document.getElementById("cam").addEventListener("change", function(e) { if (e.target.files[0]) processar(e.target.files[0], false); });
-document.getElementById("gal").addEventListener("change", function(e) {
-  if (!e.target.files[0]) return;
-  var file = e.target.files[0];
-  if (file.type.startsWith("video/")) { processarVideo(file); }
-  else { processar(file, false); }
-});
-document.getElementById("vid").addEventListener("change", function(e) { if (e.target.files[0]) processarVideo(e.target.files[0]); });
-document.getElementById("solo").addEventListener("change", function(e) { if (e.target.files[0]) processarSolo(e.target.files[0]); });
-document.getElementById("soloGal").addEventListener("change", function(e) { if (e.target.files[0]) processarSolo(e.target.files[0]); });
+
+bindCam(); bindGal(); bindVid(); bindSolo(); bindSoloGal();
 
 window.addEventListener("online",  function() { renderAreaHistorico(); });
 window.addEventListener("offline", function() { renderAreaHistorico(); });
