@@ -86,7 +86,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--creme); min-height:
 .btn-icon { font-size: 22px; flex-shrink: 0; }
 .btn-text { text-align: left; line-height: 1.3; }
 .btn-text small { display: block; font-weight: 400; font-size: 11px; opacity: 0.7; margin-top: 2px; }
-input { display: none; }
+input[type="file"] { display: none; }
 .dica { background: white; border-radius: 14px; padding: 12px 14px; display: flex; align-items: flex-start; gap: 10px; border-left: 3px solid var(--verde-neon); }
 .dica p { font-size: 12px; color: var(--cinza); line-height: 1.5; }
 .dica strong { color: var(--marrom); }
@@ -97,7 +97,6 @@ input { display: none; }
 #spinner small { color: var(--cinza); font-size: 12px; margin-top: 4px; display: block; }
 #resultado { display: none; }
 
-/* MÚLTIPLOS DIAGNÓSTICOS */
 .card-resultado { background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.1); animation: slideUp 0.4s ease; }
 .multi-header { padding: 16px 20px 8px; display: flex; align-items: center; gap: 12px; }
 .multi-foto { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; flex-shrink: 0; border: 2px solid #f0f0f0; }
@@ -154,6 +153,8 @@ input { display: none; }
 .solo-ok { color: #2e7d32; }
 .solo-baixo { color: #c62828; }
 .solo-alto { color: #e65100; }
+
+/* ── HISTÓRICO ── */
 .card-historico { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
 .hist-header { padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
 .hist-titulo { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--marrom); font-weight: 700; }
@@ -166,6 +167,88 @@ input { display: none; }
 .hist-nome { font-size: 13px; font-weight: 700; color: var(--marrom); text-transform: capitalize; }
 .hist-data { font-size: 11px; color: var(--cinza); margin-top: 2px; }
 .hist-vazio { padding: 16px 18px; font-size: 13px; color: var(--cinza); text-align: center; }
+
+/* ── FILA OFFLINE ── */
+.card-fila { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 20px rgba(230,81,0,0.15); border: 2px solid #ffe0b2; }
+.fila-header { padding: 14px 18px 12px; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.fila-header-esq { flex: 1; }
+.fila-titulo { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--marrom); font-weight: 700; }
+.fila-sub { font-size: 11px; color: #e65100; font-weight: 600; margin-top: 3px; display: flex; align-items: center; gap: 5px; }
+.fila-contagem { display: inline-flex; align-items: center; justify-content: center; background: #e65100; color: white; border-radius: 20px; padding: 2px 9px; font-size: 11px; font-weight: 700; }
+.fila-limpar { font-size: 11px; color: var(--cinza); cursor: pointer; text-decoration: underline; background: none; border: none; font-family: 'DM Sans', sans-serif; white-space: nowrap; padding-top: 2px; }
+.fila-divisor { height: 1px; background: #ffe0b2; margin: 0 18px; }
+
+/* Grid de fotos — 2 colunas, fotos grandes */
+.fila-grid { padding: 14px 18px 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fila-item {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  aspect-ratio: 1;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.18);
+  border: 2px solid #ffe0b2;
+  transition: transform 0.15s, box-shadow 0.15s;
+  background: #f5ebe0;
+}
+.fila-item:active { transform: scale(0.96); box-shadow: 0 1px 6px rgba(0,0,0,0.12); }
+.fila-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fila-item-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.18) 45%, transparent 70%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 10px 10px 9px;
+  gap: 2px;
+}
+.fila-item-hora { font-size: 11px; color: rgba(255,255,255,0.85); font-weight: 600; line-height: 1.2; }
+.fila-item-tap { font-size: 12px; color: #ffd54f; font-weight: 800; letter-spacing: 0.2px; }
+.fila-item-num {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(0,0,0,0.55);
+  color: white;
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.fila-item-del {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  background: rgba(0,0,0,0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* banner aviso sem sinal */
+.offline-banner {
+  margin: 0 18px 12px;
+  background: #fff3e0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.offline-banner-icon { font-size: 20px; flex-shrink: 0; }
+.offline-banner-txt { font-size: 12px; color: #bf360c; line-height: 1.4; font-weight: 500; }
+
 canvas { display: none; }
 </style>
 </head>
@@ -222,12 +305,15 @@ canvas { display: none; }
   <div class="secao-titulo" style="margin-top:4px">📅 Calendário Fitossanitário</div>
   <div class="card-calendario" id="cardCalendario"></div>
 
-  <div class="secao-titulo" style="margin-top:4px">📋 Histórico de Análises</div>
-  <div class="card-historico" id="cardHistorico"></div>
+  <div class="secao-titulo" style="margin-top:4px" id="tituloSecaoHistorico">📋 Histórico de Análises</div>
+  <div id="areaHistorico"></div>
 </div>
 
 <script>
 var ultimaFotoBase64 = null;
+var FILA_KEY = "doutorcafe_fila_offline";
+var HIST_KEY = "doutorcafe_hist";
+var FILA_MAX = 50;
 
 var EMOJIS = {
   ferrugem:"🟠",bicho:"🪲",cercosporiose:"🔵",aureolada:"🟣",
@@ -273,6 +359,150 @@ var CATEGORIAS = {
 var CORES_ESTAGIO = ["#4caf50","#8bc34a","#ffc107","#ff9800","#f44336"];
 var MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 
+/* ── FILA OFFLINE ─────────────────────────────── */
+
+function lerFila() {
+  try { return JSON.parse(localStorage.getItem(FILA_KEY) || "[]"); } catch(e) { return []; }
+}
+function salvarFila(arr) {
+  try { localStorage.setItem(FILA_KEY, JSON.stringify(arr)); } catch(e) {}
+}
+
+function adicionarNaFila(fotoBase64) {
+  var fila = lerFila();
+  if (fila.length >= FILA_MAX) {
+    alert("A fila já tem " + FILA_MAX + " fotos. Limpe algumas antes de tirar mais.");
+    return false;
+  }
+  var agora = new Date();
+  var hora = agora.getHours() + ":" + String(agora.getMinutes()).padStart(2,"0");
+  var data = agora.getDate() + "/" + (agora.getMonth()+1) + "/" + agora.getFullYear();
+  fila.push({ id: Date.now(), foto: fotoBase64, hora: hora, data: data });
+  salvarFila(fila);
+  return true;
+}
+
+function removerDaFila(id) {
+  var fila = lerFila().filter(function(f) { return f.id !== id; });
+  salvarFila(fila);
+  renderAreaHistorico();
+}
+
+function limparFila() {
+  if (!confirm("Limpar todas as " + lerFila().length + " fotos da fila?")) return;
+  localStorage.removeItem(FILA_KEY);
+  renderAreaHistorico();
+}
+
+function analisarDaFila(id) {
+  if (!navigator.onLine) { alert("Ainda sem sinal. Aguarde a internet para analisar."); return; }
+  var fila = lerFila();
+  var item = null;
+  for (var i = 0; i < fila.length; i++) { if (fila[i].id === id) { item = fila[i]; break; } }
+  if (!item) return;
+  ultimaFotoBase64 = item.foto;
+  salvarFila(fila.filter(function(f) { return f.id !== id; }));
+  document.getElementById("spinner").style.display = "block";
+  document.getElementById("resultado").style.display = "none";
+  document.getElementById("spinnerTexto").textContent = "Analisando...";
+  document.getElementById("spinnerSub").textContent = "Identificando sintomas e comparando padrões";
+  renderAreaHistorico();
+  var body = { imagem: item.foto, tipo: "image/jpeg" };
+  if (dadosGPS.regiao) body.regiao = dadosGPS.regiao;
+  if (dadosGPS.altitude) body.altitude = dadosGPS.altitude;
+  fetch("https://doutor-cafe-production.up.railway.app/diagnostico", {
+    method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(body)
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) { document.getElementById("spinner").style.display = "none"; mostrarResultado(data, false); })
+  .catch(function() { document.getElementById("spinner").style.display = "none"; mostrarErro(); });
+  document.getElementById("spinner").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+/* ── RENDERIZAÇÃO DA ÁREA (fila OU histórico) ─── */
+
+function renderAreaHistorico() {
+  var fila = lerFila();
+  var tituloEl = document.getElementById("tituloSecaoHistorico");
+  var areaEl = document.getElementById("areaHistorico");
+
+  if (fila.length > 0) {
+    tituloEl.textContent = "📸 Fotos Aguardando Análise";
+    var online = navigator.onLine;
+    var html = '<div class="card-fila">';
+    html += '<div class="fila-header">';
+    html += '<div class="fila-header-esq">';
+    html += '<div class="fila-titulo">📷 Fila Offline</div>';
+    html += '<div class="fila-sub"><span class="fila-contagem">' + fila.length + '</span> foto' + (fila.length > 1 ? 's' : '') + ' aguardando sinal</div>';
+    html += '</div>';
+    html += '<button class="fila-limpar" onclick="limparFila()">Limpar tudo</button>';
+    html += '</div>';
+
+    if (!online) {
+      html += '<div class="offline-banner">';
+      html += '<span class="offline-banner-icon">📵</span>';
+      html += '<span class="offline-banner-txt">Sem internet. As fotos ficam salvas aqui. Quando chegar no sinal, toque na foto para analisar.</span>';
+      html += '</div>';
+    } else {
+      html += '<div class="offline-banner" style="background:#e8f5e9;margin-bottom:0">';
+      html += '<span class="offline-banner-icon">✅</span>';
+      html += '<span class="offline-banner-txt" style="color:#1b5e20">Internet disponível! Toque em uma foto para analisar agora.</span>';
+      html += '</div>';
+    }
+
+    html += '<div class="fila-divisor" style="margin-top:12px"></div>';
+    html += '<div class="fila-grid">';
+    fila.forEach(function(item, idx) {
+      html += '<div class="fila-item" onclick="analisarDaFila(' + item.id + ')">';
+      html += '<img src="data:image/jpeg;base64,' + item.foto + '" alt="foto ' + (idx+1) + '">';
+      html += '<div class="fila-item-overlay">';
+      html += '<div class="fila-item-hora">📅 ' + item.data + ' ' + item.hora + '</div>';
+      html += '<div class="fila-item-tap">' + (online ? '▶ Toque para analisar' : '⏳ Aguardando sinal') + '</div>';
+      html += '</div>';
+      html += '<div class="fila-item-num">' + (idx+1) + '</div>';
+      html += '<button class="fila-item-del" onclick="event.stopPropagation();removerDaFila(' + item.id + ')" title="Remover foto">✕</button>';
+      html += '</div>';
+    });
+    html += '</div></div>';
+    areaEl.innerHTML = html;
+
+  } else {
+    tituloEl.textContent = "📋 Histórico de Análises";
+    renderHistoricoNaArea(areaEl);
+  }
+}
+
+function renderHistoricoNaArea(areaEl) {
+  try {
+    var hist = JSON.parse(localStorage.getItem(HIST_KEY) || "[]");
+    if (hist.length === 0) {
+      areaEl.innerHTML = '<div class="card-historico"><div class="hist-vazio">Nenhuma análise ainda. Fotografe uma folha!</div></div>';
+      return;
+    }
+    var html = '<div class="card-historico">';
+    html += '<div class="hist-header"><div class="hist-titulo">📋 Últimas análises</div><button class="hist-limpar" onclick="limparHistorico()">Limpar</button></div>';
+    html += '<div class="hist-lista">';
+    hist.forEach(function(h) {
+      var thumbHtml = h.foto
+        ? '<img class="hist-thumb" src="data:image/jpeg;base64,' + h.foto + '" alt="foto">'
+        : '<div class="hist-thumb-placeholder">' + (h.emoji || "🌿") + '</div>';
+      var nomes = h.diags ? h.diags.map(function(d) { return d.diagnostico.replace(/_/g," "); }).join(", ") : h.diag.replace(/_/g," ");
+      html += '<div class="hist-item">' + thumbHtml + '<div class="hist-info"><div class="hist-nome">' + nomes + '</div><div class="hist-data">' + h.data + (h.regiao ? " · " + h.regiao : "") + '</div></div></div>';
+    });
+    html += '</div></div>';
+    areaEl.innerHTML = html;
+  } catch(e) {
+    areaEl.innerHTML = '<div class="card-historico"><div class="hist-vazio">Histórico não disponível.</div></div>';
+  }
+}
+
+function limparHistorico() {
+  try { localStorage.removeItem(HIST_KEY); } catch(e) {}
+  renderAreaHistorico();
+}
+
+/* ── CLIMA ─────────────────────────────────────── */
+
 function calcularRiscoFerrugem(temp, umidade, chuva) {
   var pontos = 0;
   if (temp >= 18 && temp <= 22) pontos += 3;
@@ -312,6 +542,8 @@ function obterClima(lat, lon) {
     });
 }
 
+/* ── CALENDÁRIO ─────────────────────────────────── */
+
 var CALENDARIO = {
   0:{fase:"granacao",faseTxt:"🟢 Granação",alertas:[{nivel:"alto",txt:"🟠 Ferrugem — alta umidade favorece infecção"},{nivel:"alto",txt:"🪲 Bicho-mineiro — pico populacional"},{nivel:"medio",txt:"🟣 Mancha aureolada — ventos e chuvas"}],acoes:["✅ Aplicar fungicida preventivo para ferrugem","✅ Monitorar folhas para trilhas de bicho-mineiro","✅ Adubação de cobertura — N e K parcelados"]},
   1:{fase:"granacao",faseTxt:"🟢 Granação",alertas:[{nivel:"alto",txt:"🟠 Ferrugem — período crítico"},{nivel:"alto",txt:"🪲 Bicho-mineiro — alta incidência"},{nivel:"medio",txt:"🫙 Antracnose — chuvas intensas"}],acoes:["✅ Reaplicar fungicida (21 dias após última aplicação)","✅ Controle de bicho-mineiro se >30% folhas com minas","✅ Verificar adubação fosfatada"]},
@@ -339,9 +571,11 @@ function renderCalendario() {
   document.getElementById("cardCalendario").innerHTML = html;
 }
 
+/* ── HISTÓRICO ─────────────────────────────────── */
+
 function salvarHistorico(diags, fotoBase64, regiao) {
   try {
-    var hist = JSON.parse(localStorage.getItem("doutorcafe_hist") || "[]");
+    var hist = JSON.parse(localStorage.getItem(HIST_KEY) || "[]");
     var agora = new Date();
     var data = agora.getDate() + "/" + (agora.getMonth()+1) + "/" + agora.getFullYear() + " " + agora.getHours() + ":" + String(agora.getMinutes()).padStart(2,"0");
     var primeiro = diags[0];
@@ -354,33 +588,12 @@ function salvarHistorico(diags, fotoBase64, regiao) {
       foto: fotoBase64 || null
     });
     if (hist.length > 10) hist = hist.slice(0, 10);
-    localStorage.setItem("doutorcafe_hist", JSON.stringify(hist));
+    localStorage.setItem(HIST_KEY, JSON.stringify(hist));
   } catch(e) {}
-  renderHistorico();
+  renderAreaHistorico();
 }
 
-function renderHistorico() {
-  try {
-    var hist = JSON.parse(localStorage.getItem("doutorcafe_hist") || "[]");
-    var card = document.getElementById("cardHistorico");
-    if (hist.length === 0) { card.innerHTML = '<div class="hist-vazio">Nenhuma análise ainda. Fotografe uma folha!</div>'; return; }
-    var html = '<div class="hist-header"><div class="hist-titulo">📋 Últimas análises</div><button class="hist-limpar" onclick="limparHistorico()">Limpar</button></div><div class="hist-lista">';
-    hist.forEach(function(h) {
-      var thumbHtml = h.foto
-        ? '<img class="hist-thumb" src="data:image/jpeg;base64,' + h.foto + '" alt="foto">'
-        : '<div class="hist-thumb-placeholder">' + (h.emoji || "🌿") + '</div>';
-      var nomes = h.diags ? h.diags.map(function(d) { return d.diagnostico.replace(/_/g," "); }).join(", ") : h.diag.replace(/_/g," ");
-      html += '<div class="hist-item">' + thumbHtml + '<div class="hist-info"><div class="hist-nome">' + nomes + '</div><div class="hist-data">' + h.data + (h.regiao ? " · " + h.regiao : "") + '</div></div></div>';
-    });
-    html += '</div>';
-    card.innerHTML = html;
-  } catch(e) { document.getElementById("cardHistorico").innerHTML = '<div class="hist-vazio">Histórico não disponível.</div>'; }
-}
-
-function limparHistorico() {
-  try { localStorage.removeItem("doutorcafe_hist"); } catch(e) {}
-  renderHistorico();
-}
+/* ── GPS ────────────────────────────────────────── */
 
 var dadosGPS = { lat: null, lon: null, regiao: null, altitude: null };
 function identificarRegiao(lat, lon) {
@@ -417,25 +630,7 @@ function obterGPS() {
   );
 }
 
-renderCalendario();
-renderHistorico();
-obterGPS();
-
-document.getElementById("btnCam").addEventListener("click", function() { document.getElementById("cam").click(); });
-document.getElementById("btnGal").addEventListener("click", function() { document.getElementById("gal").click(); });
-document.getElementById("btnVid").addEventListener("click", function() { document.getElementById("vid").click(); });
-document.getElementById("btnSolo").addEventListener("click", function() { document.getElementById("solo").click(); });
-document.getElementById("btnSoloGal").addEventListener("click", function() { document.getElementById("soloGal").click(); });
-document.getElementById("cam").addEventListener("change", function(e) { if (e.target.files[0]) processar(e.target.files[0], false); });
-document.getElementById("gal").addEventListener("change", function(e) {
-  if (!e.target.files[0]) return;
-  var file = e.target.files[0];
-  if (file.type.startsWith("video/")) { processarVideo(file); }
-  else { processar(file, false); }
-});
-document.getElementById("vid").addEventListener("change", function(e) { if (e.target.files[0]) processarVideo(e.target.files[0]); });
-document.getElementById("solo").addEventListener("change", function(e) { if (e.target.files[0]) processarSolo(e.target.files[0]); });
-document.getElementById("soloGal").addEventListener("change", function(e) { if (e.target.files[0]) processarSolo(e.target.files[0]); });
+/* ── PROCESSAMENTO ──────────────────────────────── */
 
 function processar(file, isVideo) {
   document.getElementById("spinner").style.display = "block";
@@ -446,6 +641,17 @@ function processar(file, isVideo) {
   reader.onload = function(e) {
     var b64 = e.target.result.split(",")[1];
     ultimaFotoBase64 = b64;
+
+    if (!navigator.onLine) {
+      document.getElementById("spinner").style.display = "none";
+      var ok = adicionarNaFila(b64);
+      if (ok) {
+        renderAreaHistorico();
+        document.getElementById("areaHistorico").scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      return;
+    }
+
     var body = { imagem: b64, tipo: file.type };
     if (dadosGPS.regiao) body.regiao = dadosGPS.regiao;
     if (dadosGPS.altitude) body.altitude = dadosGPS.altitude;
@@ -454,7 +660,15 @@ function processar(file, isVideo) {
     })
     .then(function(r) { return r.json(); })
     .then(function(data) { document.getElementById("spinner").style.display = "none"; mostrarResultado(data, isVideo); })
-    .catch(function() { document.getElementById("spinner").style.display = "none"; mostrarErro(); });
+    .catch(function() {
+      document.getElementById("spinner").style.display = "none";
+      var ok = adicionarNaFila(b64);
+      if (ok) {
+        renderAreaHistorico();
+        document.getElementById("areaHistorico").scrollIntoView({ behavior: "smooth", block: "start" });
+        alert("Sem conexão com o servidor. Foto salva na fila — analise quando tiver sinal.");
+      }
+    });
   };
   reader.readAsDataURL(file);
 }
@@ -522,11 +736,13 @@ function enviarFrames(frames) {
   .catch(function() { document.getElementById("spinner").style.display = "none"; mostrarErro(); });
 }
 
+/* ── RESULTADOS ─────────────────────────────────── */
+
 function compartilhar(diagsJson, regiao) {
   var diags = JSON.parse(diagsJson);
   var texto = "🌿 *Doutor Café — Diagnóstico*\n\n";
   if (regiao) texto += "📍 " + regiao + "\n\n";
-  diags.forEach(function(d, i) {
+  diags.forEach(function(d) {
     var emoji = EMOJIS[d.diagnostico] || "🌿";
     var nome = NOMES_VOZ[d.diagnostico] || d.diagnostico;
     texto += emoji + " *" + nome + "*\n";
@@ -539,18 +755,13 @@ function compartilhar(diagsJson, regiao) {
 function mostrarResultado(data, isVideo) {
   var div = document.getElementById("resultado");
   div.style.display = "block";
-
-  // Suporte a múltiplos diagnósticos e diagnóstico único
   var diags = data.diagnosticos || [{ diagnostico: data.diagnostico || "saudavel", estagio: data.estagio || 1, confianca: data.confianca || "media", visto: data.visto || "", acao: data.acao || "Tente novamente." }];
-
   var regiao = dadosGPS.regiao || "";
   var fotoB64 = ultimaFotoBase64;
   salvarHistorico(diags, fotoB64, regiao);
-
   var thumbHtml = fotoB64
     ? '<img class="multi-foto" src="data:image/jpeg;base64,' + fotoB64 + '" alt="foto">'
     : '<div class="multi-foto-placeholder">🌿</div>';
-
   var qtd = diags.length > 1 ? diags.length + " problemas detectados" : "1 diagnóstico";
   var html = '<div class="card-resultado">';
   html += '<div class="multi-header">' + thumbHtml;
@@ -558,8 +769,7 @@ function mostrarResultado(data, isVideo) {
   if (regiao) html += ' · 📍 ' + regiao;
   if (isVideo) html += ' · 🎥 Vídeo';
   html += '</p></div></div>';
-
-  diags.forEach(function(d, idx) {
+  diags.forEach(function(d) {
     var diag = d.diagnostico || "saudavel";
     var emoji = EMOJIS[diag] || "🌿";
     var cat = CATEGORIAS[diag] || "Análise";
@@ -581,14 +791,12 @@ function mostrarResultado(data, isVideo) {
     html += '<div class="diag-acao">' + (d.acao || "") + '</div>';
     html += '</div>';
   });
-
   var textoVoz = diags.map(function(d) { return (NOMES_VOZ[d.diagnostico] || d.diagnostico) + ". " + d.acao; }).join(". ");
   html += '<div class="btns-resultado">';
   html += '<button class="btn-voz" onclick="falar(\'' + textoVoz.replace(/'/g,"\\'").replace(/\n/g," ") + '\')">🔊 Ouvir</button>';
   html += '<button class="btn-share" onclick="compartilhar(\'' + JSON.stringify(diags).replace(/'/g,"\\'") + '\',\'' + regiao + '\')">📤 WhatsApp</button>';
   html += '<button class="btn-nova" onclick="resetar()">📷 Nova</button>';
   html += '</div></div>';
-
   div.innerHTML = html;
   falar(textoVoz);
   div.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -651,6 +859,32 @@ function resetar() {
   document.getElementById("soloGal").value = "";
   window.scrollTo(0, 0);
 }
+
+/* ── EVENTOS ────────────────────────────────────── */
+
+document.getElementById("btnCam").addEventListener("click", function() { document.getElementById("cam").click(); });
+document.getElementById("btnGal").addEventListener("click", function() { document.getElementById("gal").click(); });
+document.getElementById("btnVid").addEventListener("click", function() { document.getElementById("vid").click(); });
+document.getElementById("btnSolo").addEventListener("click", function() { document.getElementById("solo").click(); });
+document.getElementById("btnSoloGal").addEventListener("click", function() { document.getElementById("soloGal").click(); });
+document.getElementById("cam").addEventListener("change", function(e) { if (e.target.files[0]) processar(e.target.files[0], false); });
+document.getElementById("gal").addEventListener("change", function(e) {
+  if (!e.target.files[0]) return;
+  var file = e.target.files[0];
+  if (file.type.startsWith("video/")) { processarVideo(file); }
+  else { processar(file, false); }
+});
+document.getElementById("vid").addEventListener("change", function(e) { if (e.target.files[0]) processarVideo(e.target.files[0]); });
+document.getElementById("solo").addEventListener("change", function(e) { if (e.target.files[0]) processarSolo(e.target.files[0]); });
+document.getElementById("soloGal").addEventListener("change", function(e) { if (e.target.files[0]) processarSolo(e.target.files[0]); });
+
+window.addEventListener("online",  function() { renderAreaHistorico(); });
+window.addEventListener("offline", function() { renderAreaHistorico(); });
+
+/* ── INIT ───────────────────────────────────────── */
+renderCalendario();
+renderAreaHistorico();
+obterGPS();
 </script>
 </body>
 </html>
