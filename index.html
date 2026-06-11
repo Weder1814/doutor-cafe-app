@@ -7,12 +7,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --verde: #1a5c2a;
-  --verde-claro: #2d8a3e;
-  --verde-neon: #5dde74;
-  --creme: #f5f0e8;
-  --marrom: #3d2b1a;
-  --cinza: #7a8a7c;
+ --verde: #1a5c2a;
+ --verde-claro: #2d8a3e;
+ --verde-neon: #5dde74;
+ --creme: #f5f0e8;
+ --marrom: #3d2b1a;
+ --cinza: #7a8a7c;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'DM Sans', sans-serif; background: var(--creme); min-height: 100vh; overflow-x: hidden; }
@@ -219,73 +219,85 @@ input[type="file"] { display: none; }
 .offline-banner { margin: 0 18px 12px; background: #fff3e0; border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
 .offline-banner-icon { font-size: 20px; flex-shrink: 0; }
 .offline-banner-txt { font-size: 12px; color: #bf360c; line-height: 1.4; font-weight: 500; }
-
 canvas { display: none; }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <img class="header-img" src="cafe.jpg.jpeg" alt="Café">
-  <div class="header-overlay"></div>
-  <div class="header-content">
-    <span class="logo-icon">🌿</span>
-    <h1>Doutor <span>Café</span></h1>
-    <div class="sub">O agrônomo no seu bolso</div>
-    <div class="regiao-tag" id="regiaoTag">📍 Localizando...</div>
-  </div>
+ <img class="header-img" src="cafe.jpg.jpeg" alt="Café">
+ <div class="header-overlay"></div>
+ <div class="header-content">
+   <span class="logo-icon">🌿</span>
+   <h1>Doutor <span>Café</span></h1>
+   <div class="sub">O agrônomo no seu bolso</div>
+   <div class="regiao-tag" id="regiaoTag">📍 Localizando...</div>
+ </div>
 </div>
 <div class="wave"></div>
 
 <div class="corpo">
-  <input id="cam" type="file" accept="image/*" capture="environment">
-  <input id="gal" type="file" accept="image/*,video/*">
-  <input id="vid" type="file" accept="video/*" capture="environment">
-  <input id="solo" type="file" accept="image/*" capture="environment">
-  <input id="soloGal" type="file" accept="image/*">
-  <input id="daninha" type="file" accept="image/*" capture="environment">
-  <input id="daninaGal" type="file" accept="image/*">
-  <canvas id="canvas"></canvas>
+ <input id="cam" type="file" accept="image/*" capture="environment">
+ <input id="gal" type="file" accept="image/*,video/*">
+ <input id="vid" type="file" accept="video/*" capture="environment">
+ <input id="solo" type="file" accept="image/*" capture="environment">
+ <input id="soloGal" type="file" accept="image/*">
+ <input id="daninha" type="file" accept="image/*" capture="environment">
+ <input id="daninaGal" type="file" accept="image/*">
+ <canvas id="canvas"></canvas>
 
-  <div class="secao-titulo">🌿 Diagnóstico de Folhas e Frutos</div>
-  <button class="btn-foto" id="btnCam"><span class="btn-icon">📷</span><span class="btn-text">Fotografar a Folha<small>Análise por foto única</small></span></button>
-  <button class="btn-video" id="btnVid"><span class="btn-icon">🎥</span><span class="btn-text">Gravar Vídeo da Folha<small>Mais preciso — vários ângulos</small></span></button>
-  <button class="btn-galeria" id="btnGal"><span class="btn-icon">🖼️</span><span class="btn-text">Escolher da Galeria<small>Use uma foto já tirada</small></span></button>
+ <div class="secao-titulo">🌿 Diagnóstico de Folhas e Frutos</div>
+ <button class="btn-foto" id="btnCam"><span class="btn-icon">📷</span><span class="btn-text">Fotografar a Folha<small>Análise por foto única</small></span></button>
+ <button class="btn-video" id="btnVid"><span class="btn-icon">🎥</span><span class="btn-text">Gravar Vídeo da Folha<small>Mais preciso — vários ângulos</small></span></button>
+ <button class="btn-galeria" id="btnGal"><span class="btn-icon">🖼️</span><span class="btn-text">Escolher da Galeria<small>Use uma foto já tirada</small></span></button>
 
-  <div id="spinner">
-    <span class="spinner-folha">🔬</span>
-    <p id="spinnerTexto">Analisando...</p>
-    <small id="spinnerSub">Identificando sintomas e comparando padrões</small>
-  </div>
-  <div id="resultado"></div>
+ <div id="spinner">
+   <span class="spinner-folha">🔬</span>
+   <p id="spinnerTexto">Analisando...</p>
+   <small id="spinnerSub">Identificando sintomas e comparando padrões</small>
+ </div>
+ <div id="resultado"></div>
 
-  <div class="secao-titulo" style="margin-top:4px">🌱 Análise de Solo</div>
-  <div class="solo-row">
-    <button class="btn-solo" id="btnSolo"><span class="btn-icon">🧪</span><span class="btn-text">Fotografar Laudo<small>Câmera</small></span></button>
-    <button class="btn-solo-gal" id="btnSoloGal"><span class="btn-icon">📄</span><span class="btn-text">Laudo da Galeria<small>Foto já tirada</small></span></button>
-  </div>
+ <div class="secao-titulo" style="margin-top:4px">🌱 Análise de Solo</div>
+ <div class="solo-row">
+   <button class="btn-solo" id="btnSolo"><span class="btn-icon">🧪</span><span class="btn-text">Fotografar Laudo<small>Câmera</small></span></button>
+   <button class="btn-solo-gal" id="btnSoloGal"><span class="btn-icon">📄</span><span class="btn-text">Laudo da Galeria<small>Foto já tirada</small></span></button>
+ </div>
 
-  <div class="secao-titulo" style="margin-top:4px">🌾 Plantas Daninhas — Leitura do Solo</div>
-  <div class="solo-row">
-    <button class="btn-daninha" id="btnDaninha"><span class="btn-icon">🔍</span><span class="btn-text">Fotografar Planta<small>Identifica e interpreta</small></span></button>
-    <button class="btn-daninha-gal" id="btnDaninhaGal"><span class="btn-icon">🌿</span><span class="btn-text">Da Galeria<small>Foto já tirada</small></span></button>
-  </div>
+ <div class="secao-titulo" style="margin-top:4px">🌾 Plantas Daninhas — Leitura do Solo</div>
+ <div class="solo-row">
+   <button class="btn-daninha" id="btnDaninha"><span class="btn-icon">🔍</span><span class="btn-text">Fotografar Planta<small>Identifica e interpreta</small></span></button>
+   <button class="btn-daninha-gal" id="btnDaninhaGal"><span class="btn-icon">🌿</span><span class="btn-text">Da Galeria<small>Foto já tirada</small></span></button>
+ </div>
 
-  <div class="dica">
-    <span style="font-size:16px;flex-shrink:0;margin-top:1px">💡</span>
-    <p><strong>Dica:</strong> Fotografe a face inferior da folha também. A ferrugem aparece embaixo com pó alaranjado.</p>
-  </div>
+ <div class="dica">
+   <span style="font-size:16px;flex-shrink:0;margin-top:1px">💡</span>
+   <p><strong>Dica:</strong> Fotografe a face inferior da folha também. A ferrugem aparece embaixo com pó alaranjado.</p>
+ </div>
 
-  <div class="secao-titulo" style="margin-top:4px">🌤️ Clima e Risco Agora</div>
-  <div class="card-clima" id="cardClima">
-    <div class="clima-topo"><span style="font-size:13px;color:var(--cinza)">Obtendo clima...</span></div>
-  </div>
+ <div class="secao-titulo" style="margin-top:4px">🌤️ Clima e Risco Agora</div>
+ <div class="card-clima" id="cardClima">
+   <div class="clima-topo"><span style="font-size:13px;color:var(--cinza)">Obtendo clima...</span></div>
+ </div>
 
-  <div class="secao-titulo" style="margin-top:4px">📅 Calendário Fitossanitário</div>
-  <div class="card-calendario" id="cardCalendario"></div>
+ <div class="secao-titulo" style="margin-top:4px">📅 Calendário Fitossanitário</div>
+ <div class="card-calendario" id="cardCalendario"></div>
 
-  <div class="secao-titulo" style="margin-top:4px" id="tituloSecaoHistorico">📋 Histórico de Análises</div>
-  <div id="areaHistorico"></div>
+ <div class="secao-titulo" style="margin-top:4px" id="tituloSecaoHistorico">📋 Histórico de Análises</div>
+ <div id="areaHistorico"></div>
+
+ <div class="secao-titulo" style="margin-top:4px">💬 Fale Conosco</div>
+ <div class="dica" style="flex-direction:column;gap:10px">
+   <p style="font-size:13px;color:var(--marrom);font-weight:600">Tem dúvidas, sugestões ou encontrou algum problema?</p>
+   <p style="font-size:12px;color:var(--cinza);line-height:1.5">Nossa equipe responde em até 24 horas. Seu feedback ajuda a melhorar o Doutor Café para todos os produtores.</p>
+   <button onclick="enviarEmail()" style="background:linear-gradient(135deg,var(--verde-claro),var(--verde));color:white;border:none;border-radius:14px;padding:14px 20px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;width:100%;justify-content:center;"><span>✉️</span> Enviar Mensagem</button>
+   <button onclick="abrirWhatsapp()" style="background:#25D366;color:white;border:none;border-radius:14px;padding:14px 20px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;width:100%;justify-content:center;"><span>📲</span> WhatsApp</button>
+ </div>
+
+ <div style="text-align:center;padding:16px 0 8px;font-size:11px;color:var(--cinza)">
+   🌿 Doutor Café © 2025 · Todos os direitos reservados<br>
+   <span style="font-size:10px">CNPJ 67.223.948/0001-87</span>
+ </div>
 </div>
 
 <script>
@@ -294,483 +306,493 @@ var HIST_KEY = "doutorcafe_hist";
 var FILA_MAX = 50;
 
 var EMOJIS = {
-  ferrugem:"🟠",bicho:"🪲",cercosporiose:"🔵",aureolada:"🟣",
-  phoma:"⚫",antracnose:"🫙",ascochyta:"🟤",manteigosa:"🫧",
-  roseliniose:"💀",helmintosporiose:"🔴",broca:"🕳️",acaro:"🟫",
-  acaro_ferrugem:"🟥",cigarra:"🦗",cochonilha:"🤍",lagarta:"🐛",
-  nematoide:"🪱",nitrogenio:"🌿",magnesio:"🟡",potassio:"🔥",
-  fosforo:"💜",calcio:"🦴",enxofre:"🌕",boro:"🟦",
-  zinco:"🫧",ferro:"🫨",manganes:"🟤",cobre:"🧡",
-  estresse_hidrico:"💧",fitotoxicidade:"⚗️",escaldadura:"☀️",
-  fruto_verde:"🟢",fruto_maduro:"🔴",fruto_passado:"⚫",saudavel:"✅"
+ ferrugem:"🟠",bicho:"🪲",cercosporiose:"🔵",aureolada:"🟣",
+ phoma:"⚫",antracnose:"🫙",ascochyta:"🟤",manteigosa:"🫧",
+ roseliniose:"💀",helmintosporiose:"🔴",broca:"🕳️",acaro:"🟫",
+ acaro_ferrugem:"🟥",cigarra:"🦗",cochonilha:"🤍",lagarta:"🐛",
+ nematoide:"🪱",nitrogenio:"🌿",magnesio:"🟡",potassio:"🔥",
+ fosforo:"💜",calcio:"🦴",enxofre:"🌕",boro:"🟦",
+ zinco:"🫧",ferro:"🫨",manganes:"🟤",cobre:"🧡",
+ estresse_hidrico:"💧",fitotoxicidade:"⚗️",escaldadura:"☀️",
+ fruto_verde:"🟢",fruto_maduro:"🔴",fruto_passado:"⚫",saudavel:"✅"
 };
 var NOMES_VOZ = {
-  ferrugem:"Ferrugem do café",bicho:"Bicho mineiro",cercosporiose:"Cercosporiose",
-  aureolada:"Mancha aureolada",phoma:"Phoma",antracnose:"Antracnose",
-  ascochyta:"Mancha Ascochyta",manteigosa:"Mancha manteigosa",roseliniose:"Roseliniose",
-  helmintosporiose:"Helmintosporiose",broca:"Broca do café",acaro:"Ácaro vermelho",
-  acaro_ferrugem:"Ácaro ferrugem falsa",cigarra:"Cigarra do cafeeiro",cochonilha:"Cochonilha",
-  lagarta:"Lagarta das rosetas",nematoide:"Nematoide das galhas",nitrogenio:"Deficiência de nitrogênio",
-  magnesio:"Deficiência de magnésio",potassio:"Deficiência de potássio",fosforo:"Deficiência de fósforo",
-  calcio:"Deficiência de cálcio",enxofre:"Deficiência de enxofre",boro:"Deficiência de boro",
-  zinco:"Deficiência de zinco",ferro:"Deficiência de ferro",manganes:"Deficiência de manganês",
-  cobre:"Deficiência de cobre",estresse_hidrico:"Estresse hídrico",fitotoxicidade:"Fitotoxicidade",
-  escaldadura:"Escaldadura solar",fruto_verde:"Fruto verde saudável",fruto_maduro:"Fruto maduro para colheita",
-  fruto_passado:"Fruto passado do ponto",saudavel:"Planta saudável"
+ ferrugem:"Ferrugem do café",bicho:"Bicho mineiro",cercosporiose:"Cercosporiose",
+ aureolada:"Mancha aureolada",phoma:"Phoma",antracnose:"Antracnose",
+ ascochyta:"Mancha Ascochyta",manteigosa:"Mancha manteigosa",roseliniose:"Roseliniose",
+ helmintosporiose:"Helmintosporiose",broca:"Broca do café",acaro:"Ácaro vermelho",
+ acaro_ferrugem:"Ácaro ferrugem falsa",cigarra:"Cigarra do cafeeiro",cochonilha:"Cochonilha",
+ lagarta:"Lagarta das rosetas",nematoide:"Nematoide das galhas",nitrogenio:"Deficiência de nitrogênio",
+ magnesio:"Deficiência de magnésio",potassio:"Deficiência de potássio",fosforo:"Deficiência de fósforo",
+ calcio:"Deficiência de cálcio",enxofre:"Deficiência de enxofre",boro:"Deficiência de boro",
+ zinco:"Deficiência de zinco",ferro:"Deficiência de ferro",manganes:"Deficiência de manganês",
+ cobre:"Deficiência de cobre",estresse_hidrico:"Estresse hídrico",fitotoxicidade:"Fitotoxicidade",
+ escaldadura:"Escaldadura solar",fruto_verde:"Fruto verde saudável",fruto_maduro:"Fruto maduro para colheita",
+ fruto_passado:"Fruto passado do ponto",saudavel:"Planta saudável"
 };
 var CATEGORIAS = {
-  ferrugem:"Doença Fúngica",bicho:"Praga",cercosporiose:"Doença Fúngica",
-  aureolada:"Doença Bacteriana",phoma:"Doença Fúngica",antracnose:"Doença Fúngica",
-  ascochyta:"Doença Fúngica",manteigosa:"Doença Fúngica",roseliniose:"Doença Fúngica",
-  helmintosporiose:"Doença Fúngica",broca:"Praga",acaro:"Praga",
-  acaro_ferrugem:"Praga",cigarra:"Praga",cochonilha:"Praga",
-  lagarta:"Praga",nematoide:"Praga",nitrogenio:"Deficiência Nutricional",
-  magnesio:"Deficiência Nutricional",potassio:"Deficiência Nutricional",
-  fosforo:"Deficiência Nutricional",calcio:"Deficiência Nutricional",
-  enxofre:"Deficiência Nutricional",boro:"Deficiência Nutricional",
-  zinco:"Deficiência Nutricional",ferro:"Deficiência Nutricional",
-  manganes:"Deficiência Nutricional",cobre:"Deficiência Nutricional",
-  estresse_hidrico:"Estresse Ambiental",fitotoxicidade:"Estresse Ambiental",
-  escaldadura:"Estresse Ambiental",fruto_verde:"Fruto",fruto_maduro:"Fruto",
-  fruto_passado:"Fruto",saudavel:"Planta Saudável"
+ ferrugem:"Doença Fúngica",bicho:"Praga",cercosporiose:"Doença Fúngica",
+ aureolada:"Doença Bacteriana",phoma:"Doença Fúngica",antracnose:"Doença Fúngica",
+ ascochyta:"Doença Fúngica",manteigosa:"Doença Fúngica",roseliniose:"Doença Fúngica",
+ helmintosporiose:"Doença Fúngica",broca:"Praga",acaro:"Praga",
+ acaro_ferrugem:"Praga",cigarra:"Praga",cochonilha:"Praga",
+ lagarta:"Praga",nematoide:"Praga",nitrogenio:"Deficiência Nutricional",
+ magnesio:"Deficiência Nutricional",potassio:"Deficiência Nutricional",
+ fosforo:"Deficiência Nutricional",calcio:"Deficiência Nutricional",
+ enxofre:"Deficiência Nutricional",boro:"Deficiência Nutricional",
+ zinco:"Deficiência Nutricional",ferro:"Deficiência Nutricional",
+ manganes:"Deficiência Nutricional",cobre:"Deficiência Nutricional",
+ estresse_hidrico:"Estresse Ambiental",fitotoxicidade:"Estresse Ambiental",
+ escaldadura:"Estresse Ambiental",fruto_verde:"Fruto",fruto_maduro:"Fruto",
+ fruto_passado:"Fruto",saudavel:"Planta Saudável"
 };
 var CORES_ESTAGIO = ["#4caf50","#8bc34a","#ffc107","#ff9800","#f44336"];
 var MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 
 var _db = null;
 function abrirDB(callback) {
-  if (_db) { callback(_db); return; }
-  var req = indexedDB.open("doutorcafe_db", 1);
-  req.onupgradeneeded = function(e) { var db = e.target.result; if (!db.objectStoreNames.contains("fila")) db.createObjectStore("fila", { keyPath: "id" }); };
-  req.onsuccess = function(e) { _db = e.target.result; callback(_db); };
-  req.onerror = function() { callback(null); };
+ if (_db) { callback(_db); return; }
+ var req = indexedDB.open("doutorcafe_db", 1);
+ req.onupgradeneeded = function(e) { var db = e.target.result; if (!db.objectStoreNames.contains("fila")) db.createObjectStore("fila", { keyPath: "id" }); };
+ req.onsuccess = function(e) { _db = e.target.result; callback(_db); };
+ req.onerror = function() { callback(null); };
 }
 function lerFila(callback) {
-  abrirDB(function(db) {
-    if (!db) { callback([]); return; }
-    var tx = db.transaction("fila", "readonly");
-    var req = tx.objectStore("fila").getAll();
-    req.onsuccess = function() { var arr = req.result || []; arr.sort(function(a,b){return a.id-b.id;}); callback(arr); };
-    req.onerror = function() { callback([]); };
-  });
+ abrirDB(function(db) {
+   if (!db) { callback([]); return; }
+   var tx = db.transaction("fila", "readonly");
+   var req = tx.objectStore("fila").getAll();
+   req.onsuccess = function() { var arr = req.result || []; arr.sort(function(a,b){return a.id-b.id;}); callback(arr); };
+   req.onerror = function() { callback([]); };
+ });
 }
 function adicionarNaFila(fotoBase64, frames, callback) {
-  lerFila(function(fila) {
-    if (fila.length >= FILA_MAX) { alert("A fila já tem "+FILA_MAX+" itens."); if (callback) callback(false); return; }
-    var agora = new Date();
-    var item = { id: Date.now(), foto: fotoBase64, hora: agora.getHours()+":"+String(agora.getMinutes()).padStart(2,"0"), data: agora.getDate()+"/"+(agora.getMonth()+1)+"/"+agora.getFullYear() };
-    if (frames) { item.frames = frames; item.isVideo = true; }
-    abrirDB(function(db) {
-      if (!db) { if (callback) callback(false); return; }
-      var tx = db.transaction("fila", "readwrite");
-      tx.objectStore("fila").add(item);
-      tx.oncomplete = function() { if (callback) callback(true); };
-      tx.onerror = function() { if (callback) callback(false); };
-    });
-  });
+ lerFila(function(fila) {
+   if (fila.length >= FILA_MAX) { alert("A fila já tem "+FILA_MAX+" itens."); if (callback) callback(false); return; }
+   var agora = new Date();
+   var item = { id: Date.now(), foto: fotoBase64, hora: agora.getHours()+":"+String(agora.getMinutes()).padStart(2,"0"), data: agora.getDate()+"/"+(agora.getMonth()+1)+"/"+agora.getFullYear() };
+   if (frames) { item.frames = frames; item.isVideo = true; }
+   abrirDB(function(db) {
+     if (!db) { if (callback) callback(false); return; }
+     var tx = db.transaction("fila", "readwrite");
+     tx.objectStore("fila").add(item);
+     tx.oncomplete = function() { if (callback) callback(true); };
+     tx.onerror = function() { if (callback) callback(false); };
+   });
+ });
 }
 function removerDaFila(id) {
-  abrirDB(function(db) {
-    if (!db) return;
-    var tx = db.transaction("fila", "readwrite");
-    tx.objectStore("fila").delete(id);
-    tx.oncomplete = function() { renderAreaHistorico(); };
-  });
+ abrirDB(function(db) {
+   if (!db) return;
+   var tx = db.transaction("fila", "readwrite");
+   tx.objectStore("fila").delete(id);
+   tx.oncomplete = function() { renderAreaHistorico(); };
+ });
 }
 function limparFila() {
-  lerFila(function(fila) {
-    if (!confirm("Limpar todas as "+fila.length+" fotos da fila?")) return;
-    abrirDB(function(db) {
-      if (!db) return;
-      var tx = db.transaction("fila", "readwrite");
-      tx.objectStore("fila").clear();
-      tx.oncomplete = function() { renderAreaHistorico(); };
-    });
-  });
+ lerFila(function(fila) {
+   if (!confirm("Limpar todas as "+fila.length+" fotos da fila?")) return;
+   abrirDB(function(db) {
+     if (!db) return;
+     var tx = db.transaction("fila", "readwrite");
+     tx.objectStore("fila").clear();
+     tx.oncomplete = function() { renderAreaHistorico(); };
+   });
+ });
 }
 function analisarDaFila(id) {
-  if (!navigator.onLine) { alert("Ainda sem sinal."); return; }
-  abrirDB(function(db) {
-    if (!db) return;
-    var tx = db.transaction("fila", "readwrite");
-    var store = tx.objectStore("fila");
-    var req = store.get(id);
-    req.onsuccess = function() {
-      var item = req.result; if (!item) return;
-      store.delete(id);
-      tx.oncomplete = function() {
-        ultimaFotoBase64 = item.foto;
-        document.getElementById("spinner").style.display = "block";
-        document.getElementById("resultado").style.display = "none";
-        renderAreaHistorico();
-        document.getElementById("spinner").scrollIntoView({behavior:"smooth",block:"start"});
-        if (item.isVideo && item.frames) {
-          document.getElementById("spinnerTexto").textContent = "Analisando "+item.frames.length+" ângulos...";
-          document.getElementById("spinnerSub").textContent = "Processando vídeo da fila offline";
-          var bodyV = { frames: item.frames, tipo: "image/jpeg" };
-          if (dadosGPS.regiao) bodyV.regiao = dadosGPS.regiao;
-          if (dadosGPS.altitude) bodyV.altitude = dadosGPS.altitude;
-          fetch("https://doutor-cafe-production.up.railway.app/diagnostico-video",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bodyV)})
-          .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultado(data,true);})
-          .catch(function(){document.getElementById("spinner").style.display="none";mostrarErro();});
-        } else {
-          document.getElementById("spinnerTexto").textContent = "Analisando...";
-          document.getElementById("spinnerSub").textContent = "Identificando sintomas e comparando padrões";
-          var bodyF = { imagem: item.foto, tipo: "image/jpeg" };
-          if (dadosGPS.regiao) bodyF.regiao = dadosGPS.regiao;
-          if (dadosGPS.altitude) bodyF.altitude = dadosGPS.altitude;
-          fetch("https://doutor-cafe-production.up.railway.app/diagnostico",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bodyF)})
-          .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultado(data,false);})
-          .catch(function(){document.getElementById("spinner").style.display="none";mostrarErro();});
-        }
-      };
-    };
-  });
+ if (!navigator.onLine) { alert("Ainda sem sinal."); return; }
+ abrirDB(function(db) {
+   if (!db) return;
+   var tx = db.transaction("fila", "readwrite");
+   var store = tx.objectStore("fila");
+   var req = store.get(id);
+   req.onsuccess = function() {
+     var item = req.result; if (!item) return;
+     store.delete(id);
+     tx.oncomplete = function() {
+       ultimaFotoBase64 = item.foto;
+       document.getElementById("spinner").style.display = "block";
+       document.getElementById("resultado").style.display = "none";
+       renderAreaHistorico();
+       document.getElementById("spinner").scrollIntoView({behavior:"smooth",block:"start"});
+       if (item.isVideo && item.frames) {
+         document.getElementById("spinnerTexto").textContent = "Analisando "+item.frames.length+" ângulos...";
+         document.getElementById("spinnerSub").textContent = "Processando vídeo da fila offline";
+         var bodyV = { frames: item.frames, tipo: "image/jpeg" };
+         if (dadosGPS.regiao) bodyV.regiao = dadosGPS.regiao;
+         if (dadosGPS.altitude) bodyV.altitude = dadosGPS.altitude;
+         fetch("https://doutor-cafe-production.up.railway.app/diagnostico-video",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bodyV)})
+         .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultado(data,true);})
+         .catch(function(){document.getElementById("spinner").style.display="none";mostrarErro();});
+       } else {
+         document.getElementById("spinnerTexto").textContent = "Analisando...";
+         document.getElementById("spinnerSub").textContent = "Identificando sintomas e comparando padrões";
+         var bodyF = { imagem: item.foto, tipo: "image/jpeg" };
+         if (dadosGPS.regiao) bodyF.regiao = dadosGPS.regiao;
+         if (dadosGPS.altitude) bodyF.altitude = dadosGPS.altitude;
+         fetch("https://doutor-cafe-production.up.railway.app/diagnostico",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bodyF)})
+         .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultado(data,false);})
+         .catch(function(){document.getElementById("spinner").style.display="none";mostrarErro();});
+       }
+     };
+   };
+ });
 }
 
 function renderAreaHistorico() {
-  lerFila(function(fila) {
-    var tituloEl = document.getElementById("tituloSecaoHistorico");
-    var areaEl = document.getElementById("areaHistorico");
-    if (fila.length > 0) {
-      tituloEl.textContent = "📸 Fotos Aguardando Análise";
-      var online = navigator.onLine;
-      var html = '<div class="card-fila"><div class="fila-header"><div class="fila-header-esq"><div class="fila-titulo">📷 Fila Offline</div><div class="fila-sub"><span class="fila-contagem">'+fila.length+'</span> foto'+(fila.length>1?'s':'')+' aguardando sinal</div></div><button class="fila-limpar" onclick="limparFila()">Limpar tudo</button></div>';
-      if (!online) {
-        html += '<div class="offline-banner"><span class="offline-banner-icon">📵</span><span class="offline-banner-txt">Sem internet. As fotos ficam salvas aqui. Quando chegar no sinal, toque na foto para analisar.</span></div>';
-      } else {
-        html += '<div class="offline-banner" style="background:#e8f5e9;margin-bottom:0"><span class="offline-banner-icon">✅</span><span class="offline-banner-txt" style="color:#1b5e20">Internet disponível! Toque em uma foto para analisar agora.</span></div>';
-      }
-      html += '<div class="fila-divisor" style="margin-top:12px"></div><div class="fila-grid">';
-      fila.forEach(function(item,idx) {
-        html += '<div class="fila-item" onclick="analisarDaFila('+item.id+')"><img src="data:image/jpeg;base64,'+item.foto+'" alt="foto '+(idx+1)+'">';
-        html += '<div class="fila-item-overlay"><div class="fila-item-hora">📅 '+item.data+' '+item.hora+'</div><div class="fila-item-tap">'+(online?'▶ Toque para analisar':'⏳ Aguardando sinal')+'</div></div>';
-        html += '<div class="fila-item-num">'+(item.isVideo?'🎥':(idx+1))+'</div>';
-        html += '<button class="fila-item-del" onclick="event.stopPropagation();removerDaFila('+item.id+')" title="Remover">✕</button></div>';
-      });
-      html += '</div></div>';
-      areaEl.innerHTML = html;
-    } else {
-      tituloEl.textContent = "📋 Histórico de Análises";
-      renderHistoricoNaArea(areaEl);
-    }
-  });
+ lerFila(function(fila) {
+   var tituloEl = document.getElementById("tituloSecaoHistorico");
+   var areaEl = document.getElementById("areaHistorico");
+   if (fila.length > 0) {
+     tituloEl.textContent = "📸 Fotos Aguardando Análise";
+     var online = navigator.onLine;
+     var html = '<div class="card-fila"><div class="fila-header"><div class="fila-header-esq"><div class="fila-titulo">📷 Fila Offline</div><div class="fila-sub"><span class="fila-contagem">'+fila.length+'</span> foto'+(fila.length>1?'s':'')+' aguardando sinal</div></div><button class="fila-limpar" onclick="limparFila()">Limpar tudo</button></div>';
+     if (!online) {
+       html += '<div class="offline-banner"><span class="offline-banner-icon">📵</span><span class="offline-banner-txt">Sem internet. As fotos ficam salvas aqui. Quando chegar no sinal, toque na foto para analisar.</span></div>';
+     } else {
+       html += '<div class="offline-banner" style="background:#e8f5e9;margin-bottom:0"><span class="offline-banner-icon">✅</span><span class="offline-banner-txt" style="color:#1b5e20">Internet disponível! Toque em uma foto para analisar agora.</span></div>';
+     }
+     html += '<div class="fila-divisor" style="margin-top:12px"></div><div class="fila-grid">';
+     fila.forEach(function(item,idx) {
+       html += '<div class="fila-item" onclick="analisarDaFila('+item.id+')"><img src="data:image/jpeg;base64,'+item.foto+'" alt="foto '+(idx+1)+'">';
+       html += '<div class="fila-item-overlay"><div class="fila-item-hora">📅 '+item.data+' '+item.hora+'</div><div class="fila-item-tap">'+(online?'▶ Toque para analisar':'⏳ Aguardando sinal')+'</div></div>';
+       html += '<div class="fila-item-num">'+(item.isVideo?'🎥':(idx+1))+'</div>';
+       html += '<button class="fila-item-del" onclick="event.stopPropagation();removerDaFila('+item.id+')" title="Remover">✕</button></div>';
+     });
+     html += '</div></div>';
+     areaEl.innerHTML = html;
+   } else {
+     tituloEl.textContent = "📋 Histórico de Análises";
+     renderHistoricoNaArea(areaEl);
+   }
+ });
 }
 function renderHistoricoNaArea(areaEl) {
-  try {
-    var hist = JSON.parse(localStorage.getItem(HIST_KEY) || "[]");
-    if (hist.length === 0) { areaEl.innerHTML = '<div class="card-historico"><div class="hist-vazio">Nenhuma análise ainda. Fotografe uma folha!</div></div>'; return; }
-    var html = '<div class="card-historico"><div class="hist-header"><div class="hist-titulo">📋 Últimas análises</div><button class="hist-limpar" onclick="limparHistorico()">Limpar</button></div><div class="hist-lista">';
-    hist.forEach(function(h) {
-      var thumbHtml = h.foto ? '<img class="hist-thumb" src="data:image/jpeg;base64,'+h.foto+'" alt="foto">' : '<div class="hist-thumb-placeholder">'+(h.emoji||"🌿")+'</div>';
-      var nomes = h.diags ? h.diags.map(function(d){return d.diagnostico.replace(/_/g," ");}).join(", ") : h.diag.replace(/_/g," ");
-      html += '<div class="hist-item">'+thumbHtml+'<div class="hist-info"><div class="hist-nome">'+nomes+'</div><div class="hist-data">'+h.data+(h.regiao?" · "+h.regiao:"")+'</div></div></div>';
-    });
-    html += '</div></div>';
-    areaEl.innerHTML = html;
-  } catch(e) { areaEl.innerHTML = '<div class="card-historico"><div class="hist-vazio">Histórico não disponível.</div></div>'; }
+ try {
+   var hist = JSON.parse(localStorage.getItem(HIST_KEY) || "[]");
+   if (hist.length === 0) { areaEl.innerHTML = '<div class="card-historico"><div class="hist-vazio">Nenhuma análise ainda. Fotografe uma folha!</div></div>'; return; }
+   var html = '<div class="card-historico"><div class="hist-header"><div class="hist-titulo">📋 Últimas análises</div><button class="hist-limpar" onclick="limparHistorico()">Limpar</button></div><div class="hist-lista">';
+   hist.forEach(function(h) {
+     var thumbHtml = h.foto ? '<img class="hist-thumb" src="data:image/jpeg;base64,'+h.foto+'" alt="foto">' : '<div class="hist-thumb-placeholder">'+(h.emoji||"🌿")+'</div>';
+     var nomes = h.diags ? h.diags.map(function(d){return d.diagnostico.replace(/_/g," ");}).join(", ") : h.diag.replace(/_/g," ");
+     html += '<div class="hist-item">'+thumbHtml+'<div class="hist-info"><div class="hist-nome">'+nomes+'</div><div class="hist-data">'+h.data+(h.regiao?" · "+h.regiao:"")+'</div></div></div>';
+   });
+   html += '</div></div>';
+   areaEl.innerHTML = html;
+ } catch(e) { areaEl.innerHTML = '<div class="card-historico"><div class="hist-vazio">Histórico não disponível.</div></div>'; }
 }
 function limparHistorico() {
-  try { localStorage.removeItem(HIST_KEY); } catch(e) {}
-  renderAreaHistorico();
+ try { localStorage.removeItem(HIST_KEY); } catch(e) {}
+ renderAreaHistorico();
 }
 
 function calcularRiscoFerrugem(temp, umidade, chuva) {
-  var pontos = 0;
-  if (temp>=18&&temp<=22) pontos+=3; else if (temp>=15&&temp<=25) pontos+=1;
-  if (umidade>=80) pontos+=3; else if (umidade>=70) pontos+=2; else if (umidade>=60) pontos+=1;
-  if (chuva>5) pontos+=2; else if (chuva>0) pontos+=1;
-  if (pontos>=7) return {nivel:"critico",txt:"Risco Crítico de Ferrugem",desc:"Condições ideais para infecção. Aplique fungicida imediatamente.",icon:"🔴"};
-  if (pontos>=5) return {nivel:"alto",txt:"Risco Alto de Ferrugem",desc:"Alta umidade e temperatura favorável. Aplique fungicida preventivo.",icon:"🟠"};
-  if (pontos>=3) return {nivel:"medio",txt:"Risco Médio de Ferrugem",desc:"Condições parcialmente favoráveis. Monitore as folhas.",icon:"🟡"};
-  return {nivel:"baixo",txt:"Risco Baixo de Ferrugem",desc:"Condições desfavoráveis para ferrugem hoje.",icon:"🟢"};
+ var pontos = 0;
+ if (temp>=18&&temp<=22) pontos+=3; else if (temp>=15&&temp<=25) pontos+=1;
+ if (umidade>=80) pontos+=3; else if (umidade>=70) pontos+=2; else if (umidade>=60) pontos+=1;
+ if (chuva>5) pontos+=2; else if (chuva>0) pontos+=1;
+ if (pontos>=7) return {nivel:"critico",txt:"Risco Crítico de Ferrugem",desc:"Condições ideais para infecção. Aplique fungicida imediatamente.",icon:"🔴"};
+ if (pontos>=5) return {nivel:"alto",txt:"Risco Alto de Ferrugem",desc:"Alta umidade e temperatura favorável. Aplique fungicida preventivo.",icon:"🟠"};
+ if (pontos>=3) return {nivel:"medio",txt:"Risco Médio de Ferrugem",desc:"Condições parcialmente favoráveis. Monitore as folhas.",icon:"🟡"};
+ return {nivel:"baixo",txt:"Risco Baixo de Ferrugem",desc:"Condições desfavoráveis para ferrugem hoje.",icon:"🟢"};
 }
 function obterClima(lat, lon) {
-  fetch("https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lon+"&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&timezone=America/Sao_Paulo")
-  .then(function(r){return r.json();}).then(function(d) {
-    var c=d.current, temp=Math.round(c.temperature_2m), umidade=Math.round(c.relative_humidity_2m), chuva=c.precipitation||0, wcode=c.weather_code;
-    var climaIcon=wcode<=1?"☀️":wcode<=3?"⛅":wcode<=49?"🌫️":wcode<=67?"🌧️":wcode<=77?"❄️":wcode<=82?"🌦️":"⛈️";
-    var risco=calcularRiscoFerrugem(temp,umidade,chuva);
-    var html='<div class="clima-topo"><span style="font-size:13px;font-weight:600;color:var(--marrom)">'+climaIcon+' Agora</span><span style="font-size:11px;color:var(--cinza)">Atualizado agora</span></div>';
-    html+='<div class="clima-dados"><div class="clima-item"><div class="clima-valor">'+temp+'°C</div><div class="clima-label">Temperatura</div></div>';
-    html+='<div class="clima-item"><div class="clima-valor">'+umidade+'%</div><div class="clima-label">Umidade</div></div>';
-    html+='<div class="clima-item"><div class="clima-valor">'+chuva.toFixed(1)+'mm</div><div class="clima-label">Chuva</div></div></div>';
-    html+='<div class="risco-box risco-'+risco.nivel+'"><span class="risco-icon">'+risco.icon+'</span><div class="risco-info"><div class="risco-titulo">'+risco.txt+'</div><div class="risco-desc">'+risco.desc+'</div></div></div>';
-    document.getElementById("cardClima").innerHTML=html;
-  }).catch(function(){document.getElementById("cardClima").innerHTML='<div class="clima-topo"><span style="font-size:13px;color:var(--cinza)">Clima não disponível</span></div>';});
+ fetch("https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lon+"&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&timezone=America/Sao_Paulo")
+ .then(function(r){return r.json();}).then(function(d) {
+   var c=d.current,temp=Math.round(c.temperature_2m),umidade=Math.round(c.relative_humidity_2m),chuva=c.precipitation||0,wcode=c.weather_code;
+   var climaIcon=wcode<=1?"☀️":wcode<=3?"⛅":wcode<=49?"🌫️":wcode<=67?"🌧️":wcode<=77?"❄️":wcode<=82?"🌦️":"⛈️";
+   var risco=calcularRiscoFerrugem(temp,umidade,chuva);
+   var html='<div class="clima-topo"><span style="font-size:13px;font-weight:600;color:var(--marrom)">'+climaIcon+' Agora</span><span style="font-size:11px;color:var(--cinza)">Atualizado agora</span></div>';
+   html+='<div class="clima-dados"><div class="clima-item"><div class="clima-valor">'+temp+'°C</div><div class="clima-label">Temperatura</div></div>';
+   html+='<div class="clima-item"><div class="clima-valor">'+umidade+'%</div><div class="clima-label">Umidade</div></div>';
+   html+='<div class="clima-item"><div class="clima-valor">'+chuva.toFixed(1)+'mm</div><div class="clima-label">Chuva</div></div></div>';
+   html+='<div class="risco-box risco-'+risco.nivel+'"><span class="risco-icon">'+risco.icon+'</span><div class="risco-info"><div class="risco-titulo">'+risco.txt+'</div><div class="risco-desc">'+risco.desc+'</div></div></div>';
+   document.getElementById("cardClima").innerHTML=html;
+ }).catch(function(){document.getElementById("cardClima").innerHTML='<div class="clima-topo"><span style="font-size:13px;color:var(--cinza)">Clima não disponível</span></div>';});
 }
 
 var CALENDARIO = {
-  0:{fase:"granacao",faseTxt:"🟢 Granação",alertas:[{nivel:"alto",txt:"🟠 Ferrugem — alta umidade favorece infecção"},{nivel:"alto",txt:"🪲 Bicho-mineiro — pico populacional"},{nivel:"medio",txt:"🟣 Mancha aureolada — ventos e chuvas"}],acoes:["✅ Aplicar fungicida preventivo para ferrugem","✅ Monitorar folhas para trilhas de bicho-mineiro","✅ Adubação de cobertura — N e K parcelados"]},
-  1:{fase:"granacao",faseTxt:"🟢 Granação",alertas:[{nivel:"alto",txt:"🟠 Ferrugem — período crítico"},{nivel:"alto",txt:"🪲 Bicho-mineiro — alta incidência"},{nivel:"medio",txt:"🫙 Antracnose — chuvas intensas"}],acoes:["✅ Reaplicar fungicida (21 dias após última aplicação)","✅ Controle de bicho-mineiro se >30% folhas com minas","✅ Verificar adubação fosfatada"]},
-  2:{fase:"maturacao",faseTxt:"🔴 Maturação",alertas:[{nivel:"alto",txt:"🟠 Ferrugem — frutos pesados reduzem resistência"},{nivel:"medio",txt:"🕳️ Broca — monitorar frutos"},{nivel:"medio",txt:"🪲 Bicho-mineiro — continua ativo"}],acoes:["✅ Monitorar broca nos frutos","✅ Aplicar fungicida se necessário","✅ Preparar equipamentos para colheita"]},
-  3:{fase:"colheita",faseTxt:"☕ Colheita",alertas:[{nivel:"medio",txt:"🕳️ Broca — pico nos frutos maduros"},{nivel:"medio",txt:"🟠 Ferrugem — desfolha pós-colheita"},{nivel:"alto",txt:"⚠️ Colha no ponto certo — 80% frutos verdes = perda de 20 sacas a cada 100"}],acoes:["✅ Colheita seletiva — cereja e passa separados","✅ Controle biológico da broca (Beauveria bassiana)","✅ Processar café rapidamente após colheita","⚠️ Evite colheita antecipada — prejuízo no peso e qualidade"]},
-  4:{fase:"colheita",faseTxt:"☕ Colheita",alertas:[{nivel:"medio",txt:"🕳️ Broca — reinfestação em frutos remanescentes"},{nivel:"medio",txt:"🟠 Ferrugem — lesões visíveis pós-colheita"},{nivel:"alto",txt:"⚠️ 50% frutos verdes = perda de 13 sacas a cada 100"}],acoes:["✅ Recolher todos os frutos caídos (repasse)","✅ Aplicar fungicida curativo pós-colheita","✅ Iniciar poda de formação e limpeza","⚠️ Aguarde ponto ideal: mínimo 80% cereja/passa"]},
-  5:{fase:"pos",faseTxt:"🌿 Pós-colheita",alertas:[{nivel:"medio",txt:"🟠 Ferrugem — lesões tardias"},{nivel:"medio",txt:"🟡 Deficiência de Mg — período seco"}],acoes:["✅ Realizar poda e esqueletamento se necessário","✅ Calagem e adubação de solo","✅ Análise de solo para planejar próxima safra"]},
-  6:{fase:"pos",faseTxt:"🌿 Pós-colheita",alertas:[{nivel:"medio",txt:"🟫 Ácaro vermelho — período seco favorece"},{nivel:"medio",txt:"🟡 Deficiências nutricionais — solo seco"}],acoes:["✅ Monitorar ácaros (folha bronzeada)","✅ Adubação fosfatada e potássica","✅ Irrigação se disponível"]},
-  7:{fase:"repouso",faseTxt:"😴 Repouso vegetativo",alertas:[{nivel:"medio",txt:"🟫 Ácaro vermelho — pico em período seco"},{nivel:"medio",txt:"🤍 Cochonilha — favorecida pelo estresse hídrico"}],acoes:["✅ Aplicar acaricida se necessário","✅ Adubação foliar de micronutrientes","✅ Revisar sistema de irrigação"]},
-  8:{fase:"florada",faseTxt:"🌸 Florada",alertas:[{nivel:"alto",txt:"🌸 NÃO aplicar inseticidas na florada — proteger abelhas"},{nivel:"medio",txt:"🟠 Ferrugem — início das chuvas"},{nivel:"medio",txt:"⚫ Phoma — regiões acima de 900m"}],acoes:["⚠️ EVITAR agrotóxicos durante a florada","✅ Fungicida preventivo ANTES da florada","✅ Adubação nitrogenada de cobertura"]},
-  9:{fase:"florada",faseTxt:"🌸 Florada/Chumbinho",alertas:[{nivel:"alto",txt:"🟠 Ferrugem — chuvas reiniciadas, risco alto"},{nivel:"alto",txt:"🪲 Bicho-mineiro — nova geração"},{nivel:"medio",txt:"🟣 Aureolada — ventos e chuvas"}],acoes:["✅ Aplicar fungicida sistêmico para ferrugem","✅ Monitorar bicho-mineiro nas folhas novas","✅ Adubação NPK completa"]},
-  10:{fase:"granacao",faseTxt:"🟢 Granação",alertas:[{nivel:"alto",txt:"🟠 Ferrugem — período de máximo risco"},{nivel:"alto",txt:"🪲 Bicho-mineiro — alta infestação"},{nivel:"medio",txt:"⚫ Phoma — em regiões altas"}],acoes:["✅ Reaplicar fungicida (intervalo 21 dias)","✅ Controle de bicho-mineiro","✅ Monitorar deficiência de boro nos ponteiros"]},
-  11:{fase:"granacao",faseTxt:"🟢 Granação",alertas:[{nivel:"alto",txt:"🟠 Ferrugem — frutos em desenvolvimento"},{nivel:"alto",txt:"🪲 Bicho-mineiro — pico"},{nivel:"medio",txt:"🟣 Aureolada — ventos de verão"}],acoes:["✅ Fungicida preventivo — não deixar passar intervalo","✅ Adubação potássica para granação","✅ Monitorar broca nos primeiros frutos"]}
+ 0:{fase:"granacao",faseTxt:"🟢 Granação",alertas:[{nivel:"alto",txt:"🟠 Ferrugem — alta umidade favorece infecção"},{nivel:"alto",txt:"🪲 Bicho-mineiro — pico populacional"},{nivel:"medio",txt:"🟣 Mancha aureolada — ventos e chuvas"}],acoes:["✅ Aplicar fungicida preventivo para ferrugem","✅ Monitorar folhas para trilhas de bicho-mineiro","✅ Adubação de cobertura — N e K parcelados"]},
+ 1:{fase:"granacao",faseTxt:"🟢 Granação",alertas:[{nivel:"alto",txt:"🟠 Ferrugem — período crítico"},{nivel:"alto",txt:"🪲 Bicho-mineiro — alta incidência"},{nivel:"medio",txt:"🫙 Antracnose — chuvas intensas"}],acoes:["✅ Reaplicar fungicida (21 dias após última aplicação)","✅ Controle de bicho-mineiro se >30% folhas com minas","✅ Verificar adubação fosfatada"]},
+ 2:{fase:"maturacao",faseTxt:"🔴 Maturação",alertas:[{nivel:"alto",txt:"🟠 Ferrugem — frutos pesados reduzem resistência"},{nivel:"medio",txt:"🕳️ Broca — monitorar frutos"},{nivel:"medio",txt:"🪲 Bicho-mineiro — continua ativo"}],acoes:["✅ Monitorar broca nos frutos","✅ Aplicar fungicida se necessário","✅ Preparar equipamentos para colheita"]},
+ 3:{fase:"colheita",faseTxt:"☕ Colheita",alertas:[{nivel:"medio",txt:"🕳️ Broca — pico nos frutos maduros"},{nivel:"medio",txt:"🟠 Ferrugem — desfolha pós-colheita"},{nivel:"alto",txt:"⚠️ Colha no ponto certo — 80% frutos verdes = perda de 20 sacas a cada 100"}],acoes:["✅ Colheita seletiva — cereja e passa separados","✅ Controle biológico da broca (Beauveria bassiana)","✅ Processar café rapidamente após colheita","⚠️ Evite colheita antecipada — prejuízo no peso e qualidade"]},
+ 4:{fase:"colheita",faseTxt:"☕ Colheita",alertas:[{nivel:"medio",txt:"🕳️ Broca — reinfestação em frutos remanescentes"},{nivel:"medio",txt:"🟠 Ferrugem — lesões visíveis pós-colheita"},{nivel:"alto",txt:"⚠️ 50% frutos verdes = perda de 13 sacas a cada 100"}],acoes:["✅ Recolher todos os frutos caídos (repasse)","✅ Aplicar fungicida curativo pós-colheita","✅ Iniciar poda de formação e limpeza","⚠️ Aguarde ponto ideal: mínimo 80% cereja/passa"]},
+ 5:{fase:"pos",faseTxt:"🌿 Pós-colheita",alertas:[{nivel:"medio",txt:"🟠 Ferrugem — lesões tardias"},{nivel:"medio",txt:"🟡 Deficiência de Mg — período seco"}],acoes:["✅ Realizar poda e esqueletamento se necessário","✅ Calagem e adubação de solo","✅ Análise de solo para planejar próxima safra"]},
+ 6:{fase:"pos",faseTxt:"🌿 Pós-colheita",alertas:[{nivel:"medio",txt:"🟫 Ácaro vermelho — período seco favorece"},{nivel:"medio",txt:"🟡 Deficiências nutricionais — solo seco"}],acoes:["✅ Monitorar ácaros (folha bronzeada)","✅ Adubação fosfatada e potássica","✅ Irrigação se disponível"]},
+ 7:{fase:"repouso",faseTxt:"😴 Repouso vegetativo",alertas:[{nivel:"medio",txt:"🟫 Ácaro vermelho — pico em período seco"},{nivel:"medio",txt:"🤍 Cochonilha — favorecida pelo estresse hídrico"}],acoes:["✅ Aplicar acaricida se necessário","✅ Adubação foliar de micronutrientes","✅ Revisar sistema de irrigação"]},
+ 8:{fase:"florada",faseTxt:"🌸 Florada",alertas:[{nivel:"alto",txt:"🌸 NÃO aplicar inseticidas na florada — proteger abelhas"},{nivel:"medio",txt:"🟠 Ferrugem — início das chuvas"},{nivel:"medio",txt:"⚫ Phoma — regiões acima de 900m"}],acoes:["⚠️ EVITAR agrotóxicos durante a florada","✅ Fungicida preventivo ANTES da florada","✅ Adubação nitrogenada de cobertura"]},
+ 9:{fase:"florada",faseTxt:"🌸 Florada/Chumbinho",alertas:[{nivel:"alto",txt:"🟠 Ferrugem — chuvas reiniciadas, risco alto"},{nivel:"alto",txt:"🪲 Bicho-mineiro — nova geração"},{nivel:"medio",txt:"🟣 Aureolada — ventos e chuvas"}],acoes:["✅ Aplicar fungicida sistêmico para ferrugem","✅ Monitorar bicho-mineiro nas folhas novas","✅ Adubação NPK completa"]},
+ 10:{fase:"granacao",faseTxt:"🟢 Granação",alertas:[{nivel:"alto",txt:"🟠 Ferrugem — período de máximo risco"},{nivel:"alto",txt:"🪲 Bicho-mineiro — alta infestação"},{nivel:"medio",txt:"⚫ Phoma — em regiões altas"}],acoes:["✅ Reaplicar fungicida (intervalo 21 dias)","✅ Controle de bicho-mineiro","✅ Monitorar deficiência de boro nos ponteiros"]},
+ 11:{fase:"granacao",faseTxt:"🟢 Granação",alertas:[{nivel:"alto",txt:"🟠 Ferrugem — frutos em desenvolvimento"},{nivel:"alto",txt:"🪲 Bicho-mineiro — pico"},{nivel:"medio",txt:"🟣 Aureolada — ventos de verão"}],acoes:["✅ Fungicida preventivo — não deixar passar intervalo","✅ Adubação potássica para granação","✅ Monitorar broca nos primeiros frutos"]}
 };
 function renderCalendario() {
-  var mes=new Date().getMonth(), cal=CALENDARIO[mes];
-  var html='<div class="cal-header"><div class="cal-mes">📅 '+MESES[mes]+'</div><div class="cal-fase fase-'+cal.fase+'">'+cal.faseTxt+'</div></div>';
-  html+='<div class="cal-divisor"></div><div class="cal-alertas"><h4>⚠️ Alertas deste mês</h4>';
-  cal.alertas.forEach(function(a){html+='<div class="alerta-item"><span class="alerta-'+a.nivel+'">'+a.txt+'</span></div>';});
-  html+='</div><div class="cal-divisor"></div><div class="cal-acoes"><h4>📋 O que fazer agora</h4>';
-  cal.acoes.forEach(function(a){html+='<div class="acao-item">'+a+'</div>';});
-  html+='</div>';
-  document.getElementById("cardCalendario").innerHTML=html;
+ var mes=new Date().getMonth(),cal=CALENDARIO[mes];
+ var html='<div class="cal-header"><div class="cal-mes">📅 '+MESES[mes]+'</div><div class="cal-fase fase-'+cal.fase+'">'+cal.faseTxt+'</div></div>';
+ html+='<div class="cal-divisor"></div><div class="cal-alertas"><h4>⚠️ Alertas deste mês</h4>';
+ cal.alertas.forEach(function(a){html+='<div class="alerta-item"><span class="alerta-'+a.nivel+'">'+a.txt+'</span></div>';});
+ html+='</div><div class="cal-divisor"></div><div class="cal-acoes"><h4>📋 O que fazer agora</h4>';
+ cal.acoes.forEach(function(a){html+='<div class="acao-item">'+a+'</div>';});
+ html+='</div>';
+ document.getElementById("cardCalendario").innerHTML=html;
 }
 
 function salvarHistorico(diags, fotoBase64, regiao) {
-  try {
-    var hist=JSON.parse(localStorage.getItem(HIST_KEY)||"[]");
-    var agora=new Date();
-    var data=agora.getDate()+"/"+(agora.getMonth()+1)+"/"+agora.getFullYear()+" "+agora.getHours()+":"+String(agora.getMinutes()).padStart(2,"0");
-    var primeiro=diags[0];
-    hist.unshift({diag:primeiro.diagnostico,emoji:EMOJIS[primeiro.diagnostico]||"🌿",diags:diags,data:data,regiao:regiao||"",foto:fotoBase64||null});
-    if (hist.length>10) hist=hist.slice(0,10);
-    localStorage.setItem(HIST_KEY,JSON.stringify(hist));
-  } catch(e) {}
-  renderAreaHistorico();
+ try {
+   var hist=JSON.parse(localStorage.getItem(HIST_KEY)||"[]");
+   var agora=new Date();
+   var data=agora.getDate()+"/"+(agora.getMonth()+1)+"/"+agora.getFullYear()+" "+agora.getHours()+":"+String(agora.getMinutes()).padStart(2,"0");
+   var primeiro=diags[0];
+   hist.unshift({diag:primeiro.diagnostico,emoji:EMOJIS[primeiro.diagnostico]||"🌿",diags:diags,data:data,regiao:regiao||"",foto:fotoBase64||null});
+   if (hist.length>10) hist=hist.slice(0,10);
+   localStorage.setItem(HIST_KEY,JSON.stringify(hist));
+ } catch(e) {}
+ renderAreaHistorico();
 }
 
 var dadosGPS={lat:null,lon:null,regiao:null,altitude:null};
 function identificarRegiao(lat,lon) {
-  if (lat>=-20.5&&lat<=-15.0&&lon>=-50.0&&lon<=-44.0) return "Cerrado Mineiro";
-  if (lat>=-22.5&&lat<=-19.5&&lon>=-46.5&&lon<=-43.5) return "Sul de Minas";
-  if (lat>=-21.5&&lat<=-19.0&&lon>=-48.5&&lon<=-46.0) return "Mogiana";
-  if (lat>=-20.0&&lat<=-17.0&&lon>=-42.5&&lon<=-40.0) return "Matas de Minas";
-  if (lat>=-15.0&&lat<=-10.0&&lon>=-41.5&&lon<=-38.5) return "Chapada Diamantina";
-  if (lat>=-12.0&&lat<=-8.0&&lon>=-40.0&&lon<=-36.0) return "Planalto da Bahia";
-  if (lat>=-12.0&&lat<=-6.0&&lon>=-62.0&&lon<=-56.0) return "Rondônia";
-  if (lat>=-22.0&&lat<=-19.0&&lon>=-52.0&&lon<=-48.0) return "Alta Paulista";
-  if (lat>=-25.0&&lat<=-21.0&&lon>=-54.0&&lon<=-49.0) return "Norte do Paraná";
-  if (lat>=-21.0&&lat<=-17.0&&lon>=-41.5&&lon<=-39.0) return "Espírito Santo";
-  return "Região Cafeeira";
+ if (lat>=-20.5&&lat<=-15.0&&lon>=-50.0&&lon<=-44.0) return "Cerrado Mineiro";
+ if (lat>=-22.5&&lat<=-19.5&&lon>=-46.5&&lon<=-43.5) return "Sul de Minas";
+ if (lat>=-21.5&&lat<=-19.0&&lon>=-48.5&&lon<=-46.0) return "Mogiana";
+ if (lat>=-20.0&&lat<=-17.0&&lon>=-42.5&&lon<=-40.0) return "Matas de Minas";
+ if (lat>=-15.0&&lat<=-10.0&&lon>=-41.5&&lon<=-38.5) return "Chapada Diamantina";
+ if (lat>=-12.0&&lat<=-8.0&&lon>=-40.0&&lon<=-36.0) return "Planalto da Bahia";
+ if (lat>=-12.0&&lat<=-6.0&&lon>=-62.0&&lon<=-56.0) return "Rondônia";
+ if (lat>=-22.0&&lat<=-19.0&&lon>=-52.0&&lon<=-48.0) return "Alta Paulista";
+ if (lat>=-25.0&&lat<=-21.0&&lon>=-54.0&&lon<=-49.0) return "Norte do Paraná";
+ if (lat>=-21.0&&lat<=-17.0&&lon>=-41.5&&lon<=-39.0) return "Espírito Santo";
+ return "Região Cafeeira";
 }
 function obterGPS() {
-  if (!navigator.geolocation) { document.getElementById("regiaoTag").textContent="📍 GPS não disponível"; return; }
-  navigator.geolocation.getCurrentPosition(function(pos) {
-    dadosGPS.lat=pos.coords.latitude; dadosGPS.lon=pos.coords.longitude;
-    dadosGPS.altitude=pos.coords.altitude?Math.round(pos.coords.altitude):null;
-    dadosGPS.regiao=identificarRegiao(dadosGPS.lat,dadosGPS.lon);
-    var tag="📍 "+dadosGPS.regiao; if (dadosGPS.altitude) tag+=" · "+dadosGPS.altitude+"m";
-    document.getElementById("regiaoTag").textContent=tag;
-    obterClima(dadosGPS.lat,dadosGPS.lon);
-  }, function() {
-    document.getElementById("regiaoTag").textContent="📍 Localização não obtida";
-    document.getElementById("cardClima").innerHTML='<div class="clima-topo"><span style="font-size:13px;color:var(--cinza)">Ative o GPS para ver o clima</span></div>';
-  }, {timeout:8000,enableHighAccuracy:false});
+ if (!navigator.geolocation) { document.getElementById("regiaoTag").textContent="📍 GPS não disponível"; return; }
+ navigator.geolocation.getCurrentPosition(function(pos) {
+   dadosGPS.lat=pos.coords.latitude; dadosGPS.lon=pos.coords.longitude;
+   dadosGPS.altitude=pos.coords.altitude?Math.round(pos.coords.altitude):null;
+   dadosGPS.regiao=identificarRegiao(dadosGPS.lat,dadosGPS.lon);
+   var tag="📍 "+dadosGPS.regiao; if (dadosGPS.altitude) tag+=" · "+dadosGPS.altitude+"m";
+   document.getElementById("regiaoTag").textContent=tag;
+   obterClima(dadosGPS.lat,dadosGPS.lon);
+ }, function() {
+   document.getElementById("regiaoTag").textContent="📍 Localização não obtida";
+   document.getElementById("cardClima").innerHTML='<div class="clima-topo"><span style="font-size:13px;color:var(--cinza)">Ative o GPS para ver o clima</span></div>';
+ }, {timeout:8000,enableHighAccuracy:false});
 }
 
 function buildCalcFungicida(fungicidas, diagIdx) {
-  if (!fungicidas||fungicidas.length===0) return "";
-  var html='<div class="calc-box"><div class="calc-titulo">🧪 Calcular Dosagem</div>';
-  fungicidas.forEach(function(f,fi) {
-    var badgeClass="calc-tipo-"+(f.tipo||"protetor");
-    var badgeTxt=f.tipo==="sistemico"?"Sistêmico":f.tipo==="biologico"?"Biológico":f.tipo==="acaricida"?"Acaricida":f.tipo==="inseticida"?"Inseticida":"Protetor";
-    var inputId="calc_"+diagIdx+"_"+fi;
-    var resTanque=(f.proporcao_por_litro*20).toFixed(1);
-    html+='<div class="calc-produto"><div class="calc-produto-nome">🧴 '+f.nome+' <span class="calc-tipo-badge '+badgeClass+'">'+badgeTxt+'</span></div>';
-    html+='<div class="calc-inputs">';
-    html+='<div class="calc-input-group"><label>Área (hectares)</label><input type="number" id="'+inputId+'_ha" value="1" min="0.1" step="0.1" oninput="calcular(\''+inputId+'\','+f.dose_min+','+f.dose_max+','+f.proporcao_por_litro+',\''+f.unidade+'\',\''+(f.unidade_proporcao||'g')+'\')"></div>';
-    html+='<div class="calc-input-group"><label>Tanque (litros)</label><input type="number" id="'+inputId+'_tanque" value="20" min="1" step="1" oninput="calcular(\''+inputId+'\','+f.dose_min+','+f.dose_max+','+f.proporcao_por_litro+',\''+f.unidade+'\',\''+(f.unidade_proporcao||'g')+'\')"></div>';
-    html+='</div><div class="calc-resultado" id="'+inputId+'_res">';
-    html+='<div class="calc-resultado-linha"><span class="calc-resultado-label">Dose total no hectare</span><span class="calc-resultado-valor">'+f.dose_min+'–'+f.dose_max+' '+f.unidade+'</span></div>';
-    html+='<div class="calc-resultado-linha"><span class="calc-resultado-label">Por tanque de 20L</span><span class="calc-resultado-valor">'+resTanque+' '+(f.unidade_proporcao||'g')+'</span></div>';
-    html+='<div class="calc-aviso">⚠️ Confirme sempre no rótulo do produto comprado</div>';
-    html+='</div></div>';
-  });
-  html+='</div>';
-  return html;
+ if (!fungicidas||fungicidas.length===0) return "";
+ var html='<div class="calc-box"><div class="calc-titulo">🧪 Calcular Dosagem</div>';
+ fungicidas.forEach(function(f,fi) {
+   var badgeClass="calc-tipo-"+(f.tipo||"protetor");
+   var badgeTxt=f.tipo==="sistemico"?"Sistêmico":f.tipo==="biologico"?"Biológico":f.tipo==="acaricida"?"Acaricida":f.tipo==="inseticida"?"Inseticida":"Protetor";
+   var inputId="calc_"+diagIdx+"_"+fi;
+   var resTanque=(f.proporcao_por_litro*20).toFixed(1);
+   html+='<div class="calc-produto"><div class="calc-produto-nome">🧴 '+f.nome+' <span class="calc-tipo-badge '+badgeClass+'">'+badgeTxt+'</span></div>';
+   html+='<div class="calc-inputs">';
+   html+='<div class="calc-input-group"><label>Área (hectares)</label><input type="number" id="'+inputId+'_ha" value="1" min="0.1" step="0.1" oninput="calcular(\''+inputId+'\','+f.dose_min+','+f.dose_max+','+f.proporcao_por_litro+',\''+f.unidade+'\',\''+(f.unidade_proporcao||'g')+'\')"></div>';
+   html+='<div class="calc-input-group"><label>Tanque (litros)</label><input type="number" id="'+inputId+'_tanque" value="20" min="1" step="1" oninput="calcular(\''+inputId+'\','+f.dose_min+','+f.dose_max+','+f.proporcao_por_litro+',\''+f.unidade+'\',\''+(f.unidade_proporcao||'g')+'\')"></div>';
+   html+='</div><div class="calc-resultado" id="'+inputId+'_res">';
+   html+='<div class="calc-resultado-linha"><span class="calc-resultado-label">Dose total no hectare</span><span class="calc-resultado-valor">'+f.dose_min+'–'+f.dose_max+' '+f.unidade+'</span></div>';
+   html+='<div class="calc-resultado-linha"><span class="calc-resultado-label">Por tanque de 20L</span><span class="calc-resultado-valor">'+resTanque+' '+(f.unidade_proporcao||'g')+'</span></div>';
+   html+='<div class="calc-aviso">⚠️ Confirme sempre no rótulo do produto comprado</div>';
+   html+='</div></div>';
+ });
+ html+='</div>';
+ return html;
 }
 function calcular(inputId,doseMin,doseMax,propPorLitro,unidade,unidadeProp) {
-  var haEl=document.getElementById(inputId+"_ha"), tanqueEl=document.getElementById(inputId+"_tanque"), resEl=document.getElementById(inputId+"_res");
-  if (!haEl||!tanqueEl||!resEl) return;
-  var ha=parseFloat(haEl.value)||1, tanque=parseFloat(tanqueEl.value)||20;
-  resEl.innerHTML=
-    '<div class="calc-resultado-linha"><span class="calc-resultado-label">Dose total ('+ha+' ha)</span><span class="calc-resultado-valor">'+(doseMin*ha).toFixed(2)+'–'+(doseMax*ha).toFixed(2)+' '+unidade+'</span></div>'+
-    '<div class="calc-resultado-linha"><span class="calc-resultado-label">Por tanque de '+tanque+'L</span><span class="calc-resultado-valor">'+(propPorLitro*tanque).toFixed(1)+' '+unidadeProp+'</span></div>'+
-    '<div class="calc-aviso">⚠️ Confirme sempre no rótulo do produto comprado</div>';
+ var haEl=document.getElementById(inputId+"_ha"),tanqueEl=document.getElementById(inputId+"_tanque"),resEl=document.getElementById(inputId+"_res");
+ if (!haEl||!tanqueEl||!resEl) return;
+ var ha=parseFloat(haEl.value)||1,tanque=parseFloat(tanqueEl.value)||20;
+ resEl.innerHTML=
+   '<div class="calc-resultado-linha"><span class="calc-resultado-label">Dose total ('+ha+' ha)</span><span class="calc-resultado-valor">'+(doseMin*ha).toFixed(2)+'–'+(doseMax*ha).toFixed(2)+' '+unidade+'</span></div>'+
+   '<div class="calc-resultado-linha"><span class="calc-resultado-label">Por tanque de '+tanque+'L</span><span class="calc-resultado-valor">'+(propPorLitro*tanque).toFixed(1)+' '+unidadeProp+'</span></div>'+
+   '<div class="calc-aviso">⚠️ Confirme sempre no rótulo do produto comprado</div>';
 }
 
 function processar(file, isVideo) {
-  document.getElementById("spinner").style.display="block";
-  document.getElementById("resultado").style.display="none";
-  document.getElementById("spinnerTexto").textContent="Analisando...";
-  document.getElementById("spinnerSub").textContent="Identificando sintomas e comparando padrões";
-  var reader=new FileReader();
-  reader.onload=function(e) {
-    var b64=e.target.result.split(",")[1]; ultimaFotoBase64=b64;
-    if (!navigator.onLine) {
-      document.getElementById("spinner").style.display="none";
-      adicionarNaFila(b64,null,function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});}});
-      return;
-    }
-    var body={imagem:b64,tipo:file.type};
-    if (dadosGPS.regiao) body.regiao=dadosGPS.regiao;
-    if (dadosGPS.altitude) body.altitude=dadosGPS.altitude;
-    fetch("https://doutor-cafe-production.up.railway.app/diagnostico",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
-    .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultado(data,isVideo);})
-    .catch(function(){document.getElementById("spinner").style.display="none";adicionarNaFila(b64,null,function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert("Sem conexão. Foto salva na fila!");}});});
-  };
-  reader.readAsDataURL(file);
+ document.getElementById("spinner").style.display="block";
+ document.getElementById("resultado").style.display="none";
+ document.getElementById("spinnerTexto").textContent="Analisando...";
+ document.getElementById("spinnerSub").textContent="Identificando sintomas e comparando padrões";
+ var reader=new FileReader();
+ reader.onload=function(e) {
+   var b64=e.target.result.split(",")[1]; ultimaFotoBase64=b64;
+   if (!navigator.onLine) {
+     document.getElementById("spinner").style.display="none";
+     adicionarNaFila(b64,null,function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});}});
+     return;
+   }
+   var body={imagem:b64,tipo:file.type};
+   if (dadosGPS.regiao) body.regiao=dadosGPS.regiao;
+   if (dadosGPS.altitude) body.altitude=dadosGPS.altitude;
+   fetch("https://doutor-cafe-production.up.railway.app/diagnostico",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
+   .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultado(data,isVideo);})
+   .catch(function(){document.getElementById("spinner").style.display="none";adicionarNaFila(b64,null,function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert("Sem conexão. Foto salva na fila!");}});});
+ };
+ reader.readAsDataURL(file);
 }
 function processarSolo(file) {
-  document.getElementById("spinner").style.display="block";
-  document.getElementById("resultado").style.display="none";
-  document.getElementById("spinnerTexto").textContent="Lendo laudo de solo...";
-  document.getElementById("spinnerSub").textContent="Interpretando valores e calculando recomendações";
-  var reader=new FileReader();
-  reader.onload=function(e) {
-    var b64=e.target.result.split(",")[1]; ultimaFotoBase64=b64;
-    var body={imagem:b64,tipo:file.type};
-    if (dadosGPS.regiao) body.regiao=dadosGPS.regiao;
-    fetch("https://doutor-cafe-production.up.railway.app/analise-solo",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
-    .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultadoSolo(data);})
-    .catch(function(){document.getElementById("spinner").style.display="none";mostrarErro();});
-  };
-  reader.readAsDataURL(file);
+ document.getElementById("spinner").style.display="block";
+ document.getElementById("resultado").style.display="none";
+ document.getElementById("spinnerTexto").textContent="Lendo laudo de solo...";
+ document.getElementById("spinnerSub").textContent="Interpretando valores e calculando recomendações";
+ var reader=new FileReader();
+ reader.onload=function(e) {
+   var b64=e.target.result.split(",")[1]; ultimaFotoBase64=b64;
+   var body={imagem:b64,tipo:file.type};
+   if (dadosGPS.regiao) body.regiao=dadosGPS.regiao;
+   fetch("https://doutor-cafe-production.up.railway.app/analise-solo",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
+   .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultadoSolo(data);})
+   .catch(function(){document.getElementById("spinner").style.display="none";mostrarErro();});
+ };
+ reader.readAsDataURL(file);
 }
 function processarDaninha(file) {
-  document.getElementById("spinner").style.display="block";
-  document.getElementById("resultado").style.display="none";
-  document.getElementById("spinnerTexto").textContent="Identificando planta daninha...";
-  document.getElementById("spinnerSub").textContent="Lendo o que ela revela sobre o seu solo";
-  var reader=new FileReader();
-  reader.onload=function(e) {
-    var b64=e.target.result.split(",")[1]; ultimaFotoBase64=b64;
-    var body={imagem:b64,tipo:file.type};
-    if (dadosGPS.regiao) body.regiao=dadosGPS.regiao;
-    fetch("https://doutor-cafe-production.up.railway.app/identifica-daninha",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
-    .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultadoDaninha(data);})
-    .catch(function(){document.getElementById("spinner").style.display="none";mostrarErro();});
-  };
-  reader.readAsDataURL(file);
+ document.getElementById("spinner").style.display="block";
+ document.getElementById("resultado").style.display="none";
+ document.getElementById("spinnerTexto").textContent="Identificando planta daninha...";
+ document.getElementById("spinnerSub").textContent="Lendo o que ela revela sobre o seu solo";
+ var reader=new FileReader();
+ reader.onload=function(e) {
+   var b64=e.target.result.split(",")[1]; ultimaFotoBase64=b64;
+   var body={imagem:b64,tipo:file.type};
+   if (dadosGPS.regiao) body.regiao=dadosGPS.regiao;
+   fetch("https://doutor-cafe-production.up.railway.app/identifica-daninha",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
+   .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultadoDaninha(data);})
+   .catch(function(){document.getElementById("spinner").style.display="none";mostrarErro();});
+ };
+ reader.readAsDataURL(file);
 }
 function processarVideo(file) {
-  document.getElementById("spinner").style.display="block";
-  document.getElementById("resultado").style.display="none";
-  document.getElementById("spinnerTexto").textContent="Extraindo frames do vídeo...";
-  document.getElementById("spinnerSub").textContent="Analisando múltiplos ângulos";
-  var video=document.createElement("video"), canvas=document.getElementById("canvas"), ctx=canvas.getContext("2d"), url=URL.createObjectURL(file);
-  video.src=url; video.muted=true;
-  video.addEventListener("loadedmetadata",function() {
-    var duration=video.duration, frames=[], tempos=[duration*0.15,duration*0.35,duration*0.60,duration*0.85], idx=0;
-    function capturarFrame(){if(idx>=tempos.length){URL.revokeObjectURL(url);enviarFrames(frames);return;}video.currentTime=tempos[idx];}
-    video.addEventListener("seeked",function(){canvas.width=640;canvas.height=480;ctx.drawImage(video,0,0,640,480);var frameB64=canvas.toDataURL("image/jpeg",0.7).split(",")[1];if(idx===0)ultimaFotoBase64=frameB64;frames.push(frameB64);idx++;capturarFrame();});
-    capturarFrame();
-  });
-  video.load();
+ document.getElementById("spinner").style.display="block";
+ document.getElementById("resultado").style.display="none";
+ document.getElementById("spinnerTexto").textContent="Extraindo frames do vídeo...";
+ document.getElementById("spinnerSub").textContent="Analisando múltiplos ângulos";
+ var video=document.createElement("video"),canvas=document.getElementById("canvas"),ctx=canvas.getContext("2d"),url=URL.createObjectURL(file);
+ video.src=url; video.muted=true;
+ video.addEventListener("loadedmetadata",function() {
+   var duration=video.duration,frames=[],tempos=[duration*0.15,duration*0.35,duration*0.60,duration*0.85],idx=0;
+   function capturarFrame(){if(idx>=tempos.length){URL.revokeObjectURL(url);enviarFrames(frames);return;}video.currentTime=tempos[idx];}
+   video.addEventListener("seeked",function(){canvas.width=640;canvas.height=480;ctx.drawImage(video,0,0,640,480);var frameB64=canvas.toDataURL("image/jpeg",0.7).split(",")[1];if(idx===0)ultimaFotoBase64=frameB64;frames.push(frameB64);idx++;capturarFrame();});
+   capturarFrame();
+ });
+ video.load();
 }
 function enviarFrames(frames) {
-  if (!navigator.onLine) {
-    document.getElementById("spinner").style.display="none";
-    adicionarNaFila(frames[0],frames,function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});}});
-    return;
-  }
-  document.getElementById("spinnerTexto").textContent="Analisando "+frames.length+" ângulos...";
-  var body={frames:frames,tipo:"image/jpeg"};
-  if (dadosGPS.regiao) body.regiao=dadosGPS.regiao;
-  if (dadosGPS.altitude) body.altitude=dadosGPS.altitude;
-  fetch("https://doutor-cafe-production.up.railway.app/diagnostico-video",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
-  .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultado(data,true);})
-  .catch(function(){document.getElementById("spinner").style.display="none";adicionarNaFila(frames[0],frames,function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert("Sem conexão. Vídeo salvo na fila!");}});});
+ if (!navigator.onLine) {
+   document.getElementById("spinner").style.display="none";
+   adicionarNaFila(frames[0],frames,function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});}});
+   return;
+ }
+ document.getElementById("spinnerTexto").textContent="Analisando "+frames.length+" ângulos...";
+ var body={frames:frames,tipo:"image/jpeg"};
+ if (dadosGPS.regiao) body.regiao=dadosGPS.regiao;
+ if (dadosGPS.altitude) body.altitude=dadosGPS.altitude;
+ fetch("https://doutor-cafe-production.up.railway.app/diagnostico-video",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
+ .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultado(data,true);})
+ .catch(function(){document.getElementById("spinner").style.display="none";adicionarNaFila(frames[0],frames,function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert("Sem conexão. Vídeo salvo na fila!");}});});
 }
 
 function compartilhar(diagsJson,regiao) {
-  var diags=JSON.parse(diagsJson), texto="🌿 *Doutor Café — Diagnóstico*\n\n";
-  if (regiao) texto+="📍 "+regiao+"\n\n";
-  diags.forEach(function(d){texto+=(EMOJIS[d.diagnostico]||"🌿")+" *"+(NOMES_VOZ[d.diagnostico]||d.diagnostico)+"*\n📋 "+d.acao+"\n\n";});
-  texto+="_Diagnóstico realizado pelo app Doutor Café_";
-  window.open("https://wa.me/?text="+encodeURIComponent(texto),"_blank");
+ var diags=JSON.parse(diagsJson),texto="🌿 *Doutor Café — Diagnóstico*\n\n";
+ if (regiao) texto+="📍 "+regiao+"\n\n";
+ diags.forEach(function(d){texto+=(EMOJIS[d.diagnostico]||"🌿")+" *"+(NOMES_VOZ[d.diagnostico]||d.diagnostico)+"*\n📋 "+d.acao+"\n\n";});
+ texto+="_Diagnóstico realizado pelo app Doutor Café_";
+ window.open("https://wa.me/?text="+encodeURIComponent(texto),"_blank");
 }
 
 function mostrarResultado(data, isVideo) {
-  var div=document.getElementById("resultado"); div.style.display="block";
-  var diags=data.diagnosticos||[{diagnostico:data.diagnostico||"saudavel",estagio:data.estagio||1,confianca:data.confianca||"media",visto:data.visto||"",acao:data.acao||"Tente novamente.",fungicidas:[]}];
-  var regiao=dadosGPS.regiao||"";
-  salvarHistorico(diags,ultimaFotoBase64,regiao);
-  var thumbHtml=ultimaFotoBase64?'<img class="multi-foto" src="data:image/jpeg;base64,'+ultimaFotoBase64+'" alt="foto">':"<div class='multi-foto-placeholder'>🌿</div>";
-  var qtd=diags.length>1?diags.length+" problemas detectados":"1 diagnóstico";
-  var html='<div class="card-resultado"><div class="multi-header">'+thumbHtml+'<div class="multi-titulo"><h3>Resultado da Análise</h3><p>'+qtd;
-  if (regiao) html+=' · 📍 '+regiao;
-  if (isVideo) html+=' · 🎥 Vídeo';
-  html+='</p></div></div>';
-  diags.forEach(function(d,diagIdx) {
-    var diag=d.diagnostico||"saudavel", estagio=d.estagio||1, confianca=d.confianca||"media";
-    var badgeTexto=confianca==="alta"?"✓ Alta":confianca==="media"?"~ Média":"! Baixa";
-    var barras=""; for(var i=1;i<=5;i++) barras+='<div class="diag-seg" style="background:'+(i<=estagio?CORES_ESTAGIO[estagio-1]:"#e8e8e8")+'"></div>';
-    html+='<div class="diag-item"><div class="diag-item-topo"><span style="font-size:28px">'+(EMOJIS[diag]||"🌿")+'</span><div><div class="diag-nome">'+diag.replace(/_/g," ")+'</div><div class="diag-cat">'+(CATEGORIAS[diag]||"Análise")+'</div></div></div>';
-    html+='<div class="diag-badges"><span class="badge badge-estagio">📊 Estágio '+estagio+'/5</span><span class="badge badge-confianca-'+confianca+'">'+badgeTexto+' confiança</span></div>';
-    html+='<div class="diag-bar">'+barras+'</div>';
-    if (d.visto) html+='<div class="diag-visto">"'+d.visto+'"</div>';
-    html+='<div class="diag-acao">'+(d.acao||"")+'</div>';
-    if (d.fungicidas&&d.fungicidas.length>0) html+=buildCalcFungicida(d.fungicidas,diagIdx);
-    html+='</div>';
-  });
-  var textoVoz=diags.map(function(d){return(NOMES_VOZ[d.diagnostico]||d.diagnostico)+". "+d.acao;}).join(". ");
-  html+='<div class="btns-resultado"><button class="btn-voz" onclick="falar(\''+textoVoz.replace(/'/g,"\\'").replace(/\n/g," ")+'\')">🔊 Ouvir</button>';
-  html+='<button class="btn-share" onclick="compartilhar(\''+JSON.stringify(diags).replace(/'/g,"\\'")+'\',\''+regiao+'\')">📤 WhatsApp</button>';
-  html+='<button class="btn-nova" onclick="resetar()">📷 Nova</button></div></div>';
-  div.innerHTML=html; falar(textoVoz); div.scrollIntoView({behavior:"smooth",block:"start"});
+ var div=document.getElementById("resultado"); div.style.display="block";
+ var diags=data.diagnosticos||[{diagnostico:data.diagnostico||"saudavel",estagio:data.estagio||1,confianca:data.confianca||"media",visto:data.visto||"",acao:data.acao||"Tente novamente.",fungicidas:[]}];
+ var regiao=dadosGPS.regiao||"";
+ salvarHistorico(diags,ultimaFotoBase64,regiao);
+ var thumbHtml=ultimaFotoBase64?'<img class="multi-foto" src="data:image/jpeg;base64,'+ultimaFotoBase64+'" alt="foto">':"<div class='multi-foto-placeholder'>🌿</div>";
+ var qtd=diags.length>1?diags.length+" problemas detectados":"1 diagnóstico";
+ var html='<div class="card-resultado"><div class="multi-header">'+thumbHtml+'<div class="multi-titulo"><h3>Resultado da Análise</h3><p>'+qtd;
+ if (regiao) html+=' · 📍 '+regiao;
+ if (isVideo) html+=' · 🎥 Vídeo';
+ html+='</p></div></div>';
+ diags.forEach(function(d,diagIdx) {
+   var diag=d.diagnostico||"saudavel",estagio=d.estagio||1,confianca=d.confianca||"media";
+   var badgeTexto=confianca==="alta"?"✓ Alta":confianca==="media"?"~ Média":"! Baixa";
+   var barras=""; for(var i=1;i<=5;i++) barras+='<div class="diag-seg" style="background:'+(i<=estagio?CORES_ESTAGIO[estagio-1]:"#e8e8e8")+'"></div>';
+   html+='<div class="diag-item"><div class="diag-item-topo"><span style="font-size:28px">'+(EMOJIS[diag]||"🌿")+'</span><div><div class="diag-nome">'+diag.replace(/_/g," ")+'</div><div class="diag-cat">'+(CATEGORIAS[diag]||"Análise")+'</div></div></div>';
+   html+='<div class="diag-badges"><span class="badge badge-estagio">📊 Estágio '+estagio+'/5</span><span class="badge badge-confianca-'+confianca+'">'+badgeTexto+' confiança</span></div>';
+   html+='<div class="diag-bar">'+barras+'</div>';
+   if (d.visto) html+='<div class="diag-visto">"'+d.visto+'"</div>';
+   html+='<div class="diag-acao">'+(d.acao||"")+'</div>';
+   if (d.fungicidas&&d.fungicidas.length>0) html+=buildCalcFungicida(d.fungicidas,diagIdx);
+   html+='</div>';
+ });
+ var textoVoz=diags.map(function(d){return(NOMES_VOZ[d.diagnostico]||d.diagnostico)+". "+d.acao;}).join(". ");
+ html+='<div class="btns-resultado"><button class="btn-voz" onclick="falar(\''+textoVoz.replace(/'/g,"\\'").replace(/\n/g," ")+'\')">🔊 Ouvir</button>';
+ html+='<button class="btn-share" onclick="compartilhar(\''+JSON.stringify(diags).replace(/'/g,"\\'")+'\',\''+regiao+'\')">📤 WhatsApp</button>';
+ html+='<button class="btn-nova" onclick="resetar()">📷 Nova</button></div></div>';
+ div.innerHTML=html; falar(textoVoz); div.scrollIntoView({behavior:"smooth",block:"start"});
 }
 
 function mostrarResultadoSolo(data) {
-  var div=document.getElementById("resultado"); div.style.display="block";
-  var acao=data.acao||"Consulte um agrônomo para mais detalhes.";
-  var textoVoz="Análise de solo. "+acao;
-  var thumbHtml=ultimaFotoBase64?'<img class="card-foto-thumb" src="data:image/jpeg;base64,'+ultimaFotoBase64+'" alt="laudo">':"<div class='card-foto-thumb-placeholder'>🧪</div>";
-  var html='<div class="card-resultado"><div class="card-topo">'+thumbHtml+'<div class="card-titulo"><h2>Análise de Solo</h2><div class="categoria">Recomendação para Café</div></div></div>';
-  html+='<div class="badges"><span class="badge badge-solo">🌱 Laudo Interpretado</span>';
-  if (dadosGPS.regiao) html+='<span class="badge badge-regiao">📍 '+dadosGPS.regiao+'</span>';
-  html+='</div>';
-  if (data.valores) {
-    html+='<div class="solo-grid">';
-    for (var k in data.valores) { var v=data.valores[k],sc=v.status==="ok"?"solo-ok":v.status==="baixo"?"solo-baixo":"solo-alto",st=v.status==="ok"?"✓ Adequado":v.status==="baixo"?"↓ Baixo":"↑ Alto"; html+='<div class="solo-item"><div class="solo-label">'+k+'</div><div class="solo-valor">'+v.valor+'</div><div class="solo-status '+sc+'">'+st+'</div></div>'; }
-    html+='</div>';
-  }
-  html+='<div class="divisor"></div><div class="acao-box"><h3>Recomendação</h3><p>'+acao+'</p></div>';
-  html+='<div class="btns-resultado"><button class="btn-voz" onclick="falar(\''+textoVoz.replace(/'/g,"\\'")+'\')">🔊 Ouvir</button><button class="btn-nova" onclick="resetar()">📷 Nova análise</button></div></div>';
-  div.innerHTML=html; falar(textoVoz); div.scrollIntoView({behavior:"smooth",block:"start"});
+ var div=document.getElementById("resultado"); div.style.display="block";
+ var acao=data.acao||"Consulte um agrônomo para mais detalhes.";
+ var textoVoz="Análise de solo. "+acao;
+ var thumbHtml=ultimaFotoBase64?'<img class="card-foto-thumb" src="data:image/jpeg;base64,'+ultimaFotoBase64+'" alt="laudo">':"<div class='card-foto-thumb-placeholder'>🧪</div>";
+ var html='<div class="card-resultado"><div class="card-topo">'+thumbHtml+'<div class="card-titulo"><h2>Análise de Solo</h2><div class="categoria">Recomendação para Café</div></div></div>';
+ html+='<div class="badges"><span class="badge badge-solo">🌱 Laudo Interpretado</span>';
+ if (dadosGPS.regiao) html+='<span class="badge badge-regiao">📍 '+dadosGPS.regiao+'</span>';
+ html+='</div>';
+ if (data.valores) {
+   html+='<div class="solo-grid">';
+   for (var k in data.valores) { var v=data.valores[k],sc=v.status==="ok"?"solo-ok":v.status==="baixo"?"solo-baixo":"solo-alto",st=v.status==="ok"?"✓ Adequado":v.status==="baixo"?"↓ Baixo":"↑ Alto"; html+='<div class="solo-item"><div class="solo-label">'+k+'</div><div class="solo-valor">'+v.valor+'</div><div class="solo-status '+sc+'">'+st+'</div></div>'; }
+   html+='</div>';
+ }
+ html+='<div class="divisor"></div><div class="acao-box"><h3>Recomendação</h3><p>'+acao+'</p></div>';
+ html+='<div class="btns-resultado"><button class="btn-voz" onclick="falar(\''+textoVoz.replace(/'/g,"\\'")+'\')">🔊 Ouvir</button><button class="btn-nova" onclick="resetar()">📷 Nova análise</button></div></div>';
+ div.innerHTML=html; falar(textoVoz); div.scrollIntoView({behavior:"smooth",block:"start"});
 }
 
 function mostrarResultadoDaninha(data) {
-  var div=document.getElementById("resultado"); div.style.display="block";
-  var nome=data.nome||"Planta não identificada", indicador=data.indicador||"", acao=data.acao||"";
-  var alertaClass="daninha-alerta-compactado";
-  if (indicador.indexOf("cido")>-1||indicador.indexOf("ACIDO")>-1) alertaClass="daninha-alerta-acido";
-  else if (indicador.indexOf("rtil")>-1||indicador.indexOf("fertil")>-1) alertaClass="daninha-alerta-fertil";
-  else if (indicador.indexOf("umidade")>-1||indicador.indexOf("encharcado")>-1) alertaClass="daninha-alerta-umidade";
-  else if (indicador.indexOf("degradado")>-1||indicador.indexOf("calcio")>-1) alertaClass="daninha-alerta-degradado";
-  else if (indicador.indexOf("magnesio")>-1||indicador.indexOf("Mg")>-1) alertaClass="daninha-alerta-mag";
-  var textoVoz="Planta identificada: "+nome+". "+indicador+". "+acao;
-  var thumbHtml=ultimaFotoBase64?'<img class="card-foto-thumb" src="data:image/jpeg;base64,'+ultimaFotoBase64+'" alt="planta">':"<div class='card-foto-thumb-placeholder'>🌾</div>";
-  var html='<div class="card-resultado"><div class="card-topo">'+thumbHtml+'<div class="card-titulo"><h2>'+nome+'</h2><div class="categoria">Planta Daninha Indicadora</div></div></div>';
-  html+='<div class="badges"><span class="badge badge-daninha">🌾 Leitura do Solo</span>';
-  if (dadosGPS.regiao) html+='<span class="badge badge-regiao">📍 '+dadosGPS.regiao+'</span>';
-  html+='</div>';
-  html+='<div class="daninha-alerta '+alertaClass+'"><div class="daninha-alerta-titulo">🔍 '+indicador+'</div><div class="daninha-alerta-desc">'+acao+'</div></div>';
-  html+='<div class="btns-resultado"><button class="btn-voz" onclick="falar(\''+textoVoz.replace(/'/g,"\\'")+'\')">🔊 Ouvir</button><button class="btn-nova" onclick="resetar()">📷 Nova análise</button></div></div>';
-  div.innerHTML=html; falar(textoVoz); div.scrollIntoView({behavior:"smooth",block:"start"});
+ var div=document.getElementById("resultado"); div.style.display="block";
+ var nome=data.nome||"Planta não identificada",indicador=data.indicador||"",acao=data.acao||"";
+ var alertaClass="daninha-alerta-compactado";
+ if (indicador.indexOf("cido")>-1||indicador.indexOf("ACIDO")>-1) alertaClass="daninha-alerta-acido";
+ else if (indicador.indexOf("rtil")>-1||indicador.indexOf("fertil")>-1) alertaClass="daninha-alerta-fertil";
+ else if (indicador.indexOf("umidade")>-1||indicador.indexOf("encharcado")>-1) alertaClass="daninha-alerta-umidade";
+ else if (indicador.indexOf("degradado")>-1||indicador.indexOf("calcio")>-1) alertaClass="daninha-alerta-degradado";
+ else if (indicador.indexOf("magnesio")>-1||indicador.indexOf("Mg")>-1) alertaClass="daninha-alerta-mag";
+ var textoVoz="Planta identificada: "+nome+". "+indicador+". "+acao;
+ var thumbHtml=ultimaFotoBase64?'<img class="card-foto-thumb" src="data:image/jpeg;base64,'+ultimaFotoBase64+'" alt="planta">':"<div class='card-foto-thumb-placeholder'>🌾</div>";
+ var html='<div class="card-resultado"><div class="card-topo">'+thumbHtml+'<div class="card-titulo"><h2>'+nome+'</h2><div class="categoria">Planta Daninha Indicadora</div></div></div>';
+ html+='<div class="badges"><span class="badge badge-daninha">🌾 Leitura do Solo</span>';
+ if (dadosGPS.regiao) html+='<span class="badge badge-regiao">📍 '+dadosGPS.regiao+'</span>';
+ html+='</div>';
+ html+='<div class="daninha-alerta '+alertaClass+'"><div class="daninha-alerta-titulo">🔍 '+indicador+'</div><div class="daninha-alerta-desc">'+acao+'</div></div>';
+ html+='<div class="btns-resultado"><button class="btn-voz" onclick="falar(\''+textoVoz.replace(/'/g,"\\'")+'\')">🔊 Ouvir</button><button class="btn-nova" onclick="resetar()">📷 Nova análise</button></div></div>';
+ div.innerHTML=html; falar(textoVoz); div.scrollIntoView({behavior:"smooth",block:"start"});
 }
 
 function mostrarErro() {
-  var div=document.getElementById("resultado"); div.style.display="block";
-  div.innerHTML='<div class="card-resultado"><div class="acao-box"><p>⚠️ Erro ao analisar. Verifique sua conexão e tente novamente.</p></div><div class="btns-resultado"><button class="btn-nova" onclick="resetar()">📷 Tentar novamente</button></div></div>';
+ var div=document.getElementById("resultado"); div.style.display="block";
+ div.innerHTML='<div class="card-resultado"><div class="acao-box"><p>⚠️ Erro ao analisar. Verifique sua conexão e tente novamente.</p></div><div class="btns-resultado"><button class="btn-nova" onclick="resetar()">📷 Tentar novamente</button></div></div>';
 }
 function falar(texto) { if(window.speechSynthesis){window.speechSynthesis.cancel();var msg=new SpeechSynthesisUtterance(texto);msg.lang="pt-BR";msg.rate=0.85;window.speechSynthesis.speak(msg);} }
 function resetar() { ultimaFotoBase64=null; document.getElementById("resultado").style.display="none"; window.scrollTo(0,0); }
 
+function enviarEmail() {
+ var assunto="Contato via app Doutor Café";
+ var corpo="Olá equipe Doutor Café,%0A%0AEscrevo para...%0A%0ARegião: "+(dadosGPS.regiao||"não informada");
+ window.open("mailto:doutorcafe.app@gmail.com?subject="+encodeURIComponent(assunto)+"&body="+corpo);
+}
+function abrirWhatsapp() {
+ var texto="Olá! Estou usando o app Doutor Café e gostaria de tirar uma dúvida.";
+ window.open("https://wa.me/55SEUNUMERO?text="+encodeURIComponent(texto),"_blank");
+}
+
 function criarInput(id,accept,capture) {
-  var old=document.getElementById(id), novo=document.createElement("input");
-  novo.type="file"; novo.id=id; novo.accept=accept;
-  if (capture) novo.setAttribute("capture",capture);
-  novo.style.display="none"; old.parentNode.replaceChild(novo,old); return novo;
+ var old=document.getElementById(id),novo=document.createElement("input");
+ novo.type="file"; novo.id=id; novo.accept=accept;
+ if (capture) novo.setAttribute("capture",capture);
+ novo.style.display="none"; old.parentNode.replaceChild(novo,old); return novo;
 }
 function bindCam(){var inp=criarInput("cam","image/*","environment");inp.addEventListener("change",function(e){if(e.target.files[0])processar(e.target.files[0],false);bindCam();});}
 function bindGal(){var inp=criarInput("gal","image/*,video/*",null);inp.addEventListener("change",function(e){if(!e.target.files[0]){bindGal();return;}var file=e.target.files[0];if(file.type.startsWith("video/"))processarVideo(file);else processar(file,false);bindGal();});}
