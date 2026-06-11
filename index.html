@@ -775,7 +775,35 @@ function mostrarErro() {
  var div=document.getElementById("resultado"); div.style.display="block";
  div.innerHTML='<div class="card-resultado"><div class="acao-box"><p>⚠️ Erro ao analisar. Verifique sua conexão e tente novamente.</p></div><div class="btns-resultado"><button class="btn-nova" onclick="resetar()">📷 Tentar novamente</button></div></div>';
 }
-function falar(texto) { if(window.speechSynthesis){window.speechSynthesis.cancel();var msg=new SpeechSynthesisUtterance(texto);msg.lang="pt-BR";msg.rate=0.85;window.speechSynthesis.speak(msg);} }
+
+function falar(texto) {
+ if (!window.speechSynthesis) return;
+ window.speechSynthesis.cancel();
+ function executarFala(vozes) {
+   var msg = new SpeechSynthesisUtterance(texto);
+   msg.lang = "pt-BR";
+   msg.rate = 1.1;
+   msg.pitch = 1.0;
+   var melhor = vozes.find(function(v){ return v.name.indexOf("Google") > -1 && v.lang === "pt-BR"; });
+   if (!melhor) melhor = vozes.find(function(v){ return v.name.indexOf("Francisca") > -1; });
+   if (!melhor) melhor = vozes.find(function(v){ return v.name.indexOf("Luciana") > -1; });
+   if (!melhor) melhor = vozes.find(function(v){ return v.lang === "pt-BR" && v.localService; });
+   if (!melhor) melhor = vozes.find(function(v){ return v.lang === "pt-BR"; });
+   if (!melhor) melhor = vozes.find(function(v){ return v.lang.startsWith("pt"); });
+   if (melhor) msg.voice = melhor;
+   window.speechSynthesis.speak(msg);
+ }
+ var vozes = window.speechSynthesis.getVoices();
+ if (vozes.length > 0) {
+   executarFala(vozes);
+ } else {
+   window.speechSynthesis.onvoiceschanged = function() {
+     executarFala(window.speechSynthesis.getVoices());
+     window.speechSynthesis.onvoiceschanged = null;
+   };
+ }
+}
+
 function resetar() { ultimaFotoBase64=null; document.getElementById("resultado").style.display="none"; window.scrollTo(0,0); }
 
 function enviarEmail() {
