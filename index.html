@@ -490,19 +490,19 @@ function setCiclo(ciclo) {
   document.getElementById("descPro").style.display = ciclo === "anual" ? "block" : "none";
 }
 function assinar(tipo) {
-  var planoId = tipo + "_" + cicloAtual;
-  var userId = "user_" + Date.now();
-  fetch("https://doutor-cafe-production.up.railway.app/criar-assinatura", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ plano: planoId, userId: userId, email: "produtor@doutorcafe.app" })
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(d) {
-    if (d.url) { window.location.href = d.url; }
-    else { alert("Erro ao processar pagamento. Tente novamente."); }
-  })
-  .catch(function() { alert("Erro de conexão. Tente novamente."); });
+  var links = {
+    basico_mensal: "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=3bdcbffc028a4d259f32fe37a96ae224",
+    basico_anual:  "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=bd08a04de79f4213886611769b6c9486",
+    pro_mensal:    "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=106181c5ed584a65af06403bd1af0608",
+    pro_anual:     "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=661a046d15c9415a9508970d2f45c819"
+  };
+  var chave = tipo + "_" + cicloAtual;
+  var url = links[chave];
+  if (url) {
+    window.open(url, "_blank");
+  } else {
+    alert("Plano não encontrado. Tente novamente.");
+  }
 }
 function contatoEmpresarial() {
   var texto = "Olá! Tenho interesse no Plano Empresarial do Doutor Café para minha cooperativa/revenda. Gostaria de mais informações.";
