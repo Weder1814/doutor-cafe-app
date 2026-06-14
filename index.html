@@ -248,6 +248,47 @@ canvas { display: none; }
 </head>
 <body>
 
+<!-- MODAL PLANOS -->
+<div class="modal-overlay" id="modalPlanos">
+  <div class="modal-planos">
+    <div class="modal-titulo">🌿 Doutor Café Premium</div>
+    <div class="modal-sub" id="modalSubtitulo">Escolha o plano ideal para sua lavoura</div>
+    <div class="modal-esgotado" id="modalEsgotado" style="display:none"><p>🔒 Suas 20 análises gratuitas foram usadas. Assine para continuar!</p></div>
+    <div class="toggle-ciclo">
+      <button class="toggle-btn ativo" id="btnMensal" onclick="setCiclo('mensal')">Mensal</button>
+      <button class="toggle-btn" id="btnAnual" onclick="setCiclo('anual')">Anual <span class="toggle-economia">2 meses grátis</span></button>
+    </div>
+    <div class="plano-card">
+      <div class="plano-nome">🌱 Plano Básico</div>
+      <div class="plano-preco"><span class="plano-valor" id="precoBasico">R$32,90</span><span class="plano-periodo">/mês</span></div>
+      <div class="plano-anual-desc" id="descBasico" style="display:none">R$299,90/ano — equivale a 2 meses grátis!</div>
+      <ul class="plano-features">
+        <li>120 análises por mês</li><li>Diagnóstico de doenças e pragas</li><li>Calculadora de fungicida</li><li>Análise de solo</li><li>Plantas daninhas</li><li>Suporte via WhatsApp</li>
+      </ul>
+      <button class="btn-assinar" onclick="assinar('basico')">💳 Assinar com Cartão</button>
+      <button class="btn-pix-plano" onclick="abrirPix('basico')">⚡ Pagar via PIX</button>
+    </div>
+    <div class="plano-card destaque">
+      <div class="plano-badge">⭐ Mais Popular</div>
+      <div class="plano-nome">🚀 Plano Pro</div>
+      <div class="plano-preco"><span class="plano-valor" id="precoPro">R$49,90</span><span class="plano-periodo">/mês</span></div>
+      <div class="plano-anual-desc" id="descPro" style="display:none">R$499,90/ano — equivale a 2 meses grátis!</div>
+      <ul class="plano-features">
+        <li>300 análises por mês</li><li>Tudo do Básico</li><li>Histórico completo</li><li>Atendimento prioritário</li><li>Acesso a novos recursos primeiro</li>
+      </ul>
+      <button class="btn-assinar" onclick="assinar('pro')">💳 Assinar com Cartão</button>
+      <button class="btn-pix-plano" onclick="abrirPix('pro')">⚡ Pagar via PIX</button>
+    </div>
+    <div class="plano-card">
+      <div class="plano-nome">🏢 Empresarial</div>
+      <div class="plano-preco"><span class="plano-valor" style="font-size:20px">A combinar</span></div>
+      <ul class="plano-features"><li>Cooperativas e revendas</li><li>Multi-usuário</li><li>Dashboard e relatórios</li><li>Contrato personalizado</li><li>R$300 a R$2.000/mês</li></ul>
+      <button class="btn-assinar" onclick="contatoEmpresarial()" style="background:linear-gradient(135deg,#795548,#4e342e)">Falar com Gerente</button>
+    </div>
+    <button class="btn-fechar-modal" onclick="fecharModal()">Continuar com plano gratuito</button>
+  </div>
+</div>
+
 <div class="header">
   <img class="header-img" src="cafe.jpg.jpeg" alt="Café">
   <div class="header-overlay"></div>
@@ -256,6 +297,10 @@ canvas { display: none; }
     <h1>Doutor <span>Café</span></h1>
     <div class="sub">O agrônomo no seu bolso</div>
     <div class="regiao-tag" id="regiaoTag">📍 Localizando...</div>
+    <div class="contador-bar" id="contadorBar" onclick="abrirModal(false)">
+      <span class="contador-txt" id="contadorTxt">20 análises grátis</span>
+      <div class="contador-progresso"><div class="contador-fill" id="contadorFill" style="width:100%"></div></div>
+    </div>
   </div>
 </div>
 <div class="wave"></div>
