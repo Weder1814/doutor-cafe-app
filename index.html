@@ -17,6 +17,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'DM Sans', sans-serif; background: var(--creme); min-height: 100vh; overflow-x: hidden; }
 
+/* ── HEADER ── */
 .header { width: 100%; position: relative; overflow: hidden; padding: 28px 24px 40px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .header-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
 .header-overlay { position: absolute; inset: 0; background: linear-gradient(160deg, rgba(8,25,12,0.85) 0%, rgba(20,70,35,0.72) 50%, rgba(8,20,10,0.88) 100%); z-index: 1; }
@@ -27,10 +28,20 @@ body { font-family: 'DM Sans', sans-serif; background: var(--creme); min-height:
 .header h1 span { color: var(--verde-neon); }
 .header .sub { color: rgba(255,255,255,0.55); font-size: 12px; margin-top: 4px; letter-spacing: 1px; text-transform: uppercase; }
 .regiao-tag { display: inline-block; margin-top: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 4px 14px; font-size: 12px; color: rgba(255,255,255,0.85); }
+
+/* ── CONTADOR ── */
+.contador-bar { margin-top: 10px; cursor: pointer; }
+.contador-txt { font-size: 12px; color: rgba(255,255,255,0.85); display: block; margin-bottom: 5px; }
+.contador-progresso { height: 5px; background: rgba(255,255,255,0.2); border-radius: 10px; overflow: hidden; }
+.contador-fill { height: 100%; border-radius: 10px; background: var(--verde-neon); transition: width 0.4s; }
+.contador-fill.amarelo { background: #ffd740; }
+.contador-fill.vermelho { background: #ff5252; }
+
 .wave { display: block; height: 36px; background: var(--creme); clip-path: ellipse(55% 100% at 50% 100%); margin-top: -1px; position: relative; z-index: 3; }
 .corpo { max-width: 420px; margin: 0 auto; padding: 16px 20px 40px; display: flex; flex-direction: column; gap: 12px; }
 .secao-titulo { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--cinza); padding: 4px 4px 0; }
 
+/* ── CLIMA ── */
 .card-clima { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
 .clima-topo { padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
 .clima-dados { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; border-top: 1px solid #f0f0f0; }
@@ -52,6 +63,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--creme); min-height:
 .risco-critico .risco-titulo { color: #c62828; }
 .risco-desc { font-size: 11px; color: #666; margin-top: 2px; line-height: 1.4; }
 
+/* ── CALENDÁRIO ── */
 .card-calendario { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
 .cal-header { padding: 16px 18px 12px; display: flex; align-items: center; justify-content: space-between; }
 .cal-mes { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--marrom); font-weight: 700; }
@@ -72,6 +84,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--creme); min-height:
 .cal-acoes h4 { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--cinza); margin-bottom: 8px; }
 .acao-item { font-size: 13px; color: #444; line-height: 1.4; margin-bottom: 5px; }
 
+/* ── BOTÕES PRINCIPAIS ── */
 .btn-foto { background: linear-gradient(135deg, var(--verde-claro), var(--verde)); color: white; border: none; border-radius: 16px; padding: 18px 24px; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 12px; width: 100%; box-shadow: 0 4px 16px rgba(26,92,42,0.25); transition: transform 0.15s; }
 .btn-foto:active { transform: scale(0.97); }
 .btn-video { background: linear-gradient(135deg, #1565c0, #0d47a1); color: white; border: none; border-radius: 16px; padding: 18px 24px; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 12px; width: 100%; box-shadow: 0 4px 16px rgba(13,71,161,0.25); transition: transform 0.15s; }
@@ -91,9 +104,13 @@ body { font-family: 'DM Sans', sans-serif; background: var(--creme); min-height:
 .btn-text { text-align: left; line-height: 1.3; }
 .btn-text small { display: block; font-weight: 400; font-size: 11px; opacity: 0.7; margin-top: 2px; }
 input[type="file"] { display: none; }
+
+/* ── DICA ── */
 .dica { background: white; border-radius: 14px; padding: 12px 14px; display: flex; align-items: flex-start; gap: 10px; border-left: 3px solid var(--verde-neon); }
 .dica p { font-size: 12px; color: var(--cinza); line-height: 1.5; }
 .dica strong { color: var(--marrom); }
+
+/* ── SPINNER ── */
 #spinner { display: none; background: white; border-radius: 20px; padding: 32px 20px; text-align: center; box-shadow: 0 2px 16px rgba(0,0,0,0.07); }
 .spinner-folha { font-size: 40px; animation: spin-pulse 1.2s ease-in-out infinite; display: block; margin-bottom: 12px; }
 @keyframes spin-pulse { 0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; } 50% { transform: scale(1.15) rotate(10deg); opacity: 0.7; } }
@@ -101,6 +118,7 @@ input[type="file"] { display: none; }
 #spinner small { color: var(--cinza); font-size: 12px; margin-top: 4px; display: block; }
 #resultado { display: none; }
 
+/* ── RESULTADO ── */
 .card-resultado { background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.1); animation: slideUp 0.4s ease; }
 .multi-header { padding: 16px 20px 8px; display: flex; align-items: center; gap: 12px; }
 .multi-foto { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; flex-shrink: 0; border: 2px solid #f0f0f0; }
@@ -118,6 +136,7 @@ input[type="file"] { display: none; }
 .diag-bar { display: flex; gap: 3px; margin-bottom: 8px; }
 .diag-seg { flex: 1; height: 6px; border-radius: 3px; background: #e8e8e8; }
 
+/* ── CALCULADORA FUNGICIDA ── */
 .calc-box { margin-top: 12px; background: #f0f7f0; border-radius: 14px; padding: 12px 14px; border: 1px solid #c8ddc8; }
 .calc-titulo { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--verde); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
 .calc-produto { background: white; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; border: 1px solid #e0ede0; }
@@ -167,6 +186,8 @@ input[type="file"] { display: none; }
 .btn-voz { flex: 1; min-width: 80px; background: var(--verde); color: white; border: none; border-radius: 14px; padding: 13px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
 .btn-nova { flex: 1; min-width: 80px; background: var(--creme); color: var(--verde); border: 2px solid #c8ddc8; border-radius: 14px; padding: 13px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
 .btn-share { flex: 1; min-width: 80px; background: #25D366; color: white; border: none; border-radius: 14px; padding: 13px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+
+/* ── SOLO ── */
 .solo-grid { padding: 0 20px 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .solo-item { background: var(--creme); border-radius: 10px; padding: 10px 12px; }
 .solo-item .solo-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--cinza); }
@@ -176,6 +197,7 @@ input[type="file"] { display: none; }
 .solo-baixo { color: #c62828; }
 .solo-alto { color: #e65100; }
 
+/* ── DANINHAS ── */
 .daninha-alerta { margin: 0 20px 14px; border-radius: 12px; padding: 12px 14px; }
 .daninha-alerta-acido { background: #fff8e1; border-left: 4px solid #f57f17; }
 .daninha-alerta-compactado { background: #fff3e0; border-left: 4px solid #e65100; }
@@ -186,6 +208,7 @@ input[type="file"] { display: none; }
 .daninha-alerta-titulo { font-size: 13px; font-weight: 700; color: var(--marrom); margin-bottom: 4px; }
 .daninha-alerta-desc { font-size: 12px; color: #555; line-height: 1.5; }
 
+/* ── HISTÓRICO ── */
 .card-historico { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
 .hist-header { padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
 .hist-titulo { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--marrom); font-weight: 700; }
@@ -199,6 +222,7 @@ input[type="file"] { display: none; }
 .hist-data { font-size: 11px; color: var(--cinza); margin-top: 2px; }
 .hist-vazio { padding: 16px 18px; font-size: 13px; color: var(--cinza); text-align: center; }
 
+/* ── FILA OFFLINE ── */
 .card-fila { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 20px rgba(230,81,0,0.15); border: 2px solid #ffe0b2; }
 .fila-header { padding: 14px 18px 12px; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
 .fila-header-esq { flex: 1; }
@@ -220,6 +244,37 @@ input[type="file"] { display: none; }
 .offline-banner-icon { font-size: 20px; flex-shrink: 0; }
 .offline-banner-txt { font-size: 12px; color: #bf360c; line-height: 1.4; font-weight: 500; }
 
+/* ── MODAL PLANOS ── */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 1000; align-items: flex-end; justify-content: center; }
+.modal-overlay.ativo { display: flex; }
+.modal-planos { background: var(--creme); border-radius: 28px 28px 0 0; padding: 24px 20px 48px; width: 100%; max-width: 480px; max-height: 92vh; overflow-y: auto; }
+.modal-titulo { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--marrom); font-weight: 900; margin-bottom: 4px; }
+.modal-sub { font-size: 13px; color: var(--cinza); margin-bottom: 14px; line-height: 1.4; }
+.modal-esgotado { background: #fce4ec; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; font-size: 13px; color: #c62828; font-weight: 600; line-height: 1.4; }
+
+/* toggle mensal/anual */
+.toggle-ciclo { display: flex; gap: 6px; background: white; border-radius: 14px; padding: 4px; margin-bottom: 16px; }
+.toggle-btn { flex: 1; border: none; border-radius: 10px; padding: 9px 6px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; background: transparent; color: var(--cinza); transition: all 0.2s; }
+.toggle-btn.ativo { background: var(--verde); color: white; }
+.toggle-economia { background: #e8f5e9; color: #2e7d32; border-radius: 20px; padding: 2px 7px; font-size: 10px; font-weight: 700; margin-left: 4px; display: inline-block; }
+
+/* cards de plano */
+.plano-card { background: white; border-radius: 20px; padding: 18px; margin-bottom: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); position: relative; }
+.plano-card.destaque { border: 2px solid var(--verde-claro); box-shadow: 0 4px 20px rgba(45,138,62,0.2); }
+.plano-badge { font-size: 11px; font-weight: 700; color: var(--verde); background: #e8f5e9; border-radius: 20px; padding: 3px 10px; display: inline-block; margin-bottom: 8px; }
+.plano-nome { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--marrom); font-weight: 700; margin-bottom: 4px; }
+.plano-preco { display: flex; align-items: baseline; gap: 4px; margin-bottom: 4px; }
+.plano-valor { font-size: 28px; font-weight: 900; color: var(--verde); }
+.plano-periodo { font-size: 13px; color: var(--cinza); }
+.plano-anual-desc { font-size: 11px; color: #2e7d32; background: #e8f5e9; border-radius: 8px; padding: 4px 10px; margin-bottom: 10px; display: inline-block; }
+.plano-features { list-style: none; margin: 12px 0 16px; display: flex; flex-direction: column; gap: 7px; }
+.plano-features li { font-size: 13px; color: #444; padding-left: 20px; position: relative; line-height: 1.4; }
+.plano-features li::before { content: "✓"; position: absolute; left: 0; color: var(--verde-claro); font-weight: 700; }
+.btn-assinar { width: 100%; padding: 13px; background: linear-gradient(135deg, var(--verde-claro), var(--verde)); color: white; border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; margin-bottom: 6px; transition: opacity 0.15s; }
+.btn-assinar:active { opacity: 0.85; }
+.btn-fechar-modal { width: 100%; padding: 14px; background: transparent; color: var(--cinza); border: none; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; margin-top: 6px; text-decoration: underline; }
+
+/* ── MODAL PIX ── */
 .btn-pix-plano { width:100%; padding:12px; background:white; color:var(--verde); border:2px solid #c8ddc8; border-radius:14px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:6px; }
 .modal-pix { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:1100; align-items:center; justify-content:center; padding:20px; }
 .modal-pix.ativo { display:flex; }
@@ -369,6 +424,16 @@ canvas { display: none; }
   </div>
 </div>
 
+<!-- MODAL PIX -->
+<div class="modal-pix" id="modalPix">
+  <div class="modal-pix-box">
+    <div class="modal-pix-titulo">⚡ Pagar via PIX</div>
+    <div class="modal-pix-sub" id="pixSubtitulo">Preencha seus dados</div>
+    <div id="pixArea"></div>
+    <button class="btn-fechar-pix" onclick="fecharPix()">Cancelar</button>
+  </div>
+</div>
+
 <script>
 
 // ── PLANOS E PAGAMENTO ──
@@ -377,16 +442,14 @@ var PLANO_KEY="doutorcafe_plano",ANALISES_KEY="doutorcafe_analises",LIMITE_GRATI
 function getPlano(){try{return JSON.parse(localStorage.getItem(PLANO_KEY))||{tipo:"gratuito"};}catch(e){return{tipo:"gratuito"};}}
 function salvarPlano(p){try{localStorage.setItem(PLANO_KEY,JSON.stringify(p));}catch(e){}}
 function getAnalisesUsadas(){return parseInt(localStorage.getItem(ANALISES_KEY)||"0");}
-
 function incrementarAnalise(){var u=getAnalisesUsadas()+1;localStorage.setItem(ANALISES_KEY,u.toString());atualizarContador();return u;}
-
 function podeanalisar(){var p=getPlano();if(p.tipo!=="gratuito")return true;return getAnalisesUsadas()<LIMITE_GRATIS;}
 function atualizarContador(){
   var p=getPlano(),usado=getAnalisesUsadas(),txt=document.getElementById("contadorTxt"),fill=document.getElementById("contadorFill");
   if(!txt||!fill)return;
-  if(p.tipo==="pro"){txt.textContent="Plano Pro — 300 analises/mes";fill.style.width="100%";fill.className="contador-fill";}
-  else if(p.tipo==="basico"){var r=120-(usado%120);txt.textContent=r+" analises restantes";fill.style.width=(r/120*100)+"%";fill.className="contador-fill";}
-  else{var r=Math.max(0,LIMITE_GRATIS-usado);txt.textContent=r+" analises gratis restantes";var pct=(r/LIMITE_GRATIS)*100;fill.style.width=pct+"%";fill.className="contador-fill"+(pct<=25?" vermelho":pct<=50?" amarelo":"");}
+  if(p.tipo==="pro"){txt.textContent="Plano Pro — 300 análises/mês";fill.style.width="100%";fill.className="contador-fill";}
+  else if(p.tipo==="basico"){var r=120-(usado%120);txt.textContent=r+" análises restantes";fill.style.width=(r/120*100)+"%";fill.className="contador-fill";}
+  else{var r=Math.max(0,LIMITE_GRATIS-usado);txt.textContent=r+" análises grátis restantes";var pct=(r/LIMITE_GRATIS)*100;fill.style.width=pct+"%";fill.className="contador-fill"+(pct<=25?" vermelho":pct<=50?" amarelo":"");}
 }
 
 function abrirModal(esgotado){
@@ -413,21 +476,20 @@ function assinar(tipo){
   };
   var url=links[tipo+"_"+cicloAtual];
   if(url)window.open(url,"_blank");
-  else alert("Plano nao encontrado.");
+  else alert("Plano não encontrado.");
 }
-function contatoEmpresarial(){window.open("https://wa.me/5535998823395?text="+encodeURIComponent("Ola! Tenho interesse no Plano Empresarial do Doutor Cafe."),"_blank");fecharModal();}
+function contatoEmpresarial(){window.open("https://wa.me/5535998823395?text="+encodeURIComponent("Olá! Tenho interesse no Plano Empresarial do Doutor Café."),"_blank");fecharModal();}
 function verificarRetornoPagamento(){
   var params=new URLSearchParams(window.location.search),pagamento=params.get("pagamento"),planoId=params.get("plano");
   if(pagamento==="sucesso"&&planoId){
     var tipo=planoId.indexOf("pro")>-1?"pro":"basico";
-    salvarPlanoLocal({tipo:tipo,planoId:planoId,dataAssinatura:new Date().toISOString()});
+    salvarPlano({tipo:tipo,planoId:planoId,dataAssinatura:new Date().toISOString()});
     localStorage.setItem(ANALISES_KEY,"0");
     atualizarContador();
-    alert("Bem-vindo ao Plano "+(tipo==="pro"?"Pro":"Basico")+"! Suas analises estao liberadas.");
+    alert("Bem-vindo ao Plano "+(tipo==="pro"?"Pro":"Básico")+"! Suas análises estão liberadas.");
     window.history.replaceState({},"",window.location.pathname);
   }
 }
-
 
 var ultimaFotoBase64 = null;
 var HIST_KEY = "doutorcafe_hist";
@@ -477,6 +539,7 @@ var CATEGORIAS = {
 var CORES_ESTAGIO = ["#4caf50","#8bc34a","#ffc107","#ff9800","#f44336"];
 var MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 
+// ── IndexedDB / Fila Offline ──
 var _db = null;
 function abrirDB(callback) {
   if (_db) { callback(_db); return; }
@@ -615,6 +678,7 @@ function limparHistorico() {
   renderAreaHistorico();
 }
 
+// ── CLIMA ──
 function calcularRiscoFerrugem(temp, umidade, chuva) {
   var pontos = 0;
   if (temp>=18&&temp<=22) pontos+=3; else if (temp>=15&&temp<=25) pontos+=1;
@@ -640,6 +704,7 @@ function obterClima(lat, lon) {
   }).catch(function(){document.getElementById("cardClima").innerHTML='<div class="clima-topo"><span style="font-size:13px;color:var(--cinza)">Clima não disponível</span></div>';});
 }
 
+// ── CALENDÁRIO ──
 var CALENDARIO = {
   0:{fase:"granacao",faseTxt:"🟢 Granação",alertas:[{nivel:"alto",txt:"🟠 Ferrugem — alta umidade favorece infecção"},{nivel:"alto",txt:"🪲 Bicho-mineiro — pico populacional"},{nivel:"medio",txt:"🟣 Mancha aureolada — ventos e chuvas"}],acoes:["✅ Aplicar fungicida preventivo para ferrugem","✅ Monitorar folhas para trilhas de bicho-mineiro","✅ Adubação de cobertura — N e K parcelados"]},
   1:{fase:"granacao",faseTxt:"🟢 Granação",alertas:[{nivel:"alto",txt:"🟠 Ferrugem — período crítico"},{nivel:"alto",txt:"🪲 Bicho-mineiro — alta incidência"},{nivel:"medio",txt:"🫙 Antracnose — chuvas intensas"}],acoes:["✅ Reaplicar fungicida (21 dias após última aplicação)","✅ Controle de bicho-mineiro se >30% folhas com minas","✅ Verificar adubação fosfatada"]},
@@ -678,6 +743,7 @@ function salvarHistorico(diags, fotoBase64, regiao) {
   renderAreaHistorico();
 }
 
+// ── GPS ──
 var dadosGPS={lat:null,lon:null,regiao:null,altitude:null};
 function identificarRegiao(lat,lon) {
   if (lat>=-20.5&&lat<=-15.0&&lon>=-50.0&&lon<=-44.0) return "Cerrado Mineiro";
@@ -707,6 +773,7 @@ function obterGPS() {
   }, {timeout:8000,enableHighAccuracy:false});
 }
 
+// ── CALCULADORA FUNGICIDA ──
 function buildCalcFungicida(fungicidas, diagIdx) {
   if (!fungicidas||fungicidas.length===0) return "";
   var html='<div class="calc-box"><div class="calc-titulo">🧪 Calcular Dosagem</div>';
@@ -738,6 +805,7 @@ function calcular(inputId,doseMin,doseMax,propPorLitro,unidade,unidadeProp) {
     '<div class="calc-aviso">⚠️ Confirme sempre no rótulo do produto comprado</div>';
 }
 
+// ── PROCESSAR ARQUIVOS ──
 function processar(file, isVideo) {
   document.getElementById("spinner").style.display="block";
   document.getElementById("resultado").style.display="none";
@@ -822,21 +890,16 @@ function enviarFrames(frames) {
   .catch(function(){document.getElementById("spinner").style.display="none";adicionarNaFila(frames[0],frames,function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert("Sem conexão. Vídeo salvo na fila!");}});});
 }
 
+// ── COMPARTILHAR ──
 function compartilhar(diagsJson,regiao) {
-  var diags=JSON.parse(diagsJson),texto="🌿 *Doutor Café — Diagnóstico*\
-\
-";
-  if (regiao) texto+="📍 "+regiao+"\
-\
-";
-  diags.forEach(function(d){texto+=(EMOJIS[d.diagnostico]||"🌿")+" *"+(NOMES_VOZ[d.diagnostico]||d.diagnostico)+"*\
-📋 "+d.acao+"\
-\
-";});
+  var diags=JSON.parse(diagsJson),texto="🌿 *Doutor Café — Diagnóstico*\n\n";
+  if (regiao) texto+="📍 "+regiao+"\n\n";
+  diags.forEach(function(d){texto+=(EMOJIS[d.diagnostico]||"🌿")+" *"+(NOMES_VOZ[d.diagnostico]||d.diagnostico)+"*\n📋 "+d.acao+"\n\n";});
   texto+="_Diagnóstico realizado pelo app Doutor Café_";
   window.open("https://wa.me/?text="+encodeURIComponent(texto),"_blank");
 }
 
+// ── MOSTRAR RESULTADOS ──
 function mostrarResultado(data, isVideo) {
   var div=document.getElementById("resultado"); div.style.display="block";
   var diags=data.diagnosticos||[{diagnostico:data.diagnostico||"saudavel",estagio:data.estagio||1,confianca:data.confianca||"media",visto:data.visto||"",acao:data.acao||"Tente novamente.",fungicidas:[]}];
@@ -911,14 +974,13 @@ function mostrarErro() {
   div.innerHTML='<div class="card-resultado"><div class="acao-box"><p>⚠️ Erro ao analisar. Verifique sua conexão e tente novamente.</p></div><div class="btns-resultado"><button class="btn-nova" onclick="resetar()">📷 Tentar novamente</button></div></div>';
 }
 
+// ── VOZ ──
 function falar(texto) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   function executarFala(vozes) {
     var msg = new SpeechSynthesisUtterance(texto);
-    msg.lang = "pt-BR";
-    msg.rate = 1.1;
-    msg.pitch = 1.0;
+    msg.lang = "pt-BR"; msg.rate = 1.1; msg.pitch = 1.0;
     var melhor = vozes.find(function(v){ return v.name.indexOf("Google") > -1 && v.lang === "pt-BR"; });
     if (!melhor) melhor = vozes.find(function(v){ return v.name.indexOf("Francisca") > -1; });
     if (!melhor) melhor = vozes.find(function(v){ return v.name.indexOf("Luciana") > -1; });
@@ -929,14 +991,8 @@ function falar(texto) {
     window.speechSynthesis.speak(msg);
   }
   var vozes = window.speechSynthesis.getVoices();
-  if (vozes.length > 0) {
-    executarFala(vozes);
-  } else {
-    window.speechSynthesis.onvoiceschanged = function() {
-      executarFala(window.speechSynthesis.getVoices());
-      window.speechSynthesis.onvoiceschanged = null;
-    };
-  }
+  if (vozes.length > 0) { executarFala(vozes); }
+  else { window.speechSynthesis.onvoiceschanged = function() { executarFala(window.speechSynthesis.getVoices()); window.speechSynthesis.onvoiceschanged = null; }; }
 }
 
 function resetar() { ultimaFotoBase64=null; document.getElementById("resultado").style.display="none"; window.scrollTo(0,0); }
@@ -951,6 +1007,7 @@ function abrirWhatsapp() {
   window.open("https://wa.me/5535998823395?text="+encodeURIComponent(texto),"_blank");
 }
 
+// ── INPUTS DE ARQUIVO ──
 function criarInput(id,accept,capture) {
   var old=document.getElementById(id),novo=document.createElement("input");
   novo.type="file"; novo.id=id; novo.accept=accept;
@@ -973,31 +1030,74 @@ document.getElementById("btnSoloGal").addEventListener("click",function(){docume
 document.getElementById("btnDaninha").addEventListener("click",function(){document.getElementById("daninha").click();});
 document.getElementById("btnDaninhaGal").addEventListener("click",function(){document.getElementById("daninaGal").click();});
 
-bindCam();bindGal();bindVid();bindSolo();bindSoloGal();bindDaninha();bindDaninhaGal();
+bindCam(); bindGal(); bindVid(); bindSolo(); bindSoloGal(); bindDaninha(); bindDaninhaGal();
 window.addEventListener("online",function(){renderAreaHistorico();});
 window.addEventListener("offline",function(){renderAreaHistorico();});
 
+// ── PIX ──
 var planoPixAtual='',pixPaymentId=null,pixCheckInterval=null;
 function obterUserId(){var u=localStorage.getItem('doutorcafe_uid');if(!u){u='user_'+Date.now()+'_'+Math.random().toString(36).substr(2,9);localStorage.setItem('doutorcafe_uid',u);}return u;}
-function abrirPix(tipo){planoPixAtual=tipo;fecharModal();document.getElementById('modalPix').classList.add('ativo');var nomes={basico_mensal:'Basico Mensal - R$ 32,90/mes',basico_anual:'Basico Anual - R$ 299,90/ano',pro_mensal:'Pro Mensal - R$ 49,90/mes',pro_anual:'Pro Anual - R$ 499,90/ano'};document.getElementById('pixSubtitulo').textContent='Plano '+(nomes[tipo+'_'+cicloAtual]||tipo);document.getElementById('pixArea').innerHTML='<label class="pix-form-label">Nome completo *</label><input class="pix-form-input" id="pixNome" type="text" placeholder="Ex: Joao da Silva"><label class="pix-form-label">CPF *</label><input class="pix-form-input" id="pixCpf" type="tel" placeholder="000.000.000-00" maxlength="14" oninput="mascararCpf(this)"><label class="pix-form-label">Email (opcional)</label><input class="pix-form-input" id="pixEmail" type="email" placeholder="seuemail@gmail.com"><button onclick="confirmarPix()" style="width:100%;padding:14px;background:linear-gradient(135deg,#2d8a3e,#1a5c2a);color:white;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px">Gerar QR Code PIX</button>';}
+function abrirPix(tipo){
+  planoPixAtual=tipo; fecharModal();
+  document.getElementById('modalPix').classList.add('ativo');
+  var nomes={basico_mensal:'Básico Mensal - R$ 32,90/mês',basico_anual:'Básico Anual - R$ 299,90/ano',pro_mensal:'Pro Mensal - R$ 49,90/mês',pro_anual:'Pro Anual - R$ 499,90/ano'};
+  document.getElementById('pixSubtitulo').textContent='Plano '+(nomes[tipo+'_'+cicloAtual]||tipo);
+  document.getElementById('pixArea').innerHTML='<label class="pix-form-label">Nome completo *</label><input class="pix-form-input" id="pixNome" type="text" placeholder="Ex: João da Silva"><label class="pix-form-label">CPF *</label><input class="pix-form-input" id="pixCpf" type="tel" placeholder="000.000.000-00" maxlength="14" oninput="mascararCpf(this)"><label class="pix-form-label">Email (opcional)</label><input class="pix-form-input" id="pixEmail" type="email" placeholder="seuemail@gmail.com"><button onclick="confirmarPix()" style="width:100%;padding:14px;background:linear-gradient(135deg,#2d8a3e,#1a5c2a);color:white;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px">Gerar QR Code PIX</button>';
+}
 function mascararCpf(input){var v=input.value.replace(/[^0-9]/g,'');if(v.length>3)v=v.slice(0,3)+'.'+v.slice(3);if(v.length>7)v=v.slice(0,7)+'.'+v.slice(7);if(v.length>11)v=v.slice(0,11)+'-'+v.slice(11,13);input.value=v;}
-function confirmarPix(){var nome=document.getElementById('pixNome').value.trim(),cpf=document.getElementById('pixCpf').value.replace(/[^0-9]/g,''),email=document.getElementById('pixEmail').value.trim()||'produtor@doutorcafe.app';if(!nome){alert('Informe seu nome completo.');return;}if(cpf.length!==11){alert('CPF invalido. Digite os 11 digitos.');return;}document.getElementById('pixArea').innerHTML='<div class="pix-loading"><div class="pix-spinner"></div> Gerando QR Code...</div>';fetch('https://doutor-cafe-production.up.railway.app/gerar-pix',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plano:planoPixAtual+'_'+cicloAtual,userId:obterUserId(),nome:nome,cpf:cpf,email:email})}).then(function(r){return r.json();}).then(function(d){if(d.qr_code_base64){pixPaymentId=d.id;document.getElementById('pixArea').innerHTML='<div class="pix-qr-img"><img src="data:image/png;base64,'+d.qr_code_base64+'" alt="QR Code PIX"></div><div class="pix-codigo-box"><div class="pix-codigo-label">Codigo PIX:</div><div class="pix-codigo-txt" id="pixCodigoTxt">'+d.qr_code+'</div></div><div class="pix-status pix-status-aguardando" id="pixStatusTxt">Aguardando pagamento...</div><button class="btn-copiar-pix" onclick="copiarCodigoPix()">Copiar codigo PIX</button>';iniciarVerificacaoPix();}else{document.getElementById('pixArea').innerHTML='<div class="pix-status pix-status-erro">Erro: '+(d.erro||'Tente novamente.')+'</div>';}}).catch(function(){document.getElementById('pixArea').innerHTML='<div class="pix-status pix-status-erro">Erro de conexao. Tente novamente.</div>';});}
-function iniciarVerificacaoPix(){if(pixCheckInterval)clearInterval(pixCheckInterval);var t=0;pixCheckInterval=setInterval(function(){t++;if(t>72){clearInterval(pixCheckInterval);return;}if(!pixPaymentId)return;fetch('https://doutor-cafe-production.up.railway.app/verificar-pix/'+pixPaymentId).then(function(r){return r.json();}).then(function(d){if(d.aprovado){clearInterval(pixCheckInterval);var tipo=d.plano_id&&d.plano_id.indexOf('pro')>-1?'pro':'basico';salvarPlano({tipo:tipo,planoId:d.plano_id,dataAssinatura:new Date().toISOString()});localStorage.setItem(ANALISES_KEY,'0');atualizarContador();document.getElementById('pixArea').innerHTML='<div class="pix-status pix-status-aprovado">Pagamento aprovado! Plano '+(tipo==='pro'?'Pro':'Basico')+' liberado!</div>';setTimeout(function(){fecharPix();},3000);}}).catch(function(){});},5000);}
-function copiarCodigoPix(){var txt=document.getElementById('pixCodigoTxt');if(!txt)return;if(navigator.clipboard){navigator.clipboard.writeText(txt.textContent).then(function(){alert('Codigo PIX copiado!');});}else{var el=document.createElement('textarea');el.value=txt.textContent;document.body.appendChild(el);el.select();document.execCommand('copy');document.body.removeChild(el);alert('Codigo PIX copiado!');}}
+function confirmarPix(){
+  var nome=document.getElementById('pixNome').value.trim(),cpf=document.getElementById('pixCpf').value.replace(/[^0-9]/g,''),email=document.getElementById('pixEmail').value.trim()||'produtor@doutorcafe.app';
+  if(!nome){alert('Informe seu nome completo.');return;}
+  if(cpf.length!==11){alert('CPF inválido. Digite os 11 dígitos.');return;}
+  document.getElementById('pixArea').innerHTML='<div class="pix-loading"><div class="pix-spinner"></div> Gerando QR Code...</div>';
+  fetch('https://doutor-cafe-production.up.railway.app/gerar-pix',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plano:planoPixAtual+'_'+cicloAtual,userId:obterUserId(),nome:nome,cpf:cpf,email:email})})
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(d.qr_code_base64){
+      pixPaymentId=d.id;
+      document.getElementById('pixArea').innerHTML='<div class="pix-qr-img"><img src="data:image/png;base64,'+d.qr_code_base64+'" alt="QR Code PIX"></div><div class="pix-codigo-box"><div class="pix-codigo-label">Código PIX:</div><div class="pix-codigo-txt" id="pixCodigoTxt">'+d.qr_code+'</div></div><div class="pix-status pix-status-aguardando" id="pixStatusTxt">Aguardando pagamento...</div><button class="btn-copiar-pix" onclick="copiarCodigoPix()">Copiar código PIX</button>';
+      iniciarVerificacaoPix();
+    } else {
+      document.getElementById('pixArea').innerHTML='<div class="pix-status pix-status-erro">Erro: '+(d.erro||'Tente novamente.')+'</div>';
+    }
+  })
+  .catch(function(){document.getElementById('pixArea').innerHTML='<div class="pix-status pix-status-erro">Erro de conexão. Tente novamente.</div>';});
+}
+function iniciarVerificacaoPix(){
+  if(pixCheckInterval)clearInterval(pixCheckInterval);
+  var t=0;
+  pixCheckInterval=setInterval(function(){
+    t++; if(t>72){clearInterval(pixCheckInterval);return;}
+    if(!pixPaymentId)return;
+    fetch('https://doutor-cafe-production.up.railway.app/verificar-pix/'+pixPaymentId)
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.aprovado){
+        clearInterval(pixCheckInterval);
+        var tipo=d.plano_id&&d.plano_id.indexOf('pro')>-1?'pro':'basico';
+        salvarPlano({tipo:tipo,planoId:d.plano_id,dataAssinatura:new Date().toISOString()});
+        localStorage.setItem(ANALISES_KEY,'0');
+        atualizarContador();
+        document.getElementById('pixArea').innerHTML='<div class="pix-status pix-status-aprovado">✅ Pagamento aprovado! Plano '+(tipo==='pro'?'Pro':'Básico')+' liberado!</div>';
+        setTimeout(function(){fecharPix();},3000);
+      }
+    }).catch(function(){});
+  },5000);
+}
+function copiarCodigoPix(){
+  var txt=document.getElementById('pixCodigoTxt');
+  if(!txt)return;
+  if(navigator.clipboard){navigator.clipboard.writeText(txt.textContent).then(function(){alert('Código PIX copiado!');});}
+  else{var el=document.createElement('textarea');el.value=txt.textContent;document.body.appendChild(el);el.select();document.execCommand('copy');document.body.removeChild(el);alert('Código PIX copiado!');}
+}
 function fecharPix(){if(pixCheckInterval)clearInterval(pixCheckInterval);pixPaymentId=null;document.getElementById('modalPix').classList.remove('ativo');}
 
+// ── INICIALIZAÇÃO ──
+atualizarContador();
+verificarRetornoPagamento();
 renderCalendario();
 renderAreaHistorico();
 obterGPS();
 </script>
-
-<div class="modal-pix" id="modalPix">
-  <div class="modal-pix-box">
-    <div class="modal-pix-titulo">⚡ Pagar via PIX</div>
-    <div class="modal-pix-sub" id="pixSubtitulo">Preencha seus dados</div>
-    <div id="pixArea"></div>
-    <button class="btn-fechar-pix" onclick="fecharPix()">Cancelar</button>
-  </div>
-</div>
 </body>
 </html>
