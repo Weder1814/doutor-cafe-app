@@ -264,6 +264,24 @@ input[type="file"] { display: none; }
 .btn-copiar-pix { width:100%; padding:11px; background:var(--verde); color:white; border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:700; cursor:pointer; margin-bottom:8px; }
 .btn-fechar-pix { width:100%; padding:11px; background:white; color:var(--cinza); border:2px solid #e8e8e8; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; cursor:pointer; }
 canvas { display: none; }
+
+/* ── MODAL CADASTRO ── */
+.modal-cadastro { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.82); z-index:1200; align-items:center; justify-content:center; padding:20px; }
+.modal-cadastro.ativo { display:flex; }
+.modal-cadastro-box { background:white; border-radius:24px; padding:28px 22px 24px; width:100%; max-width:380px; text-align:center; }
+.modal-cadastro-icon { font-size:44px; margin-bottom:8px; display:block; }
+.modal-cadastro-titulo { font-family:'Playfair Display',serif; font-size:22px; color:var(--marrom); font-weight:900; margin-bottom:6px; }
+.modal-cadastro-sub { font-size:13px; color:var(--cinza); margin-bottom:6px; line-height:1.5; }
+.modal-cadastro-bonus { background:#e8f5e9; border-radius:12px; padding:10px 14px; margin-bottom:16px; font-size:13px; color:#2e7d32; font-weight:700; }
+.cad-label { font-size:11px; font-weight:700; color:var(--cinza); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:4px; text-align:left; }
+.cad-input { width:100%; border:1.5px solid #ddd; border-radius:10px; padding:11px 13px; font-size:15px; font-family:'DM Sans',sans-serif; color:var(--marrom); outline:none; margin-bottom:12px; display:block; }
+.cad-input:focus { border-color:var(--verde-claro); }
+.cad-select { width:100%; border:1.5px solid #ddd; border-radius:10px; padding:11px 13px; font-size:15px; font-family:'DM Sans',sans-serif; color:var(--marrom); outline:none; margin-bottom:12px; display:block; background:white; }
+.cad-select:focus { border-color:var(--verde-claro); }
+.btn-cadastrar { width:100%; padding:14px; background:linear-gradient(135deg,var(--verde-claro),var(--verde)); color:white; border:none; border-radius:14px; font-family:'DM Sans',sans-serif; font-size:15px; font-weight:700; cursor:pointer; margin-top:4px; }
+.btn-cadastrar:active { opacity:0.85; }
+.cad-privacidade { font-size:10px; color:var(--cinza); margin-top:10px; line-height:1.4; }
+
 </style>
 </head>
 <body>
@@ -389,6 +407,40 @@ canvas { display: none; }
   </div>
 </div>
 
+
+<!-- MODAL CADASTRO -->
+<div class="modal-cadastro" id="modalCadastro">
+  <div class="modal-cadastro-box">
+    <span class="modal-cadastro-icon">🌿</span>
+    <div class="modal-cadastro-titulo">Você usou 5 análises!</div>
+    <div class="modal-cadastro-sub">Cadastre-se gratuitamente e continue usando o Doutor Café.</div>
+    <div class="modal-cadastro-bonus">🎁 Ganhe mais 10 análises grátis ao se cadastrar</div>
+    <label class="cad-label">Nome completo *</label>
+    <input class="cad-input" id="cadNome" type="text" placeholder="Ex: João da Silva">
+    <label class="cad-label">WhatsApp / Celular *</label>
+    <input class="cad-input" id="cadCelular" type="tel" placeholder="(35) 99999-9999" maxlength="15" oninput="mascararCelular(this)">
+    <label class="cad-label">Região produtora</label>
+    <select class="cad-select" id="cadRegiao">
+      <option value="">Selecione sua região...</option>
+      <option value="Mogiana">Mogiana (SP/MG)</option>
+      <option value="Sul de Minas">Sul de Minas</option>
+      <option value="Cerrado Mineiro">Cerrado Mineiro</option>
+      <option value="Matas de Minas">Matas de Minas</option>
+      <option value="Chapada Diamantina">Chapada Diamantina (BA)</option>
+      <option value="Planalto da Bahia">Planalto da Bahia</option>
+      <option value="Rondonia">Rondônia</option>
+      <option value="Norte do Parana">Norte do Paraná</option>
+      <option value="Espirito Santo">Espírito Santo</option>
+      <option value="Alta Paulista">Alta Paulista (SP)</option>
+      <option value="Outra">Outra região</option>
+    </select>
+    <label class="cad-label">E-mail (opcional)</label>
+    <input class="cad-input" id="cadEmail" type="email" placeholder="seuemail@gmail.com">
+    <button class="btn-cadastrar" onclick="confirmarCadastro()">✅ Cadastrar e Continuar</button>
+    <div class="cad-privacidade">🔒 Seus dados são protegidos e não serão compartilhados com terceiros.</div>
+  </div>
+</div>
+
 <!-- MODAL PIX -->
 <div class="modal-pix" id="modalPix">
   <div class="modal-pix-box">
@@ -408,13 +460,23 @@ function salvarPlano(p){try{localStorage.setItem(PLANO_KEY,JSON.stringify(p));}c
 function getAnalisesUsadas(){return parseInt(localStorage.getItem(ANALISES_KEY)||"0");}
 function incrementarAnalise(){var u=getAnalisesUsadas()+1;localStorage.setItem(ANALISES_KEY,u.toString());atualizarContador();return u;}
 function podeanalisar(){var p=getPlano();if(p.tipo!=="gratuito")return true;return getAnalisesUsadas()<LIMITE_GRATIS;}
+
 function atualizarContador(){
   var p=getPlano(),usado=getAnalisesUsadas(),txt=document.getElementById("contadorTxt"),fill=document.getElementById("contadorFill");
   if(!txt||!fill)return;
+  var cad = getCadastro();
   if(p.tipo==="pro"){txt.textContent="Plano Pro — 300 análises/mês";fill.style.width="100%";fill.className="contador-fill";}
   else if(p.tipo==="basico"){var r=120-(usado%120);txt.textContent=r+" análises restantes";fill.style.width=(r/120*100)+"%";fill.className="contador-fill";}
-  else{var r=Math.max(0,LIMITE_GRATIS-usado);txt.textContent=r+" análises grátis restantes";var pct=(r/LIMITE_GRATIS)*100;fill.style.width=pct+"%";fill.className="contador-fill"+(pct<=25?" vermelho":pct<=50?" amarelo":"");}
+  else if(cad){
+    var r=Math.max(0,TOTAL_GRATIS_COM_CAD-usado);
+    txt.textContent=r+" análises grátis restantes";
+    var pct=(r/TOTAL_GRATIS_COM_CAD)*100;
+    fill.style.width=pct+"%";
+    fill.className="contador-fill"+(pct<=25?" vermelho":pct<=50?" amarelo":"");
+  }
+  else{var r=Math.max(0,ANALISES_GRATIS_SEM_CAD-usado);txt.textContent=r+" análises grátis restantes";var pct=(r/ANALISES_GRATIS_SEM_CAD)*100;fill.style.width=pct+"%";fill.className="contador-fill"+(pct<=25?" vermelho":pct<=50?" amarelo":"");}
 }
+
 function abrirModal(esgotado){document.getElementById("modalPlanos").classList.add("ativo");document.getElementById("modalEsgotado").style.display=esgotado?"block":"none";document.getElementById("modalSubtitulo").textContent=esgotado?"Continue diagnosticando sua lavoura sem limites":"Escolha o plano ideal para sua lavoura";}
 function fecharModal(){document.getElementById("modalPlanos").classList.remove("ativo");}
 function setCiclo(c){cicloAtual=c;document.getElementById("btnMensal").className="toggle-btn"+(c==="mensal"?" ativo":"");document.getElementById("btnAnual").className="toggle-btn"+(c==="anual"?" ativo":"");document.getElementById("precoBasico").textContent=c==="mensal"?"R$32,90":"R$24,92";document.getElementById("precoPro").textContent=c==="mensal"?"R$49,90":"R$41,66";document.getElementById("descBasico").style.display=c==="anual"?"block":"none";document.getElementById("descPro").style.display=c==="anual"?"block":"none";}
@@ -450,6 +512,88 @@ var NOMES_VOZ = {ferrugem:"Ferrugem do café",bicho:"Bicho mineiro",cercosporios
 var CATEGORIAS = {ferrugem:"Doença Fúngica",bicho:"Praga",cercosporiose:"Doença Fúngica",aureolada:"Doença Bacteriana",phoma:"Doença Fúngica",antracnose:"Doença Fúngica",ascochyta:"Doença Fúngica",manteigosa:"Doença Fúngica",roseliniose:"Doença Fúngica",helmintosporiose:"Doença Fúngica",broca:"Praga",acaro:"Praga",acaro_ferrugem:"Praga",cigarra:"Praga",cochonilha:"Praga",lagarta:"Praga",nematoide:"Praga",nitrogenio:"Deficiência Nutricional",magnesio:"Deficiência Nutricional",potassio:"Deficiência Nutricional",fosforo:"Deficiência Nutricional",calcio:"Deficiência Nutricional",enxofre:"Deficiência Nutricional",boro:"Deficiência Nutricional",zinco:"Deficiência Nutricional",ferro:"Deficiência Nutricional",manganes:"Deficiência Nutricional",cobre:"Deficiência Nutricional",estresse_hidrico:"Estresse Ambiental",fitotoxicidade:"Estresse Ambiental",escaldadura:"Estresse Ambiental",fruto_verde:"Fruto",fruto_maduro:"Fruto",fruto_passado:"Fruto",saudavel:"Planta Saudável"};
 var CORES_ESTAGIO = ["#4caf50","#8bc34a","#ffc107","#ff9800","#f44336"];
 var MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+
+
+// ── CADASTRO DE USUÁRIO ──
+var CADASTRO_KEY = "doutorcafe_cadastro";
+var ANALISES_GRATIS_SEM_CAD = 5;
+var ANALISES_BONUS_CAD = 10;
+var TOTAL_GRATIS_COM_CAD = 15;
+
+function getCadastro() {
+  try { return JSON.parse(localStorage.getItem(CADASTRO_KEY)) || null; } catch(e) { return null; }
+}
+function salvarCadastroLocal(dados) {
+  try { localStorage.setItem(CADASTRO_KEY, JSON.stringify(dados)); } catch(e) {}
+}
+
+function podeanalisarComCadastro() {
+  var cad = getCadastro();
+  var usado = getAnalisesUsadas();
+  var p = getPlano();
+  if (p.tipo !== "gratuito") return true;
+  if (!cad) return usado < ANALISES_GRATIS_SEM_CAD;
+  return usado < TOTAL_GRATIS_COM_CAD;
+}
+
+function verificarCadastroNecessario() {
+  var cad = getCadastro();
+  var usado = getAnalisesUsadas();
+  var p = getPlano();
+  if (p.tipo !== "gratuito") return false;
+  if (!cad && usado >= ANALISES_GRATIS_SEM_CAD) return true;
+  return false;
+}
+
+function abrirModalCadastro() {
+  document.getElementById("modalCadastro").classList.add("ativo");
+}
+
+function mascararCelular(input) {
+  var v = input.value.replace(/\D/g, '');
+  if (v.length > 11) v = v.slice(0, 11);
+  if (v.length > 7) v = '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7);
+  else if (v.length > 2) v = '(' + v.slice(0,2) + ') ' + v.slice(2);
+  else if (v.length > 0) v = '(' + v;
+  input.value = v;
+}
+
+function confirmarCadastro() {
+  var nome    = document.getElementById('cadNome').value.trim();
+  var celular = document.getElementById('cadCelular').value.trim();
+  var regiao  = document.getElementById('cadRegiao').value;
+  var email   = document.getElementById('cadEmail').value.trim();
+
+  if (!nome) { alert('Informe seu nome completo.'); return; }
+  if (celular.replace(/\D/g,'').length < 10) { alert('Informe um celular válido.'); return; }
+
+  var btn = document.querySelector('.btn-cadastrar');
+  btn.textContent = 'Cadastrando...'; btn.disabled = true;
+
+  var dados = { nome: nome, celular: celular, regiao: regiao, email: email, dataCadastro: new Date().toISOString() };
+
+  fetch('https://doutor-cafe-production.up.railway.app/cadastrar-usuario', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId: obterUserId(), nome: nome, celular: celular, regiao: regiao, email: email })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    salvarCadastroLocal(dados);
+    document.getElementById('modalCadastro').classList.remove('ativo');
+    atualizarContador();
+    alert('✅ Cadastro realizado! Você ganhou mais 10 análises gratuitas. Bom diagnóstico!');
+    btn.textContent = '✅ Cadastrar e Continuar'; btn.disabled = false;
+  })
+  .catch(function() {
+    // Salva local mesmo se backend falhar
+    salvarCadastroLocal(dados);
+    document.getElementById('modalCadastro').classList.remove('ativo');
+    atualizarContador();
+    alert('✅ Cadastro realizado! Você ganhou mais 10 análises gratuitas.');
+    btn.textContent = '✅ Cadastrar e Continuar'; btn.disabled = false;
+  });
+}
 
 // ── IndexedDB / Fila Offline ──
 var _db = null;
@@ -719,6 +863,16 @@ function calcular(inputId,doseMin,doseMax,propPorLitro,unidade,unidadeProp) {
 
 // ── PROCESSAR ARQUIVOS ──
 function processar(file, isVideo) {
+  // Verificar se precisa de cadastro
+  if (verificarCadastroNecessario()) {
+    abrirModalCadastro();
+    return;
+  }
+  // Verificar se esgotou análises
+  if (!podeanalisarComCadastro()) {
+    abrirModal(true);
+    return;
+  }
   document.getElementById("spinner").style.display="block";
   document.getElementById("resultado").style.display="none";
   document.getElementById("spinnerTexto").textContent="Analisando...";
