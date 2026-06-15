@@ -1022,22 +1022,108 @@ function mostrarResultadoSolo(data) {
 
 function mostrarResultadoDaninha(data) {
   var div=document.getElementById("resultado"); div.style.display="block";
-  var nome=data.nome||"Planta não identificada",indicador=data.indicador||"",acao=data.acao||"";
-  var alertaClass="daninha-alerta-compactado";
-  if (indicador.indexOf("cido")>-1||indicador.indexOf("ACIDO")>-1) alertaClass="daninha-alerta-acido";
-  else if (indicador.indexOf("rtil")>-1||indicador.indexOf("fertil")>-1) alertaClass="daninha-alerta-fertil";
-  else if (indicador.indexOf("umidade")>-1||indicador.indexOf("encharcado")>-1) alertaClass="daninha-alerta-umidade";
-  else if (indicador.indexOf("degradado")>-1||indicador.indexOf("calcio")>-1) alertaClass="daninha-alerta-degradado";
+
+  // Suporte ao formato antigo e novo
+  var nome = data.nome || "Planta não identificada";
+  var nomeCientifico = data.nome_cientifico || "";
+  var indicador = data.indicador || "";
+  var acao = data.acao || "";
+  var alerta = data.alerta || "";
+  var manejoPreventivo = data.manejo_preventivo || "";
+  var urgencia = data.urgencia || "media";
+  var tipoControle = data.tipo_controle || "integrado";
+  var produtos = data.produtos || [];
+
+  // Cor do card de indicador baseado no conteúdo
+  var alertaClass = "daninha-alerta-compactado";
+  if (indicador.indexOf("cido")>-1||indicador.indexOf("ACIDO")>-1||indicador.indexOf("pH")>-1) alertaClass="daninha-alerta-acido";
+  else if (indicador.indexOf("rtil")>-1||indicador.indexOf("fertil")>-1||indicador.indexOf("Fertil")>-1) alertaClass="daninha-alerta-fertil";
+  else if (indicador.indexOf("umidade")>-1||indicador.indexOf("encharcado")>-1||indicador.indexOf("drenagem")>-1) alertaClass="daninha-alerta-umidade";
+  else if (indicador.indexOf("degradado")>-1||indicador.indexOf("glifosato")>-1||indicador.indexOf("resistente")>-1) alertaClass="daninha-alerta-degradado";
+  else if (indicador.indexOf("compacta")>-1||indicador.indexOf("pisoteado")>-1) alertaClass="daninha-alerta-compactado";
   else if (indicador.indexOf("magnesio")>-1||indicador.indexOf("Mg")>-1) alertaClass="daninha-alerta-mag";
-  var textoVoz="Planta identificada: "+nome+". "+indicador+". "+acao;
-  var thumbHtml=ultimaFotoBase64?'<img class="card-foto-thumb" src="data:image/jpeg;base64,'+ultimaFotoBase64+'" alt="planta">':"<div class='card-foto-thumb-placeholder'>\uD83C\uDF3E</div>";
-  var html='<div class="card-resultado"><div class="card-topo">'+thumbHtml+'<div class="card-titulo"><h2>'+nome+'</h2><div class="categoria">Planta Daninha Indicadora</div></div></div>';
-  html+='<div class="badges"><span class="badge badge-daninha">\uD83C\uDF3E Leitura do Solo</span>';
-  if (dadosGPS.regiao) html+='<span class="badge badge-regiao">\uD83D\uDCCD '+dadosGPS.regiao+'</span>';
-  html+='</div>';
-  html+='<div class="daninha-alerta '+alertaClass+'"><div class="daninha-alerta-titulo">\uD83D\uDD0D '+indicador+'</div><div class="daninha-alerta-desc">'+acao+'</div></div>';
-  html+='<div class="btns-resultado"><button class="btn-voz" onclick="falar(\'\'\'\'\'\'\'\'"+textoVoz.replace(/\'/g,"\\\'")+"\'\'\'\'\'\'\'\'")">\uD83D\uDD0A Ouvir</button><button class="btn-nova" onclick="resetar()">\uD83D\uDCF7 Nova análise</button></div></div>';
-  div.innerHTML=html; falar(textoVoz); div.scrollIntoView({behavior:"smooth",block:"start"});
+
+  // Badge de urgência
+  var urgBadge = urgencia==="alta"
+    ? '<span style="background:#fce4ec;color:#c62828;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700">🔴 Urgência Alta</span>'
+    : urgencia==="media"
+    ? '<span style="background:#fff8e1;color:#f57f17;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700">🟡 Urgência Média</span>'
+    : '<span style="background:#e8f5e9;color:#2e7d32;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700">🟢 Urgência Baixa</span>';
+
+  // Badge de tipo de controle
+  var ctrlBadge = '<span style="background:#e8eaf6;color:#283593;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700">⚙️ '+tipoControle.charAt(0).toUpperCase()+tipoControle.slice(1)+'</span>';
+
+  var textoVoz = "Planta identificada: "+nome+". "+indicador+". "+acao;
+  var thumbHtml = ultimaFotoBase64
+    ? '<img class="card-foto-thumb" src="data:image/jpeg;base64,'+ultimaFotoBase64+'" alt="planta">'
+    : "<div class='card-foto-thumb-placeholder'>🌾</div>";
+
+  var html = '<div class="card-resultado">';
+  html += '<div class="card-topo">'+thumbHtml+'<div class="card-titulo"><h2>'+nome+'</h2>';
+  if (nomeCientifico) html += '<div class="categoria" style="font-style:italic">'+nomeCientifico+'</div>';
+  html += '<div class="categoria">Planta Daninha Indicadora</div></div></div>';
+
+  // Badges
+  html += '<div class="badges"><span class="badge badge-daninha">🌾 Leitura do Solo</span>';
+  if (dadosGPS.regiao) html += '<span class="badge badge-regiao">📍 '+dadosGPS.regiao+'</span>';
+  html += urgBadge+ctrlBadge+'</div>';
+
+  // Card indicador de solo
+  html += '<div class="daninha-alerta '+alertaClass+'">';
+  html += '<div class="daninha-alerta-titulo">🔍 O que indica no solo</div>';
+  html += '<div class="daninha-alerta-desc">'+indicador+'</div></div>';
+
+  // Ação recomendada
+  html += '<div class="divisor"></div><div class="acao-box"><h3>📋 Como controlar</h3><p>'+acao+'</p></div>';
+
+  // Produtos com doses
+  if (produtos && produtos.length > 0) {
+    html += '<div class="divisor"></div>';
+    html += '<div style="padding:14px 20px"><div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--cinza);margin-bottom:10px">🧪 Produtos Recomendados</div>';
+    produtos.forEach(function(p) {
+      var momentoBadge = p.momento && p.momento.indexOf("pre")>-1
+        ? '<span style="background:#fff3e0;color:#e65100;border-radius:10px;padding:2px 7px;font-size:10px;font-weight:600">Pré-emergência</span>'
+        : p.momento && p.momento.indexOf("pos")>-1
+        ? '<span style="background:#e8eaf6;color:#283593;border-radius:10px;padding:2px 7px;font-size:10px;font-weight:600">Pós-emergência</span>'
+        : '<span style="background:#e8f5e9;color:#2e7d32;border-radius:10px;padding:2px 7px;font-size:10px;font-weight:600">Qualquer fase</span>';
+      html += '<div style="background:#f5f0e8;border-radius:12px;padding:10px 12px;margin-bottom:8px">';
+      html += '<div style="font-size:13px;font-weight:700;color:var(--marrom);margin-bottom:4px">🧴 '+p.nome+' '+momentoBadge+'</div>';
+      if (p.ingrediente_ativo) html += '<div style="font-size:11px;color:var(--cinza);margin-bottom:4px">i.a.: '+p.ingrediente_ativo+'</div>';
+      if (p.dose) html += '<div style="font-size:13px;color:var(--verde);font-weight:700">📏 '+p.dose+'</div>';
+      if (p.observacao) html += '<div style="font-size:11px;color:#555;margin-top:4px;font-style:italic">⚠️ '+p.observacao+'</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  // Alerta crítico
+  if (alerta) {
+    html += '<div style="margin:0 20px 14px;background:#fce4ec;border-radius:12px;padding:10px 14px;border-left:4px solid #c62828">';
+    html += '<div style="font-size:13px;font-weight:700;color:#c62828;margin-bottom:4px">⚠️ Atenção</div>';
+    html += '<div style="font-size:12px;color:#555;line-height:1.5">'+alerta+'</div></div>';
+  }
+
+  // Manejo preventivo
+  if (manejoPreventivo) {
+    html += '<div style="margin:0 20px 14px;background:#e8f5e9;border-radius:12px;padding:10px 14px;border-left:4px solid #2e7d32">';
+    html += '<div style="font-size:13px;font-weight:700;color:#2e7d32;margin-bottom:4px">🛡️ Prevenção</div>';
+    html += '<div style="font-size:12px;color:#555;line-height:1.5">'+manejoPreventivo+'</div></div>';
+  }
+
+  // Botões
+  html += '<div class="btns-resultado">';
+  html += '<button class="btn-voz" onclick="falar(\''+textoVoz.replace(/\'/g,"\\\'")+'\')">';
+  html += '🔊 Ouvir</button>';
+  html += '<button class="btn-nova" onclick="resetar()">📷 Nova análise</button>';
+  html += '</div></div>';
+
+  div.innerHTML = html;
+  falar(textoVoz);
+  div.scrollIntoView({behavior:"smooth",block:"start"});
+  setTimeout(function(){
+    if (deveAbrirCadastroAposAnalise()) { abrirModalCadastro(); }
+    else if (!podeanalisarComCadastro()) { abrirModal(true); }
+  }, 2000);
 }
 
 function mostrarErro() {
