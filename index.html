@@ -890,7 +890,7 @@ function processar(file, isVideo) {
     if (dadosGPS.altitude) body.altitude=dadosGPS.altitude;
     fetchComTimeout("https://doutor-cafe-production.up.railway.app/diagnostico",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)},TIMEOUT_MS)
     .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultado(data,isVideo);})
-    .catch(function(){document.getElementById("spinner").style.display="none";adicionarNaFila(b64,null,function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert("Sem conexão ou tempo esgotado. Foto salva na fila!");}});});
+    .catch(function(err){document.getElementById("spinner").style.display="none";adicionarNaFila(b64,null,function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert("Foto salva na fila!\n\n[DEBUG] Erro: " + err.name + "\nDetalhe: " + err.message);}});});
   };
   reader.readAsDataURL(file);
 }
