@@ -412,9 +412,9 @@ canvas { display: none; }
 <div class="modal-cadastro" id="modalCadastro">
   <div class="modal-cadastro-box">
     <span class="modal-cadastro-icon">🌿</span>
-    <div class="modal-cadastro-titulo">Você usou 5 análises!</div>
-    <div class="modal-cadastro-sub">Cadastre-se gratuitamente e continue usando o Doutor Café.</div>
-    <div class="modal-cadastro-bonus">🎁 Ganhe mais 10 análises grátis ao se cadastrar</div>
+    <div class="modal-cadastro-titulo">Continue usando gratuitamente!</div>
+    <div class="modal-cadastro-sub">Você usou 5 análises. Cadastre-se e ganhe mais 10 análises grátis para continuar cuidando da sua lavoura.</div>
+    <div class="modal-cadastro-bonus">🎁 Cadastro gratuito · Mais 10 análises liberadas</div>
     <label class="cad-label">Nome completo *</label>
     <input class="cad-input" id="cadNome" type="text" placeholder="Ex: João da Silva">
     <label class="cad-label">WhatsApp / Celular *</label>
@@ -453,7 +453,7 @@ canvas { display: none; }
 
 <script>
 // ── PLANOS E PAGAMENTO ──
-var PLANO_KEY="doutorcafe_plano",ANALISES_KEY="doutorcafe_analises",LIMITE_GRATIS=20,cicloAtual="mensal";
+var PLANO_KEY="doutorcafe_plano",ANALISES_KEY="doutorcafe_analises",LIMITE_GRATIS=15,cicloAtual="mensal";
 
 function getPlano(){try{return JSON.parse(localStorage.getItem(PLANO_KEY))||{tipo:"gratuito"};}catch(e){return{tipo:"gratuito"};}}
 function salvarPlano(p){try{localStorage.setItem(PLANO_KEY,JSON.stringify(p));}catch(e){}}
@@ -474,7 +474,7 @@ function atualizarContador(){
     fill.style.width=pct+"%";
     fill.className="contador-fill"+(pct<=25?" vermelho":pct<=50?" amarelo":"");
   }
-  else{var r=Math.max(0,ANALISES_GRATIS_SEM_CAD-usado);txt.textContent=r+" análises grátis restantes";var pct=(r/ANALISES_GRATIS_SEM_CAD)*100;fill.style.width=pct+"%";fill.className="contador-fill"+(pct<=25?" vermelho":pct<=50?" amarelo":"");}
+  else{var r=Math.max(0,TOTAL_GRATIS_COM_CAD-usado);txt.textContent=r+" análises grátis restantes";var pct=(r/TOTAL_GRATIS_COM_CAD)*100;fill.style.width=pct+"%";fill.className="contador-fill"+(pct<=25?" vermelho":pct<=50?" amarelo":"");}
 }
 
 function abrirModal(esgotado){document.getElementById("modalPlanos").classList.add("ativo");document.getElementById("modalEsgotado").style.display=esgotado?"block":"none";document.getElementById("modalSubtitulo").textContent=esgotado?"Continue diagnosticando sua lavoura sem limites":"Escolha o plano ideal para sua lavoura";}
@@ -532,17 +532,22 @@ function podeanalisarComCadastro() {
   var usado = getAnalisesUsadas();
   var p = getPlano();
   if (p.tipo !== "gratuito") return true;
-  if (!cad) return usado < ANALISES_GRATIS_SEM_CAD;
   return usado < TOTAL_GRATIS_COM_CAD;
 }
 
 function verificarCadastroNecessario() {
+  // Não bloqueia antes — o modal aparece depois do resultado
+  return false;
+}
+
+function deveAbrirCadastroAposAnalise() {
   var cad = getCadastro();
   var usado = getAnalisesUsadas();
   var p = getPlano();
   if (p.tipo !== "gratuito") return false;
-  if (!cad && usado >= ANALISES_GRATIS_SEM_CAD) return true;
-  return false;
+  if (cad) return false;
+  // Abre após a 5ª análise (quando usado acabou de virar 5)
+  return usado >= ANALISES_GRATIS_SEM_CAD;
 }
 
 function abrirModalCadastro() {
@@ -863,11 +868,6 @@ function calcular(inputId,doseMin,doseMax,propPorLitro,unidade,unidadeProp) {
 
 // ── PROCESSAR ARQUIVOS ──
 function processar(file, isVideo) {
-  // Verificar se precisa de cadastro
-  if (verificarCadastroNecessario()) {
-    abrirModalCadastro();
-    return;
-  }
   // Verificar se esgotou análises
   if (!podeanalisarComCadastro()) {
     abrirModal(true);
@@ -994,6 +994,11 @@ function mostrarResultado(data, isVideo) {
   html+='<button class="btn-share" onclick="compartilhar(\'\'\'\'\'\'\'\'"+JSON.stringify(diags).replace(/\'/g,"\\\'")+"\'\'\'\'\'\'\'\'",\'\'\'\'\'\'\'\'"+regiao+"\'\'\'\'\'\'\'\'")">\uD83D\uDCE4 WhatsApp</button>';
   html+='<button class="btn-nova" onclick="resetar()">\uD83D\uDCF7 Nova</button></div></div>';
   div.innerHTML=html; falar(textoVoz); div.scrollIntoView({behavior:"smooth",block:"start"});
+  // Verificar se deve abrir cadastro após esta análise
+  setTimeout(function(){
+    if (deveAbrirCadastroAposAnalise()) { abrirModalCadastro(); }
+    else if (!podeanalisarComCadastro()) { abrirModal(true); }
+  }, 2000);
 }
 
 function mostrarResultadoSolo(data) {
