@@ -1086,11 +1086,13 @@ function mostrarResultadoDaninha(data) {
         : p.momento && p.momento.indexOf("pos")>-1
         ? '<span style="background:#e8eaf6;color:#283593;border-radius:10px;padding:2px 7px;font-size:10px;font-weight:600">Pós-emergência</span>'
         : '<span style="background:#e8f5e9;color:#2e7d32;border-radius:10px;padding:2px 7px;font-size:10px;font-weight:600">Qualquer fase</span>';
-      html += '<div style="background:#f5f0e8;border-radius:12px;padding:10px 12px;margin-bottom:8px">';
-      html += '<div style="font-size:13px;font-weight:700;color:var(--marrom);margin-bottom:4px">🧴 '+p.nome+' '+momentoBadge+'</div>';
-      if (p.ingrediente_ativo) html += '<div style="font-size:11px;color:var(--cinza);margin-bottom:4px">i.a.: '+p.ingrediente_ativo+'</div>';
-      if (p.dose) html += '<div style="font-size:13px;color:var(--verde);font-weight:700">📏 '+p.dose+'</div>';
-      if (p.observacao) html += '<div style="font-size:11px;color:#555;margin-top:4px;font-style:italic">⚠️ '+p.observacao+'</div>';
+      html += '<div style="background:#f5f0e8;border-radius:12px;padding:12px 14px;margin-bottom:8px">';
+      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
+      html += '<span style="font-size:15px">🧴</span>';
+      html += '<span style="font-size:14px;font-weight:700;color:var(--marrom)">'+p.nome+'</span>';
+      html += momentoBadge+'</div>';
+      if (p.dose) html += '<div style="background:var(--verde);color:white;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:700;margin-bottom:6px">📏 '+p.dose+'</div>';
+      if (p.como_usar) html += '<div style="font-size:12px;color:#444;line-height:1.5">👨‍🌾 '+p.como_usar+'</div>';
       html += '</div>';
     });
     html += '</div>';
