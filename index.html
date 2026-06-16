@@ -1032,7 +1032,8 @@ function mostrarResultado(data, isVideo) {
     html+='</div>';
   });
   var textoVoz=diags.map(function(d){return(NOMES_VOZ[d.diagnostico]||d.diagnostico)+". "+d.acao;}).join(". ");
-  html+='<div class="btns-resultado"><button class="btn-voz" onclick="falar(\'\'\'\'\'\'\'\'"+textoVoz.replace(/\'/g,"\\\'").replace(/\n/g," ")+"\'\'\'\'\'\'\'\'")">\uD83D\uDD0A Ouvir</button>';
+  _textoParaFalar = textoVoz;
+  html+='<div class="btns-resultado"><button class="btn-voz" onclick="falarTextoAtual()">🔊 Ouvir</button>'';
   html+='<button class="btn-share" onclick="compartilhar(\'\'\'\'\'\'\'\'"+JSON.stringify(diags).replace(/\'/g,"\\\'")+"\'\'\'\'\'\'\'\'",\'\'\'\'\'\'\'\'"+regiao+"\'\'\'\'\'\'\'\'")">\uD83D\uDCE4 WhatsApp</button>';
   html+='<button class="btn-nova" onclick="resetar()">\uD83D\uDCF7 Nova</button></div></div>';
   div.innerHTML=html; falar(textoVoz); div.scrollIntoView({behavior:"smooth",block:"start"});
@@ -1176,6 +1177,8 @@ function mostrarErro() {
 }
 
 // ── VOZ ──
+var _textoParaFalar = "";
+function falarTextoAtual() { falar(_textoParaFalar); }
 function falar(texto) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
