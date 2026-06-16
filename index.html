@@ -497,9 +497,7 @@ function verificarRetornoPagamento(){var params=new URLSearchParams(window.locat
 var ultimaFotoBase64 = null;
 var HIST_KEY = "doutorcafe_hist";
 var FILA_MAX = 50;
-var TIMEOUT_MS = 45000; // 60s — necessario para prompt com plano de acao
-  fetch("https://doutor-cafe-production.up.railway.app/ping").catch(function(){});
-
+var TIMEOUT_MS = 60000; // 60s — necessario para prompt com plano de acao
 
 // ── FETCH COM TIMEOUT ──
 function fetchComTimeout(url, opcoes, ms) {
@@ -1035,7 +1033,7 @@ function mostrarResultado(data, isVideo) {
   });
   var textoVoz=diags.map(function(d){return(NOMES_VOZ[d.diagnostico]||d.diagnostico)+". "+d.acao;}).join(". ");
   _textoParaFalar = textoVoz;
-  html+='<div class="btns-resultado"><button class="btn-voz" onclick="falarTextoAtual()">🔊 Ouvir</button>'';
+  html+='<div class="btns-resultado"><button class="btn-voz" onclick="falarTextoAtual()">🔊 Ouvir</button>';
   html+='<button class="btn-share" onclick="compartilhar(\'\'\'\'\'\'\'\'"+JSON.stringify(diags).replace(/\'/g,"\\\'")+"\'\'\'\'\'\'\'\'",\'\'\'\'\'\'\'\'"+regiao+"\'\'\'\'\'\'\'\'")">\uD83D\uDCE4 WhatsApp</button>';
   html+='<button class="btn-nova" onclick="resetar()">\uD83D\uDCF7 Nova</button></div></div>';
   div.innerHTML=html; falar(textoVoz); div.scrollIntoView({behavior:"smooth",block:"start"});
