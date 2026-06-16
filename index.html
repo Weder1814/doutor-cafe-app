@@ -890,6 +890,15 @@ function processar(file, isVideo) {
     abrirModal(true);
     return;
   }
+  // Se servidor ainda dormindo, acorda primeiro
+  if (!servidorAcordado) {
+    document.getElementById("spinnerTexto").textContent = "Acordando servidor...";
+    document.getElementById("spinnerSub").textContent = "Aguarde alguns segundos — servidor hibernado";
+    document.getElementById("spinner").style.display = "block";
+    document.getElementById("resultado").style.display = "none";
+    acordarServidor(function(){ processar(file, isVideo); });
+    return;
+  }
   document.getElementById("spinner").style.display="block";
   document.getElementById("resultado").style.display="none";
   document.getElementById("spinnerTexto").textContent="Analisando...";
@@ -1365,6 +1374,56 @@ verificarRetornoPagamento();
 renderCalendario();
 renderAreaHistorico();
 obterGPS();
+
+// ── KEEP-ALIVE: mantém o Railway acordado ──
+var servidorAcordado = false;
+var tentativasAcordar = 0;
+
+function acordarServidor(callback) {
+  fetch("https://doutor-cafe-production.up.railway.app/ping")
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      servidorAcordado = true;
+      tentativasAcordar = 0;
+      esconderAvisoServidor();
+      if (callback) callback();
+    })
+    .catch(function(){
+      servidorAcordado = false;
+      tentativasAcordar++;
+      mostrarAvisoServidor(tentativasAcordar);
+      // Tenta de novo em 3 segundos
+      setTimeout(function(){ acordarServidor(callback); }, 3000);
+    });
+}
+
+function mostrarAvisoServidor(tentativa) {
+  var tag = document.getElementById("regiaoTag");
+  if (tag) {
+    tag.style.background = "rgba(255,200,0,0.25)";
+    tag.style.borderColor = "rgba(255,200,0,0.5)";
+    tag.textContent = "⏳ Aquecendo servidor" + (tentativa > 1 ? " (" + tentativa + "s)..." : "...");
+  }
+}
+
+function esconderAvisoServidor() {
+  var tag = document.getElementById("regiaoTag");
+  if (tag) {
+    tag.style.background = "";
+    tag.style.borderColor = "";
+  }
+  // Restaura a região se já estava carregada
+  if (dadosGPS.regiao) {
+    var textoTag = "📍 " + dadosGPS.regiao;
+    if (dadosGPS.altitude) textoTag += " · " + dadosGPS.altitude + "m";
+    tag.textContent = textoTag;
+  }
+}
+
+// Acorda ao abrir
+acordarServidor(null);
+// Mantém acordado a cada 2 minutos
+setInterval(function(){ acordarServidor(null); }, 2 * 60 * 1000);
 </script>
 </body>
 </html>
