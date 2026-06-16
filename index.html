@@ -966,9 +966,39 @@ function compartilhar(diagsJson,regiao) {
 }
 
 // ── MOSTRAR RESULTADOS ──
+function buildPlanoAcao(plano) {
+  if (!plano) return "";
+  var html = '<div class="plano-acao-card">';
+  html += '<div class="plano-acao-header">';
+  html += '<div class="plano-acao-titulo">📋 Plano de Ação</div>';
+  if (plano.resumo) html += '<div class="plano-acao-resumo">' + plano.resumo + '</div>';
+  html += '</div>';
+  if (plano.urgente) {
+    html += '<div class="plano-acao-item plano-acao-urgente">';
+    html += '<div class="plano-acao-icone">🚨</div>';
+    html += '<div><div class="plano-acao-label">Faça essa semana</div>';
+    html += '<div class="plano-acao-texto">' + plano.urgente + '</div></div></div>';
+  }
+  if (plano.em_21_dias) {
+    html += '<div class="plano-acao-item plano-acao-21dias">';
+    html += '<div class="plano-acao-icone">📅</div>';
+    html += '<div><div class="plano-acao-label">Em 21 dias</div>';
+    html += '<div class="plano-acao-texto">' + plano.em_21_dias + '</div></div></div>';
+  }
+  if (plano.nutricao) {
+    html += '<div class="plano-acao-item plano-acao-nutricao">';
+    html += '<div class="plano-acao-icone">🌱</div>';
+    html += '<div><div class="plano-acao-label">Nutrição</div>';
+    html += '<div class="plano-acao-texto">' + plano.nutricao + '</div></div></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
 function mostrarResultado(data, isVideo) {
   var div=document.getElementById("resultado"); div.style.display="block";
   var diags=data.diagnosticos||[{diagnostico:data.diagnostico||"saudavel",estagio:data.estagio||1,confianca:data.confianca||"media",visto:data.visto||"",acao:data.acao||"Tente novamente.",fungicidas:[]}];
+  var planoAcao=data.plano_acao||null;
   var regiao=dadosGPS.regiao||"";
   salvarHistorico(diags,ultimaFotoBase64,regiao);
   var thumbHtml=ultimaFotoBase64?'<img class="multi-foto" src="data:image/jpeg;base64,'+ultimaFotoBase64+'" alt="foto">':"<div class='multi-foto-placeholder'>\uD83C\uDF3F</div>";
@@ -977,6 +1007,8 @@ function mostrarResultado(data, isVideo) {
   if (regiao) html+=' \u00b7 \uD83D\uDCCD '+regiao;
   if (isVideo) html+=' \u00b7 \uD83C\uDFA5 Vídeo';
   html+='</p></div></div>';
+  // Plano de ação no topo
+  if (planoAcao) html+=buildPlanoAcao(planoAcao);
   diags.forEach(function(d,diagIdx) {
     var diag=d.diagnostico||"saudavel",estagio=d.estagio||1,confianca=d.confianca||"media";
     var badgeTexto=confianca==="alta"?"\u2713 Alta":confianca==="media"?"\u007e Média":"! Baixa";
