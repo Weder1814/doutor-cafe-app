@@ -893,7 +893,7 @@ function processar(file, isVideo) {
   document.getElementById("spinner").style.display="block";
   document.getElementById("resultado").style.display="none";
   document.getElementById("spinnerTexto").textContent="Analisando...";
-  document.getElementById("spinnerSub").textContent="Identificando sintomas e comparando padrões";
+  document.getElementById("spinnerSub").textContent="Identificando sintomas — resultado em ~15 segundos";
   var reader=new FileReader();
   reader.onload=function(e) {
     var b64=e.target.result.split(",")[1]; ultimaFotoBase64=b64;
@@ -905,8 +905,43 @@ function processar(file, isVideo) {
     var body={imagem:b64,tipo:file.type};
     if (dadosGPS.regiao) body.regiao=dadosGPS.regiao;
     if (dadosGPS.altitude) body.altitude=dadosGPS.altitude;
+    // Fase 1: diagnóstico (~15s) — mostra resultado imediatamente
     fetchComTimeout("https://doutor-cafe-production.up.railway.app/diagnostico",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)},TIMEOUT_MS)
-    .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultado(data,isVideo);})
+    .then(function(r){return r.json();})
+    .then(function(data){
+      document.getElementById("spinner").style.display="none";
+      mostrarResultado(data, isVideo);
+      // Fase 2: plano de ação via haiku (~4s) — aparece logo depois
+      var diags = data.diagnosticos || [];
+      var todosSaudaveis = diags.every(function(d){ return d.diagnostico === "saudavel"; });
+      if (diags.length > 0 && !todosSaudaveis) {
+        var bodyPlano = { diagnosticos: diags };
+        if (dadosGPS.regiao) bodyPlano.regiao = dadosGPS.regiao;
+        fetch("https://doutor-cafe-production.up.railway.app/plano-acao", {
+          method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(bodyPlano)
+        })
+        .then(function(r2){ return r2.json(); })
+        .then(function(plano){
+          // Inserir o plano de ação no topo do card de resultado
+          var cardRes = document.querySelector(".card-resultado");
+          if (cardRes && plano && (plano.urgente || plano.resumo_geral)) {
+            var planoHtml = buildPlanoAcao(plano);
+            var multiHeader = cardRes.querySelector(".multi-header");
+            if (multiHeader && planoHtml) {
+              var div = document.createElement("div");
+              div.innerHTML = planoHtml;
+              multiHeader.parentNode.insertBefore(div, multiHeader.nextSibling);
+              // Atualizar voz com plano de ação
+              var partesVoz = [];
+              if (plano.resumo_geral) partesVoz.push("Sua planta tem: " + plano.resumo_geral);
+              if (plano.urgente) partesVoz.push("Faça essa semana: " + plano.urgente);
+              _textoParaFalar = partesVoz.concat([_textoParaFalar]).join(". ");
+            }
+          }
+        })
+        .catch(function(){}); // Se plano falhar não trava o app
+      }
+    })
     .catch(function(err){document.getElementById("spinner").style.display="none";adicionarNaFila(b64,null,function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert("Foto salva na fila!\n\n[DEBUG] Erro: " + (err.name||"desconhecido") + "\nDetalhe: " + (err.message||"sem detalhe") + "\nTempo: " + new Date().toLocaleTimeString());}});});
   };
   reader.readAsDataURL(file);
@@ -1025,7 +1060,7 @@ function buildPlanoAcao(plano) {
 function mostrarResultado(data, isVideo) {
   var div=document.getElementById("resultado"); div.style.display="block";
   var diags=data.diagnosticos||[{diagnostico:data.diagnostico||"saudavel",estagio:data.estagio||1,confianca:data.confianca||"media",visto:data.visto||"",acao:data.acao||"Tente novamente.",fungicidas:[]}];
-  var planoAcao=data.plano_acao||null;
+  var planoAcao=data.plano_acao||null; // Pode vir do backend ou ser inserido depois
   var regiao=dadosGPS.regiao||"";
   salvarHistorico(diags,ultimaFotoBase64,regiao);
   var thumbHtml=ultimaFotoBase64?'<img class="multi-foto" src="data:image/jpeg;base64,'+ultimaFotoBase64+'" alt="foto">':"<div class='multi-foto-placeholder'>\uD83C\uDF3F</div>";
