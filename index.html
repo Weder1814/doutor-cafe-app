@@ -282,6 +282,23 @@ canvas { display: none; }
 .btn-cadastrar:active { opacity:0.85; }
 .cad-privacidade { font-size:10px; color:var(--cinza); margin-top:10px; line-height:1.4; }
 
+/* RESUMO DIAGNOSTICO */
+.resumo-diag-card { background: linear-gradient(135deg, #1a5c2a, #2d7a3a); border-radius: 18px; padding: 18px; margin-bottom: 10px; color: white; }
+.resumo-diag-titulo { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.75); margin-bottom: 8px; }
+.resumo-diag-texto { font-size: 15px; line-height: 1.6; color: white; font-weight: 500; }
+/* PLANO DE ACAO */
+.plano-acao-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 20px rgba(26,92,42,0.15); border: 2px solid #2d8a3e; margin-bottom: 10px; }
+.plano-acao-header { background: linear-gradient(135deg, #2d8a3e, #1a5c2a); padding: 14px 18px; }
+.plano-acao-titulo { font-family: 'Playfair Display', serif; font-size: 17px; color: white; font-weight: 700; margin-bottom: 2px; }
+.plano-acao-resumo { font-size: 12px; color: rgba(255,255,255,0.85); line-height: 1.4; }
+.plano-acao-item { padding: 12px 18px; border-top: 1px solid #f0f0f0; display: flex; gap: 12px; align-items: flex-start; }
+.plano-acao-icone { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+.plano-acao-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #7a8a7c; margin-bottom: 4px; }
+.plano-acao-texto { font-size: 14px; color: #3d2b1a; line-height: 1.5; font-weight: 500; }
+.plano-acao-urgente { background: #fff8f8; }
+.plano-acao-21dias { background: #f8fff8; }
+.plano-acao-nutricao { background: #fffff8; }
+
 </style>
 </head>
 <body>
@@ -978,7 +995,7 @@ function buildPlanoAcao(plano) {
     out += '</div>';
   }
 
-  var html = '<div class="plano-acao-card">';
+  var html = '<div class="plano-acao-card" style="margin-top:10px">';
   html += '<div class="plano-acao-header">';
   html += '<div class="plano-acao-titulo">📋 Plano de Ação</div>';
   if (plano.resumo) html += '<div class="plano-acao-resumo">' + plano.resumo + '</div>';
@@ -1031,7 +1048,18 @@ function mostrarResultado(data, isVideo) {
     if (d.fungicidas&&d.fungicidas.length>0) html+=buildCalcFungicida(d.fungicidas,diagIdx);
     html+='</div>';
   });
-  var textoVoz=diags.map(function(d){return(NOMES_VOZ[d.diagnostico]||d.diagnostico)+". "+d.acao;}).join(". ");
+  // Voz: começa com plano de ação, depois diagnósticos individuais
+  var partesVoz = [];
+  if (planoAcao) {
+    if (planoAcao.resumo_geral) partesVoz.push("Sua planta tem: " + planoAcao.resumo_geral);
+    if (planoAcao.urgente) partesVoz.push("Faça essa semana: " + planoAcao.urgente);
+    if (planoAcao.em_21_dias) partesVoz.push("Em 21 dias: " + planoAcao.em_21_dias);
+    if (planoAcao.nutricao) partesVoz.push("Nutrição: " + planoAcao.nutricao);
+  }
+  diags.forEach(function(d){
+    if (d.diagnostico !== "saudavel") partesVoz.push((NOMES_VOZ[d.diagnostico]||d.diagnostico) + ". " + d.acao);
+  });
+  var textoVoz = partesVoz.join(". ");
   _textoParaFalar = textoVoz;
   html+='<div class="btns-resultado"><button class="btn-voz" onclick="falarTextoAtual()">🔊 Ouvir</button>';
   html+='<button class="btn-share" onclick="compartilhar(\'\'\'\'\'\'\'\'"+JSON.stringify(diags).replace(/\'/g,"\\\'")+"\'\'\'\'\'\'\'\'",\'\'\'\'\'\'\'\'"+regiao+"\'\'\'\'\'\'\'\'")">\uD83D\uDCE4 WhatsApp</button>';
