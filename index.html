@@ -16,8 +16,6 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'DM Sans', sans-serif; background: var(--creme); min-height: 100vh; overflow-x: hidden; }
-
-/* ── HEADER ── */
 .header { width: 100%; position: relative; overflow: hidden; padding: 28px 24px 40px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .header-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
 .header-overlay { position: absolute; inset: 0; background: linear-gradient(160deg, rgba(8,25,12,0.85) 0%, rgba(20,70,35,0.72) 50%, rgba(8,20,10,0.88) 100%); z-index: 1; }
@@ -45,34 +43,22 @@ body { font-family: 'DM Sans', sans-serif; background: var(--creme); min-height:
 .clima-valor { font-size: 20px; font-weight: 700; color: var(--marrom); }
 .clima-label { font-size: 10px; color: var(--cinza); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
 .risco-box { margin: 0 18px 14px; border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
-.risco-baixo { background: #e8f5e9; }
-.risco-medio { background: #fff8e1; }
-.risco-alto { background: #fff3e0; }
-.risco-critico { background: #fce4ec; }
+.risco-baixo { background: #e8f5e9; } .risco-medio { background: #fff8e1; } .risco-alto { background: #fff3e0; } .risco-critico { background: #fce4ec; }
 .risco-icon { font-size: 20px; flex-shrink: 0; }
 .risco-info { flex: 1; }
 .risco-titulo { font-size: 13px; font-weight: 700; }
-.risco-baixo .risco-titulo { color: #2e7d32; }
-.risco-medio .risco-titulo { color: #f57f17; }
-.risco-alto .risco-titulo { color: #e65100; }
-.risco-critico .risco-titulo { color: #c62828; }
+.risco-baixo .risco-titulo { color: #2e7d32; } .risco-medio .risco-titulo { color: #f57f17; } .risco-alto .risco-titulo { color: #e65100; } .risco-critico .risco-titulo { color: #c62828; }
 .risco-desc { font-size: 11px; color: #666; margin-top: 2px; line-height: 1.4; }
 .card-calendario { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
 .cal-header { padding: 16px 18px 12px; display: flex; align-items: center; justify-content: space-between; }
 .cal-mes { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--marrom); font-weight: 700; }
 .cal-fase { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
-.fase-florada { background: #fff8e1; color: #f57f17; }
-.fase-granacao { background: #e8f5e9; color: #2e7d32; }
-.fase-maturacao { background: #fff3e0; color: #e65100; }
-.fase-colheita { background: #fce4ec; color: #c62828; }
-.fase-pos { background: #e8eaf6; color: #283593; }
-.fase-repouso { background: #f3e5f5; color: #6a1b9a; }
+.fase-florada { background: #fff8e1; color: #f57f17; } .fase-granacao { background: #e8f5e9; color: #2e7d32; } .fase-maturacao { background: #fff3e0; color: #e65100; } .fase-colheita { background: #fce4ec; color: #c62828; } .fase-pos { background: #e8eaf6; color: #283593; } .fase-repouso { background: #f3e5f5; color: #6a1b9a; }
 .cal-divisor { height: 1px; background: #f0f0f0; margin: 0 18px; }
 .cal-alertas { padding: 12px 18px; }
 .cal-alertas h4 { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--cinza); margin-bottom: 8px; }
 .alerta-item { margin-bottom: 6px; }
-.alerta-alto { color: #c62828; font-weight: 600; font-size: 13px; }
-.alerta-medio { color: #e65100; font-weight: 600; font-size: 13px; }
+.alerta-alto { color: #c62828; font-weight: 600; font-size: 13px; } .alerta-medio { color: #e65100; font-weight: 600; font-size: 13px; }
 .cal-acoes { padding: 0 18px 14px; }
 .cal-acoes h4 { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--cinza); margin-bottom: 8px; }
 .acao-item { font-size: 13px; color: #444; line-height: 1.4; margin-bottom: 5px; }
@@ -103,6 +89,9 @@ input[type="file"] { display: none; }
 @keyframes spin-pulse { 0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; } 50% { transform: scale(1.15) rotate(10deg); opacity: 0.7; } }
 #spinner p { color: var(--verde); font-weight: 700; font-size: 16px; }
 #spinner small { color: var(--cinza); font-size: 12px; margin-top: 4px; display: block; }
+/* Barra de progresso do spinner */
+.spinner-progress { height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin: 12px 20px 0; }
+.spinner-progress-fill { height: 100%; background: linear-gradient(90deg, var(--verde-claro), var(--verde-neon)); border-radius: 2px; width: 0%; transition: width 0.5s ease; }
 #resultado { display: none; }
 .card-resultado { background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.1); animation: slideUp 0.4s ease; }
 .multi-header { padding: 16px 20px 8px; display: flex; align-items: center; gap: 12px; }
@@ -125,11 +114,7 @@ input[type="file"] { display: none; }
 .calc-produto { background: white; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; border: 1px solid #e0ede0; }
 .calc-produto-nome { font-size: 13px; font-weight: 700; color: var(--marrom); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
 .calc-tipo-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
-.calc-tipo-protetor { background: #fff3e0; color: #e65100; }
-.calc-tipo-sistemico { background: #e8eaf6; color: #283593; }
-.calc-tipo-biologico { background: #e8f5e9; color: #2e7d32; }
-.calc-tipo-acaricida { background: #fce4ec; color: #c62828; }
-.calc-tipo-inseticida { background: #f3e5f5; color: #6a1b9a; }
+.calc-tipo-protetor { background: #fff3e0; color: #e65100; } .calc-tipo-sistemico { background: #e8eaf6; color: #283593; } .calc-tipo-biologico { background: #e8f5e9; color: #2e7d32; } .calc-tipo-acaricida { background: #fce4ec; color: #c62828; } .calc-tipo-inseticida { background: #f3e5f5; color: #6a1b9a; }
 .calc-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
 .calc-input-group { display: flex; flex-direction: column; gap: 3px; }
 .calc-input-group label { font-size: 10px; color: var(--cinza); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -149,14 +134,7 @@ input[type="file"] { display: none; }
 .card-titulo .categoria { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--cinza); margin-top: 2px; }
 .badges { padding: 0 20px 16px; display: flex; gap: 8px; flex-wrap: wrap; }
 .badge { border-radius: 30px; padding: 5px 12px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
-.badge-estagio { background: #fff3e0; color: #e65100; }
-.badge-confianca-alta { background: #e8f5e9; color: #2e7d32; }
-.badge-confianca-media { background: #fff8e1; color: #f57f17; }
-.badge-confianca-baixa { background: #fce4ec; color: #c62828; }
-.badge-regiao { background: #e3f2fd; color: #1565c0; }
-.badge-video { background: #e8eaf6; color: #283593; }
-.badge-solo { background: #efebe9; color: #4e342e; }
-.badge-daninha { background: #f1f8e9; color: #33691e; }
+.badge-estagio { background: #fff3e0; color: #e65100; } .badge-confianca-alta { background: #e8f5e9; color: #2e7d32; } .badge-confianca-media { background: #fff8e1; color: #f57f17; } .badge-confianca-baixa { background: #fce4ec; color: #c62828; } .badge-regiao { background: #e3f2fd; color: #1565c0; } .badge-video { background: #e8eaf6; color: #283593; } .badge-solo { background: #efebe9; color: #4e342e; } .badge-daninha { background: #f1f8e9; color: #33691e; }
 .visto-box { margin: 0 20px 16px; background: var(--creme); border-radius: 12px; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start; }
 .visto-box .visto-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
 .visto-box p { font-size: 13px; color: #555; line-height: 1.5; font-style: italic; }
@@ -173,16 +151,9 @@ input[type="file"] { display: none; }
 .solo-item .solo-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--cinza); }
 .solo-item .solo-valor { font-size: 16px; font-weight: 700; color: var(--marrom); margin-top: 2px; }
 .solo-item .solo-status { font-size: 11px; margin-top: 2px; }
-.solo-ok { color: #2e7d32; }
-.solo-baixo { color: #c62828; }
-.solo-alto { color: #e65100; }
+.solo-ok { color: #2e7d32; } .solo-baixo { color: #c62828; } .solo-alto { color: #e65100; }
 .daninha-alerta { margin: 0 20px 14px; border-radius: 12px; padding: 12px 14px; }
-.daninha-alerta-acido { background: #fff8e1; border-left: 4px solid #f57f17; }
-.daninha-alerta-compactado { background: #fff3e0; border-left: 4px solid #e65100; }
-.daninha-alerta-fertil { background: #e8f5e9; border-left: 4px solid #2e7d32; }
-.daninha-alerta-umidade { background: #e3f2fd; border-left: 4px solid #1565c0; }
-.daninha-alerta-degradado { background: #fce4ec; border-left: 4px solid #c62828; }
-.daninha-alerta-mag { background: #f3e5f5; border-left: 4px solid #6a1b9a; }
+.daninha-alerta-acido { background: #fff8e1; border-left: 4px solid #f57f17; } .daninha-alerta-compactado { background: #fff3e0; border-left: 4px solid #e65100; } .daninha-alerta-fertil { background: #e8f5e9; border-left: 4px solid #2e7d32; } .daninha-alerta-umidade { background: #e3f2fd; border-left: 4px solid #1565c0; } .daninha-alerta-degradado { background: #fce4ec; border-left: 4px solid #c62828; } .daninha-alerta-mag { background: #f3e5f5; border-left: 4px solid #6a1b9a; }
 .daninha-alerta-titulo { font-size: 13px; font-weight: 700; color: var(--marrom); margin-bottom: 4px; }
 .daninha-alerta-desc { font-size: 12px; color: #555; line-height: 1.5; }
 .card-historico { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
@@ -207,13 +178,13 @@ input[type="file"] { display: none; }
 .fila-divisor { height: 1px; background: #ffe0b2; margin: 0 18px; }
 .fila-grid { padding: 14px 18px 16px; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; }
 .fila-item { position: relative; border-radius: 14px; overflow: hidden; aspect-ratio: 1; cursor: pointer; box-shadow: 0 3px 12px rgba(0,0,0,0.18); border: 2px solid #ffe0b2; transition: transform 0.15s, box-shadow 0.15s; background: #f5ebe0; }
-.fila-item:active { transform: scale(0.96); box-shadow: 0 1px 6px rgba(0,0,0,0.12); }
+.fila-item:active { transform: scale(0.96); }
 .fila-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .fila-item-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.18) 45%, transparent 70%); display: flex; flex-direction: column; justify-content: flex-end; padding: 10px 10px 9px; gap: 2px; }
-.fila-item-hora { font-size: 9px; color: rgba(255,255,255,0.85); font-weight: 600; line-height: 1.2; }
-.fila-item-tap { font-size: 9px; color: #ffd54f; font-weight: 800; letter-spacing: 0.1px; }
+.fila-item-hora { font-size: 9px; color: rgba(255,255,255,0.85); font-weight: 600; }
+.fila-item-tap { font-size: 9px; color: #ffd54f; font-weight: 800; }
 .fila-item-num { position: absolute; top: 5px; left: 5px; background: rgba(0,0,0,0.55); color: white; border-radius: 20px; padding: 1px 6px; font-size: 9px; font-weight: 700; }
-.fila-item-del { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; padding: 0; font-family: 'DM Sans', sans-serif; }
+.fila-item-del { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .offline-banner { margin: 0 18px 12px; background: #fff3e0; border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
 .offline-banner-icon { font-size: 20px; flex-shrink: 0; }
 .offline-banner-txt { font-size: 12px; color: #bf360c; line-height: 1.4; font-weight: 500; }
@@ -222,12 +193,12 @@ input[type="file"] { display: none; }
 .modal-planos { background: var(--creme); border-radius: 28px 28px 0 0; padding: 24px 20px 48px; width: 100%; max-width: 480px; max-height: 92vh; overflow-y: auto; }
 .modal-titulo { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--marrom); font-weight: 900; margin-bottom: 4px; }
 .modal-sub { font-size: 13px; color: var(--cinza); margin-bottom: 14px; line-height: 1.4; }
-.modal-esgotado { background: #fce4ec; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; font-size: 13px; color: #c62828; font-weight: 600; line-height: 1.4; }
+.modal-esgotado { background: #fce4ec; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; font-size: 13px; color: #c62828; font-weight: 600; }
 .toggle-ciclo { display: flex; gap: 6px; background: white; border-radius: 14px; padding: 4px; margin-bottom: 16px; }
 .toggle-btn { flex: 1; border: none; border-radius: 10px; padding: 9px 6px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; background: transparent; color: var(--cinza); transition: all 0.2s; }
 .toggle-btn.ativo { background: var(--verde); color: white; }
 .toggle-economia { background: #e8f5e9; color: #2e7d32; border-radius: 20px; padding: 2px 7px; font-size: 10px; font-weight: 700; margin-left: 4px; display: inline-block; }
-.plano-card { background: white; border-radius: 20px; padding: 18px; margin-bottom: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); position: relative; }
+.plano-card { background: white; border-radius: 20px; padding: 18px; margin-bottom: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
 .plano-card.destaque { border: 2px solid var(--verde-claro); box-shadow: 0 4px 20px rgba(45,138,62,0.2); }
 .plano-badge { font-size: 11px; font-weight: 700; color: var(--verde); background: #e8f5e9; border-radius: 20px; padding: 3px 10px; display: inline-block; margin-bottom: 8px; }
 .plano-nome { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--marrom); font-weight: 700; margin-bottom: 4px; }
@@ -238,24 +209,21 @@ input[type="file"] { display: none; }
 .plano-features { list-style: none; margin: 12px 0 16px; display: flex; flex-direction: column; gap: 7px; }
 .plano-features li { font-size: 13px; color: #444; padding-left: 20px; position: relative; line-height: 1.4; }
 .plano-features li::before { content: "\2713"; position: absolute; left: 0; color: var(--verde-claro); font-weight: 700; }
-.btn-assinar { width: 100%; padding: 13px; background: linear-gradient(135deg, var(--verde-claro), var(--verde)); color: white; border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; margin-bottom: 6px; transition: opacity 0.15s; }
-.btn-assinar:active { opacity: 0.85; }
+.btn-assinar { width: 100%; padding: 13px; background: linear-gradient(135deg, var(--verde-claro), var(--verde)); color: white; border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; margin-bottom: 6px; }
 .btn-fechar-modal { width: 100%; padding: 14px; background: transparent; color: var(--cinza); border: none; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; margin-top: 6px; text-decoration: underline; }
 .btn-pix-plano { width:100%; padding:12px; background:white; color:var(--verde); border:2px solid #c8ddc8; border-radius:14px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:6px; }
 .modal-pix { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:1100; align-items:center; justify-content:center; padding:20px; }
 .modal-pix.ativo { display:flex; }
 .modal-pix-box { background:white; border-radius:24px; padding:24px 20px; width:100%; max-width:360px; text-align:center; max-height:90vh; overflow-y:auto; }
 .modal-pix-titulo { font-family:'Playfair Display',serif; font-size:20px; color:var(--marrom); margin-bottom:4px; }
-.modal-pix-sub { font-size:13px; color:var(--cinza); margin-bottom:16px; line-height:1.4; }
+.modal-pix-sub { font-size:13px; color:var(--cinza); margin-bottom:16px; }
 .pix-loading { display:flex; align-items:center; justify-content:center; gap:8px; font-size:13px; color:var(--cinza); padding:20px 0; }
-.pix-spinner { width:20px; height:20px; border:2px solid #e0e0e0; border-top-color:var(--verde); border-radius:50%; animation:pixspin 1s linear infinite; flex-shrink:0; }
+.pix-spinner { width:20px; height:20px; border:2px solid #e0e0e0; border-top-color:var(--verde); border-radius:50%; animation:pixspin 1s linear infinite; }
 @keyframes pixspin { to { transform:rotate(360deg); } }
 .pix-form-label { font-size:11px; font-weight:700; color:var(--cinza); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:4px; text-align:left; }
 .pix-form-input { width:100%; border:1.5px solid #ddd; border-radius:10px; padding:10px 12px; font-size:14px; font-family:'DM Sans',sans-serif; color:var(--marrom); outline:none; margin-bottom:12px; display:block; }
 .pix-status { padding:12px; border-radius:12px; margin-bottom:12px; font-size:13px; font-weight:600; text-align:center; }
-.pix-status-aguardando { background:#fff8e1; color:#f57f17; }
-.pix-status-aprovado { background:#e8f5e9; color:#2e7d32; }
-.pix-status-erro { background:#fce4ec; color:#c62828; }
+.pix-status-aguardando { background:#fff8e1; color:#f57f17; } .pix-status-aprovado { background:#e8f5e9; color:#2e7d32; } .pix-status-erro { background:#fce4ec; color:#c62828; }
 .pix-qr-img { width:200px; height:200px; margin:0 auto 14px; border-radius:12px; overflow:hidden; border:3px solid #f0f0f0; }
 .pix-qr-img img { width:100%; height:100%; object-fit:contain; }
 .pix-codigo-box { background:#f5f0e8; border-radius:10px; padding:10px 12px; margin-bottom:12px; text-align:left; }
@@ -264,8 +232,6 @@ input[type="file"] { display: none; }
 .btn-copiar-pix { width:100%; padding:11px; background:var(--verde); color:white; border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:700; cursor:pointer; margin-bottom:8px; }
 .btn-fechar-pix { width:100%; padding:11px; background:white; color:var(--cinza); border:2px solid #e8e8e8; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; cursor:pointer; }
 canvas { display: none; }
-
-/* ── MODAL CADASTRO ── */
 .modal-cadastro { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.82); z-index:1200; align-items:center; justify-content:center; padding:20px; }
 .modal-cadastro.ativo { display:flex; }
 .modal-cadastro-box { background:white; border-radius:24px; padding:28px 22px 24px; width:100%; max-width:380px; text-align:center; }
@@ -277,11 +243,24 @@ canvas { display: none; }
 .cad-input { width:100%; border:1.5px solid #ddd; border-radius:10px; padding:11px 13px; font-size:15px; font-family:'DM Sans',sans-serif; color:var(--marrom); outline:none; margin-bottom:12px; display:block; }
 .cad-input:focus { border-color:var(--verde-claro); }
 .cad-select { width:100%; border:1.5px solid #ddd; border-radius:10px; padding:11px 13px; font-size:15px; font-family:'DM Sans',sans-serif; color:var(--marrom); outline:none; margin-bottom:12px; display:block; background:white; }
-.cad-select:focus { border-color:var(--verde-claro); }
 .btn-cadastrar { width:100%; padding:14px; background:linear-gradient(135deg,var(--verde-claro),var(--verde)); color:white; border:none; border-radius:14px; font-family:'DM Sans',sans-serif; font-size:15px; font-weight:700; cursor:pointer; margin-top:4px; }
-.btn-cadastrar:active { opacity:0.85; }
 .cad-privacidade { font-size:10px; color:var(--cinza); margin-top:10px; line-height:1.4; }
-
+/* Plano de Ação */
+.resumo-diag-card { margin: 0 20px 12px; background: #e8f5e9; border-radius: 14px; padding: 14px 16px; border-left: 4px solid var(--verde-claro); }
+.resumo-diag-titulo { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--verde); margin-bottom: 6px; }
+.resumo-diag-texto { font-size: 13px; color: var(--marrom); line-height: 1.6; }
+.plano-acao-card { margin: 0 20px 12px; background: white; border-radius: 14px; border: 1px solid #e0e0e0; overflow: hidden; }
+.plano-acao-header { padding: 12px 14px; background: var(--verde); }
+.plano-acao-titulo { font-size: 12px; font-weight: 700; letter-spacing: 1px; color: white; }
+.plano-acao-resumo { font-size: 12px; color: rgba(255,255,255,0.85); margin-top: 3px; }
+.plano-acao-item { display: flex; gap: 10px; padding: 10px 14px; border-bottom: 1px solid #f0f0f0; }
+.plano-acao-item:last-child { border-bottom: none; }
+.plano-acao-urgente { background: #fff8f8; }
+.plano-acao-21dias { background: #fffef8; }
+.plano-acao-nutricao { background: #f8fff8; }
+.plano-acao-icone { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.plano-acao-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--cinza); margin-bottom: 3px; }
+.plano-acao-texto { font-size: 13px; color: var(--marrom); line-height: 1.5; }
 </style>
 </head>
 <body>
@@ -291,7 +270,7 @@ canvas { display: none; }
   <div class="modal-planos">
     <div class="modal-titulo">&#127807; Doutor Caf&#233; Premium</div>
     <div class="modal-sub" id="modalSubtitulo">Escolha o plano ideal para sua lavoura</div>
-    <div class="modal-esgotado" id="modalEsgotado" style="display:none"><p>&#128274; Suas 20 an&#225;lises gratuitas foram usadas. Assine para continuar!</p></div>
+    <div class="modal-esgotado" id="modalEsgotado" style="display:none"><p>&#128274; Suas an&#225;lises gratuitas foram usadas. Assine para continuar!</p></div>
     <div class="toggle-ciclo">
       <button class="toggle-btn ativo" id="btnMensal" onclick="setCiclo('mensal')">Mensal</button>
       <button class="toggle-btn" id="btnAnual" onclick="setCiclo('anual')">Anual <span class="toggle-economia">2 meses gr&#225;tis</span></button>
@@ -336,7 +315,7 @@ canvas { display: none; }
     <div class="sub">O agr&#244;nomo no seu bolso</div>
     <div class="regiao-tag" id="regiaoTag">&#128205; Localizando...</div>
     <div class="contador-bar" id="contadorBar" onclick="abrirModal(false)">
-      <span class="contador-txt" id="contadorTxt">20 an&#225;lises gr&#225;tis</span>
+      <span class="contador-txt" id="contadorTxt">Carregando...</span>
       <div class="contador-progresso"><div class="contador-fill" id="contadorFill" style="width:100%"></div></div>
     </div>
   </div>
@@ -362,6 +341,7 @@ canvas { display: none; }
     <span class="spinner-folha">&#128300;</span>
     <p id="spinnerTexto">Analisando...</p>
     <small id="spinnerSub">Identificando sintomas e comparando padr&#245;es</small>
+    <div class="spinner-progress"><div class="spinner-progress-fill" id="spinnerProgress"></div></div>
   </div>
   <div id="resultado"></div>
 
@@ -396,7 +376,7 @@ canvas { display: none; }
   <div class="secao-titulo" style="margin-top:4px">&#128172; Fale Conosco</div>
   <div class="dica" style="flex-direction:column;gap:10px">
     <p style="font-size:13px;color:var(--marrom);font-weight:600">Tem d&#250;vidas, sugest&#245;es ou encontrou algum problema?</p>
-    <p style="font-size:12px;color:var(--cinza);line-height:1.5">Nossa equipe responde em at&#233; 24 horas. Seu feedback ajuda a melhorar o Doutor Caf&#233; para todos os produtores.</p>
+    <p style="font-size:12px;color:var(--cinza);line-height:1.5">Nossa equipe responde em at&#233; 24 horas.</p>
     <button onclick="enviarEmail()" style="background:linear-gradient(135deg,var(--verde-claro),var(--verde));color:white;border:none;border-radius:14px;padding:14px 20px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;width:100%;justify-content:center;"><span>&#9993;&#65039;</span> Enviar Mensagem</button>
     <button onclick="abrirWhatsapp()" style="background:#25D366;color:white;border:none;border-radius:14px;padding:14px 20px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;width:100%;justify-content:center;"><span>&#128242;</span> Falar com Gerente Comercial</button>
   </div>
@@ -407,13 +387,12 @@ canvas { display: none; }
   </div>
 </div>
 
-
 <!-- MODAL CADASTRO -->
 <div class="modal-cadastro" id="modalCadastro">
   <div class="modal-cadastro-box">
     <span class="modal-cadastro-icon">🌿</span>
     <div class="modal-cadastro-titulo">Continue usando gratuitamente!</div>
-    <div class="modal-cadastro-sub">Você usou 5 análises. Cadastre-se e ganhe mais 10 análises grátis para continuar cuidando da sua lavoura.</div>
+    <div class="modal-cadastro-sub">Você usou 5 análises. Cadastre-se e ganhe mais 10 análises grátis.</div>
     <div class="modal-cadastro-bonus">🎁 Cadastro gratuito · Mais 10 análises liberadas</div>
     <label class="cad-label">Nome completo *</label>
     <input class="cad-input" id="cadNome" type="text" placeholder="Ex: João da Silva">
@@ -437,7 +416,7 @@ canvas { display: none; }
     <label class="cad-label">E-mail (opcional)</label>
     <input class="cad-input" id="cadEmail" type="email" placeholder="seuemail@gmail.com">
     <button class="btn-cadastrar" onclick="confirmarCadastro()">✅ Cadastrar e Continuar</button>
-    <div class="cad-privacidade">🔒 Seus dados são protegidos e não serão compartilhados com terceiros.</div>
+    <div class="cad-privacidade">🔒 Seus dados são protegidos.</div>
   </div>
 </div>
 
@@ -452,856 +431,179 @@ canvas { display: none; }
 </div>
 
 <script>
-// ── PLANOS E PAGAMENTO ──
-var PLANO_KEY="doutorcafe_plano",ANALISES_KEY="doutorcafe_analises",LIMITE_GRATIS=15,cicloAtual="mensal";
+var BACKEND = "https://doutor-cafe-production.up.railway.app";
+var PLANO_KEY="doutorcafe_plano", ANALISES_KEY="doutorcafe_analises";
+var LIMITE_GRATIS=15, ANALISES_GRATIS_SEM_CAD=5, TOTAL_GRATIS_COM_CAD=15;
+var cicloAtual="mensal";
+var ultimaFotoBase64=null;
+var HIST_KEY="doutorcafe_hist";
+var FILA_MAX=50;
+var TIMEOUT_MS=45000; // Reduzido de 60s para 45s
+var CADASTRO_KEY="doutorcafe_cadastro";
+
+// ── WAKE-UP DO RAILWAY (novo) ──
+// Acorda o servidor assim que o app abre — evita espera na primeira análise
+(function wakeUpServer(){
+  fetch(BACKEND+"/ping").catch(function(){});
+})();
+
+// Animação de progresso do spinner
+var _spinnerTimer=null;
+function startSpinnerProgress(){
+  var fill=document.getElementById("spinnerProgress");
+  if(!fill) return;
+  fill.style.width="0%";
+  var pct=0;
+  _spinnerTimer=setInterval(function(){
+    // Cresce rápido até 70%, depois desacelera (simula espera do AI)
+    if(pct<70) pct+=3;
+    else if(pct<90) pct+=0.5;
+    fill.style.width=pct+"%";
+  },400);
+}
+function stopSpinnerProgress(){
+  if(_spinnerTimer) clearInterval(_spinnerTimer);
+  var fill=document.getElementById("spinnerProgress");
+  if(fill){ fill.style.width="100%"; setTimeout(function(){ fill.style.width="0%"; },300); }
+}
 
 function getPlano(){try{return JSON.parse(localStorage.getItem(PLANO_KEY))||{tipo:"gratuito"};}catch(e){return{tipo:"gratuito"};}}
 function salvarPlano(p){try{localStorage.setItem(PLANO_KEY,JSON.stringify(p));}catch(e){}}
 function getAnalisesUsadas(){return parseInt(localStorage.getItem(ANALISES_KEY)||"0");}
-function incrementarAnalise(){var u=getAnalisesUsadas()+1;localStorage.setItem(ANALISES_KEY,u.toString());atualizarContador();return u;}
-function podeanalisar(){var p=getPlano();if(p.tipo!=="gratuito")return true;return getAnalisesUsadas()<LIMITE_GRATIS;}
+function getCadastro(){try{return JSON.parse(localStorage.getItem(CADASTRO_KEY))||null;}catch(e){return null;}}
+function salvarCadastroLocal(d){try{localStorage.setItem(CADASTRO_KEY,JSON.stringify(d));}catch(e){}}
+
+function podeanalisarComCadastro(){
+  var p=getPlano(),usado=getAnalisesUsadas();
+  if(p.tipo!=="gratuito") return true;
+  return usado<TOTAL_GRATIS_COM_CAD;
+}
+function deveAbrirCadastroAposAnalise(){
+  var cad=getCadastro(),usado=getAnalisesUsadas(),p=getPlano();
+  if(p.tipo!=="gratuito"||cad) return false;
+  return usado>=ANALISES_GRATIS_SEM_CAD;
+}
 
 function atualizarContador(){
-  var p=getPlano(),usado=getAnalisesUsadas(),txt=document.getElementById("contadorTxt"),fill=document.getElementById("contadorFill");
-  if(!txt||!fill)return;
-  var cad = getCadastro();
-  if(p.tipo==="pro"){txt.textContent="Plano Pro — 300 análises/mês";fill.style.width="100%";fill.className="contador-fill";}
+  var p=getPlano(),usado=getAnalisesUsadas();
+  var txt=document.getElementById("contadorTxt"),fill=document.getElementById("contadorFill");
+  if(!txt||!fill) return;
+  var cad=getCadastro();
+  if(p.tipo==="pro"){txt.textContent="Plano Pro — análises ilimitadas";fill.style.width="100%";fill.className="contador-fill";}
   else if(p.tipo==="basico"){var r=120-(usado%120);txt.textContent=r+" análises restantes";fill.style.width=(r/120*100)+"%";fill.className="contador-fill";}
-  else if(cad){
-    var r=Math.max(0,TOTAL_GRATIS_COM_CAD-usado);
-    txt.textContent=r+" análises grátis restantes";
-    var pct=(r/TOTAL_GRATIS_COM_CAD)*100;
-    fill.style.width=pct+"%";
-    fill.className="contador-fill"+(pct<=25?" vermelho":pct<=50?" amarelo":"");
-  }
-  else{var r=Math.max(0,TOTAL_GRATIS_COM_CAD-usado);txt.textContent=r+" análises grátis restantes";var pct=(r/TOTAL_GRATIS_COM_CAD)*100;fill.style.width=pct+"%";fill.className="contador-fill"+(pct<=25?" vermelho":pct<=50?" amarelo":"");}
+  else{var total=TOTAL_GRATIS_COM_CAD,r=Math.max(0,total-usado),pct=(r/total)*100;txt.textContent=r+" análises grátis restantes";fill.style.width=pct+"%";fill.className="contador-fill"+(pct<=25?" vermelho":pct<=50?" amarelo":"");}
 }
 
 function abrirModal(esgotado){document.getElementById("modalPlanos").classList.add("ativo");document.getElementById("modalEsgotado").style.display=esgotado?"block":"none";document.getElementById("modalSubtitulo").textContent=esgotado?"Continue diagnosticando sua lavoura sem limites":"Escolha o plano ideal para sua lavoura";}
 function fecharModal(){document.getElementById("modalPlanos").classList.remove("ativo");}
 function setCiclo(c){cicloAtual=c;document.getElementById("btnMensal").className="toggle-btn"+(c==="mensal"?" ativo":"");document.getElementById("btnAnual").className="toggle-btn"+(c==="anual"?" ativo":"");document.getElementById("precoBasico").textContent=c==="mensal"?"R$32,90":"R$24,92";document.getElementById("precoPro").textContent=c==="mensal"?"R$49,90":"R$41,66";document.getElementById("descBasico").style.display=c==="anual"?"block":"none";document.getElementById("descPro").style.display=c==="anual"?"block":"none";}
-function assinar(tipo){
-  var links={
-    basico_mensal:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=3bdcbffc028a4d259f32fe37a96ae224",
-    basico_anual:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=bd08a04de79f4213886611769b6c9486",
-    pro_mensal:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=106181c5ed584a65af06403bd1af0608",
-    pro_anual:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=661a046d15c9415a9508970d2f45c819"
-  };
-  var url=links[tipo+"_"+cicloAtual];
-  if(url)window.open(url,"_blank");
-  else alert("Plano não encontrado.");
-}
+function assinar(tipo){var links={basico_mensal:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=3bdcbffc028a4d259f32fe37a96ae224",basico_anual:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=bd08a04de79f4213886611769b6c9486",pro_mensal:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=106181c5ed584a65af06403bd1af0608",pro_anual:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=661a046d15c9415a9508970d2f45c819"};var url=links[tipo+"_"+cicloAtual];if(url)window.open(url,"_blank");}
 function contatoEmpresarial(){window.open("https://wa.me/5535998823395?text="+encodeURIComponent("Olá! Tenho interesse no Plano Empresarial do Doutor Café."),"_blank");fecharModal();}
 function verificarRetornoPagamento(){var params=new URLSearchParams(window.location.search),pagamento=params.get("pagamento"),planoId=params.get("plano");if(pagamento==="sucesso"&&planoId){var tipo=planoId.indexOf("pro")>-1?"pro":"basico";salvarPlano({tipo:tipo,planoId:planoId,dataAssinatura:new Date().toISOString()});localStorage.setItem(ANALISES_KEY,"0");atualizarContador();alert("Bem-vindo ao Plano "+(tipo==="pro"?"Pro":"Básico")+"! Suas análises estão liberadas.");window.history.replaceState({},"",window.location.pathname);}}
 
-var ultimaFotoBase64 = null;
-var HIST_KEY = "doutorcafe_hist";
-var FILA_MAX = 50;
-var TIMEOUT_MS = 60000; // 60s — necessario para prompt com plano de acao
+function mascararCelular(input){var v=input.value.replace(/\D/g,'');if(v.length>11)v=v.slice(0,11);if(v.length>7)v='('+v.slice(0,2)+') '+v.slice(2,7)+'-'+v.slice(7);else if(v.length>2)v='('+v.slice(0,2)+') '+v.slice(2);else if(v.length>0)v='('+v;input.value=v;}
 
-// ── FETCH COM TIMEOUT ──
-function fetchComTimeout(url, opcoes, ms) {
-  var controller = new AbortController();
-  var timer = setTimeout(function(){ controller.abort(); }, ms);
-  return fetch(url, Object.assign({}, opcoes, { signal: controller.signal }))
-    .finally(function(){ clearTimeout(timer); });
+function confirmarCadastro(){
+  var nome=document.getElementById('cadNome').value.trim(),celular=document.getElementById('cadCelular').value.trim(),regiao=document.getElementById('cadRegiao').value,email=document.getElementById('cadEmail').value.trim();
+  if(!nome){alert('Informe seu nome completo.');return;}
+  if(celular.replace(/\D/g,'').length<10){alert('Informe um celular válido.');return;}
+  var btn=document.querySelector('.btn-cadastrar');btn.textContent='Cadastrando...';btn.disabled=true;
+  var dados={nome,celular,regiao,email,dataCadastro:new Date().toISOString()};
+  fetch(BACKEND+'/cadastrar-usuario',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:obterUserId(),nome,celular,regiao,email})})
+  .then(function(r){return r.json();}).then(function(){salvarCadastroLocal(dados);document.getElementById('modalCadastro').classList.remove('ativo');atualizarContador();alert('✅ Cadastro realizado! Você ganhou mais 10 análises gratuitas.');btn.textContent='✅ Cadastrar e Continuar';btn.disabled=false;})
+  .catch(function(){salvarCadastroLocal(dados);document.getElementById('modalCadastro').classList.remove('ativo');atualizarContador();alert('✅ Cadastro realizado! Mais 10 análises liberadas.');btn.textContent='✅ Cadastrar e Continuar';btn.disabled=false;});
 }
+function abrirModalCadastro(){document.getElementById("modalCadastro").classList.add("ativo");}
 
-var EMOJIS = {ferrugem:"\uD83D\uDFE0",bicho:"\uD83E\uDEB2",cercosporiose:"\uD83D\uDD35",aureolada:"\uD83D\uDFE3",phoma:"\u26AB",antracnose:"\uD83E\uDED9",ascochyta:"\uD83D\uDFE4",manteigosa:"\uD83E\uDED7",roseliniose:"\uD83D\uDC80",helmintosporiose:"\uD83D\uDD34",broca:"\uD83D\uDD73\uFE0F",acaro:"\uD83D\uDFEB",acaro_ferrugem:"\uD83D\uDFE5",cigarra:"\uD83E\uDD97",cochonilha:"\uD83E\uDD0D",lagarta:"\uD83D\uDC1B",nematoide:"\uD83E\uDEB1",nitrogenio:"\uD83C\uDF3F",magnesio:"\uD83D\uDFE1",potassio:"\uD83D\uDD25",fosforo:"\uD83D\uDC9C",calcio:"\uD83E\uDDB4",enxofre:"\uD83C\uDF15",boro:"\uD83D\uDFE6",zinco:"\uD83E\uDED7",ferro:"\uD83E\uDEA8",manganes:"\uD83D\uDFE4",cobre:"\uD83E\uDDE1",estresse_hidrico:"\uD83D\uDCA7",fitotoxicidade:"\u2697\uFE0F",escaldadura:"\u2600\uFE0F",fruto_verde:"\uD83D\uDFE2",fruto_maduro:"\uD83D\uDD34",fruto_passado:"\u26AB",saudavel:"\u2705"};
-var NOMES_VOZ = {ferrugem:"Ferrugem do café",bicho:"Bicho mineiro",cercosporiose:"Cercosporiose",aureolada:"Mancha aureolada",phoma:"Phoma",antracnose:"Antracnose",ascochyta:"Mancha Ascochyta",manteigosa:"Mancha manteigosa",roseliniose:"Roseliniose",helmintosporiose:"Helmintosporiose",broca:"Broca do café",acaro:"Ácaro vermelho",acaro_ferrugem:"Ácaro ferrugem falsa",cigarra:"Cigarra do cafeeiro",cochonilha:"Cochonilha",lagarta:"Lagarta das rosetas",nematoide:"Nematoide das galhas",nitrogenio:"Deficiência de nitrogênio",magnesio:"Deficiência de magnésio",potassio:"Deficiência de potássio",fosforo:"Deficiência de fósforo",calcio:"Deficiência de cálcio",enxofre:"Deficiência de enxofre",boro:"Deficiência de boro",zinco:"Deficiência de zinco",ferro:"Deficiência de ferro",manganes:"Deficiência de manganês",cobre:"Deficiência de cobre",estresse_hidrico:"Estresse hírico",fitotoxicidade:"Fitotoxicidade",escaldadura:"Escaldadura solar",fruto_verde:"Fruto verde saudável",fruto_maduro:"Fruto maduro para colheita",fruto_passado:"Fruto passado do ponto",saudavel:"Planta saudável"};
-var CATEGORIAS = {ferrugem:"Doença Fúngica",bicho:"Praga",cercosporiose:"Doença Fúngica",aureolada:"Doença Bacteriana",phoma:"Doença Fúngica",antracnose:"Doença Fúngica",ascochyta:"Doença Fúngica",manteigosa:"Doença Fúngica",roseliniose:"Doença Fúngica",helmintosporiose:"Doença Fúngica",broca:"Praga",acaro:"Praga",acaro_ferrugem:"Praga",cigarra:"Praga",cochonilha:"Praga",lagarta:"Praga",nematoide:"Praga",nitrogenio:"Deficiência Nutricional",magnesio:"Deficiência Nutricional",potassio:"Deficiência Nutricional",fosforo:"Deficiência Nutricional",calcio:"Deficiência Nutricional",enxofre:"Deficiência Nutricional",boro:"Deficiência Nutricional",zinco:"Deficiência Nutricional",ferro:"Deficiência Nutricional",manganes:"Deficiência Nutricional",cobre:"Deficiência Nutricional",estresse_hidrico:"Estresse Ambiental",fitotoxicidade:"Estresse Ambiental",escaldadura:"Estresse Ambiental",fruto_verde:"Fruto",fruto_maduro:"Fruto",fruto_passado:"Fruto",saudavel:"Planta Saudável"};
-var CORES_ESTAGIO = ["#4caf50","#8bc34a","#ffc107","#ff9800","#f44336"];
-var MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+function fetchComTimeout(url,opcoes,ms){var controller=new AbortController();var timer=setTimeout(function(){controller.abort();},ms);return fetch(url,Object.assign({},opcoes,{signal:controller.signal})).finally(function(){clearTimeout(timer);});}
 
+var EMOJIS={ferrugem:"\uD83D\uDFE0",bicho:"\uD83E\uDEB2",cercosporiose:"\uD83D\uDD35",aureolada:"\uD83D\uDFE3",phoma:"\u26AB",antracnose:"\uD83E\uDED9",ascochyta:"\uD83D\uDFE4",manteigosa:"\uD83E\uDED7",roseliniose:"\uD83D\uDC80",helmintosporiose:"\uD83D\uDD34",broca:"\uD83D\uDD73\uFE0F",acaro:"\uD83D\uDFEB",acaro_ferrugem:"\uD83D\uDFE5",cigarra:"\uD83E\uDD97",cochonilha:"\uD83E\uDD0D",lagarta:"\uD83D\uDC1B",nematoide:"\uD83E\uDEB1",nitrogenio:"\uD83C\uDF3F",magnesio:"\uD83D\uDFE1",potassio:"\uD83D\uDD25",fosforo:"\uD83D\uDC9C",calcio:"\uD83E\uDDB4",enxofre:"\uD83C\uDF15",boro:"\uD83D\uDFE6",zinco:"\uD83E\uDED7",ferro:"\uD83E\uDEA8",manganes:"\uD83D\uDFE4",cobre:"\uD83E\uDDE1",estresse_hidrico:"\uD83D\uDCA7",fitotoxicidade:"\u2697\uFE0F",escaldadura:"\u2600\uFE0F",fruto_verde:"\uD83D\uDFE2",fruto_maduro:"\uD83D\uDD34",fruto_passado:"\u26AB",saudavel:"\u2705"};
+var NOMES_VOZ={ferrugem:"Ferrugem do café",bicho:"Bicho mineiro",cercosporiose:"Cercosporiose",aureolada:"Mancha aureolada",phoma:"Phoma",antracnose:"Antracnose",ascochyta:"Mancha Ascochyta",manteigosa:"Mancha manteigosa",roseliniose:"Roseliniose",helmintosporiose:"Helmintosporiose",broca:"Broca do café",acaro:"Ácaro vermelho",acaro_ferrugem:"Ácaro ferrugem falsa",cigarra:"Cigarra",cochonilha:"Cochonilha",lagarta:"Lagarta",nematoide:"Nematoide",nitrogenio:"Deficiência de nitrogênio",magnesio:"Deficiência de magnésio",potassio:"Deficiência de potássio",fosforo:"Deficiência de fósforo",calcio:"Deficiência de cálcio",enxofre:"Deficiência de enxofre",boro:"Deficiência de boro",zinco:"Deficiência de zinco",ferro:"Deficiência de ferro",manganes:"Deficiência de manganês",cobre:"Deficiência de cobre",estresse_hidrico:"Estresse hídrico",fitotoxicidade:"Fitotoxicidade",escaldadura:"Escaldadura solar",fruto_verde:"Fruto verde saudável",fruto_maduro:"Fruto maduro para colheita",fruto_passado:"Fruto passado do ponto",saudavel:"Planta saudável"};
+var CATEGORIAS={ferrugem:"Doença Fúngica",bicho:"Praga",cercosporiose:"Doença Fúngica",aureolada:"Doença Bacteriana",phoma:"Doença Fúngica",antracnose:"Doença Fúngica",ascochyta:"Doença Fúngica",manteigosa:"Doença Fúngica",roseliniose:"Doença Fúngica",helmintosporiose:"Doença Fúngica",broca:"Praga",acaro:"Praga",acaro_ferrugem:"Praga",cigarra:"Praga",cochonilha:"Praga",lagarta:"Praga",nematoide:"Praga",nitrogenio:"Deficiência Nutricional",magnesio:"Deficiência Nutricional",potassio:"Deficiência Nutricional",fosforo:"Deficiência Nutricional",calcio:"Deficiência Nutricional",enxofre:"Deficiência Nutricional",boro:"Deficiência Nutricional",zinco:"Deficiência Nutricional",ferro:"Deficiência Nutricional",manganes:"Deficiência Nutricional",cobre:"Deficiência Nutricional",estresse_hidrico:"Estresse Ambiental",fitotoxicidade:"Estresse Ambiental",escaldadura:"Estresse Ambiental",fruto_verde:"Fruto",fruto_maduro:"Fruto",fruto_passado:"Fruto",saudavel:"Planta Saudável"};
+var CORES_ESTAGIO=["#4caf50","#8bc34a","#ffc107","#ff9800","#f44336"];
+var MESES=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 
-// ── CADASTRO DE USUÁRIO ──
-var CADASTRO_KEY = "doutorcafe_cadastro";
-var ANALISES_GRATIS_SEM_CAD = 5;
-var ANALISES_BONUS_CAD = 10;
-var TOTAL_GRATIS_COM_CAD = 15;
+// ── IndexedDB ──
+var _db=null;
+function abrirDB(callback){if(_db){callback(_db);return;}var req=indexedDB.open("doutorcafe_db",1);req.onupgradeneeded=function(e){var db=e.target.result;if(!db.objectStoreNames.contains("fila"))db.createObjectStore("fila",{keyPath:"id"});};req.onsuccess=function(e){_db=e.target.result;callback(_db);};req.onerror=function(){callback(null);};}
+function lerFila(callback){abrirDB(function(db){if(!db){callback([]);return;}var tx=db.transaction("fila","readonly");var req=tx.objectStore("fila").getAll();req.onsuccess=function(){var arr=req.result||[];arr.sort(function(a,b){return a.id-b.id;});callback(arr);};req.onerror=function(){callback([]);};});}
+function adicionarNaFila(fotoBase64,frames,callback){lerFila(function(fila){if(fila.length>=FILA_MAX){alert("A fila já tem "+FILA_MAX+" itens.");if(callback)callback(false);return;}var agora=new Date();var item={id:Date.now(),foto:fotoBase64,hora:agora.getHours()+":"+String(agora.getMinutes()).padStart(2,"0"),data:agora.getDate()+"/"+(agora.getMonth()+1)+"/"+agora.getFullYear()};if(frames){item.frames=frames;item.isVideo=true;}abrirDB(function(db){if(!db){if(callback)callback(false);return;}var tx=db.transaction("fila","readwrite");tx.objectStore("fila").add(item);tx.oncomplete=function(){if(callback)callback(true);};tx.onerror=function(){if(callback)callback(false);};});});}
+function removerDaFila(id){abrirDB(function(db){if(!db)return;var tx=db.transaction("fila","readwrite");tx.objectStore("fila").delete(id);tx.oncomplete=function(){renderAreaHistorico();};});}
+function limparFila(){lerFila(function(fila){if(!confirm("Limpar todas as "+fila.length+" fotos da fila?"))return;abrirDB(function(db){if(!db)return;var tx=db.transaction("fila","readwrite");tx.objectStore("fila").clear();tx.oncomplete=function(){renderAreaHistorico();};});});}
 
-function getCadastro() {
-  try { return JSON.parse(localStorage.getItem(CADASTRO_KEY)) || null; } catch(e) { return null; }
-}
-function salvarCadastroLocal(dados) {
-  try { localStorage.setItem(CADASTRO_KEY, JSON.stringify(dados)); } catch(e) {}
-}
-
-function podeanalisarComCadastro() {
-  var cad = getCadastro();
-  var usado = getAnalisesUsadas();
-  var p = getPlano();
-  if (p.tipo !== "gratuito") return true;
-  return usado < TOTAL_GRATIS_COM_CAD;
-}
-
-function verificarCadastroNecessario() {
-  // Não bloqueia antes — o modal aparece depois do resultado
-  return false;
-}
-
-function deveAbrirCadastroAposAnalise() {
-  var cad = getCadastro();
-  var usado = getAnalisesUsadas();
-  var p = getPlano();
-  if (p.tipo !== "gratuito") return false;
-  if (cad) return false;
-  // Abre após a 5ª análise (quando usado acabou de virar 5)
-  return usado >= ANALISES_GRATIS_SEM_CAD;
-}
-
-function abrirModalCadastro() {
-  document.getElementById("modalCadastro").classList.add("ativo");
-}
-
-function mascararCelular(input) {
-  var v = input.value.replace(/\D/g, '');
-  if (v.length > 11) v = v.slice(0, 11);
-  if (v.length > 7) v = '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7);
-  else if (v.length > 2) v = '(' + v.slice(0,2) + ') ' + v.slice(2);
-  else if (v.length > 0) v = '(' + v;
-  input.value = v;
-}
-
-function confirmarCadastro() {
-  var nome    = document.getElementById('cadNome').value.trim();
-  var celular = document.getElementById('cadCelular').value.trim();
-  var regiao  = document.getElementById('cadRegiao').value;
-  var email   = document.getElementById('cadEmail').value.trim();
-
-  if (!nome) { alert('Informe seu nome completo.'); return; }
-  if (celular.replace(/\D/g,'').length < 10) { alert('Informe um celular válido.'); return; }
-
-  var btn = document.querySelector('.btn-cadastrar');
-  btn.textContent = 'Cadastrando...'; btn.disabled = true;
-
-  var dados = { nome: nome, celular: celular, regiao: regiao, email: email, dataCadastro: new Date().toISOString() };
-
-  fetch('https://doutor-cafe-production.up.railway.app/cadastrar-usuario', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ userId: obterUserId(), nome: nome, celular: celular, regiao: regiao, email: email })
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(d) {
-    salvarCadastroLocal(dados);
-    document.getElementById('modalCadastro').classList.remove('ativo');
-    atualizarContador();
-    alert('✅ Cadastro realizado! Você ganhou mais 10 análises gratuitas. Bom diagnóstico!');
-    btn.textContent = '✅ Cadastrar e Continuar'; btn.disabled = false;
-  })
-  .catch(function() {
-    // Salva local mesmo se backend falhar
-    salvarCadastroLocal(dados);
-    document.getElementById('modalCadastro').classList.remove('ativo');
-    atualizarContador();
-    alert('✅ Cadastro realizado! Você ganhou mais 10 análises gratuitas.');
-    btn.textContent = '✅ Cadastrar e Continuar'; btn.disabled = false;
-  });
-}
-
-// ── IndexedDB / Fila Offline ──
-var _db = null;
-function abrirDB(callback) {
-  if (_db) { callback(_db); return; }
-  var req = indexedDB.open("doutorcafe_db", 1);
-  req.onupgradeneeded = function(e) { var db = e.target.result; if (!db.objectStoreNames.contains("fila")) db.createObjectStore("fila", { keyPath: "id" }); };
-  req.onsuccess = function(e) { _db = e.target.result; callback(_db); };
-  req.onerror = function() { callback(null); };
-}
-function lerFila(callback) {
-  abrirDB(function(db) {
-    if (!db) { callback([]); return; }
-    var tx = db.transaction("fila", "readonly");
-    var req = tx.objectStore("fila").getAll();
-    req.onsuccess = function() { var arr = req.result || []; arr.sort(function(a,b){return a.id-b.id;}); callback(arr); };
-    req.onerror = function() { callback([]); };
-  });
-}
-function adicionarNaFila(fotoBase64, frames, callback) {
-  lerFila(function(fila) {
-    if (fila.length >= FILA_MAX) { alert("A fila já tem "+FILA_MAX+" itens."); if (callback) callback(false); return; }
-    var agora = new Date();
-    var item = { id: Date.now(), foto: fotoBase64, hora: agora.getHours()+":"+String(agora.getMinutes()).padStart(2,"0"), data: agora.getDate()+"/"+(agora.getMonth()+1)+"/"+agora.getFullYear() };
-    if (frames) { item.frames = frames; item.isVideo = true; }
-    abrirDB(function(db) {
-      if (!db) { if (callback) callback(false); return; }
-      var tx = db.transaction("fila", "readwrite");
-      tx.objectStore("fila").add(item);
-      tx.oncomplete = function() { if (callback) callback(true); };
-      tx.onerror = function() { if (callback) callback(false); };
-    });
-  });
-}
-function removerDaFila(id) {
-  abrirDB(function(db) {
-    if (!db) return;
-    var tx = db.transaction("fila", "readwrite");
-    tx.objectStore("fila").delete(id);
-    tx.oncomplete = function() { renderAreaHistorico(); };
-  });
-}
-function limparFila() {
-  lerFila(function(fila) {
-    if (!confirm("Limpar todas as "+fila.length+" fotos da fila?")) return;
-    abrirDB(function(db) {
-      if (!db) return;
-      var tx = db.transaction("fila", "readwrite");
-      tx.objectStore("fila").clear();
-      tx.oncomplete = function() { renderAreaHistorico(); };
-    });
-  });
-}
-function analisarDaFila(id) {
-  if (!navigator.onLine) { alert("Ainda sem sinal."); return; }
-  abrirDB(function(db) {
-    if (!db) return;
-    var tx = db.transaction("fila", "readwrite");
-    var store = tx.objectStore("fila");
-    var req = store.get(id);
-    req.onsuccess = function() {
-      var item = req.result; if (!item) return;
+function analisarDaFila(id){
+  if(!navigator.onLine){alert("Ainda sem sinal.");return;}
+  abrirDB(function(db){
+    if(!db)return;
+    var tx=db.transaction("fila","readwrite"),store=tx.objectStore("fila"),req=store.get(id);
+    req.onsuccess=function(){
+      var item=req.result;if(!item)return;
       store.delete(id);
-      tx.oncomplete = function() {
-        ultimaFotoBase64 = item.foto;
-        document.getElementById("spinner").style.display = "block";
-        document.getElementById("resultado").style.display = "none";
+      tx.oncomplete=function(){
+        ultimaFotoBase64=item.foto;
+        document.getElementById("spinner").style.display="block";
+        document.getElementById("resultado").style.display="none";
+        startSpinnerProgress();
         renderAreaHistorico();
         document.getElementById("spinner").scrollIntoView({behavior:"smooth",block:"start"});
-        if (item.isVideo && item.frames) {
-          document.getElementById("spinnerTexto").textContent = "Analisando "+item.frames.length+" ângulos...";
-          document.getElementById("spinnerSub").textContent = "Processando vídeo da fila offline";
-          var bodyV = { frames: item.frames, tipo: "image/jpeg" };
-          if (dadosGPS.regiao) bodyV.regiao = dadosGPS.regiao;
-          if (dadosGPS.altitude) bodyV.altitude = dadosGPS.altitude;
-          fetchComTimeout("https://doutor-cafe-production.up.railway.app/diagnostico-video",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bodyV)},TIMEOUT_MS)
-          .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultado(data,true);})
-          .catch(function(){document.getElementById("spinner").style.display="none";adicionarNaFila(item.foto,item.frames,function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert("Sem conexão. Foto salva na fila!");}});});
+        if(item.isVideo&&item.frames){
+          document.getElementById("spinnerTexto").textContent="Analisando "+item.frames.length+" ângulos...";
+          document.getElementById("spinnerSub").textContent="Processando vídeo da fila offline";
+          var bodyV={frames:item.frames,tipo:"image/jpeg"};
+          if(dadosGPS.regiao)bodyV.regiao=dadosGPS.regiao;
+          fetchComTimeout(BACKEND+"/diagnostico-video",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bodyV)},TIMEOUT_MS)
+          .then(function(r){return r.json();}).then(function(data){stopSpinnerProgress();document.getElementById("spinner").style.display="none";mostrarResultado(data,true);})
+          .catch(function(){stopSpinnerProgress();document.getElementById("spinner").style.display="none";adicionarNaFila(item.foto,item.frames,function(ok){if(ok){renderAreaHistorico();}});});
         } else {
-          document.getElementById("spinnerTexto").textContent = "Analisando...";
-          document.getElementById("spinnerSub").textContent = "Identificando sintomas e comparando padrões";
-          var bodyF = { imagem: item.foto, tipo: "image/jpeg" };
-          if (dadosGPS.regiao) bodyF.regiao = dadosGPS.regiao;
-          if (dadosGPS.altitude) bodyF.altitude = dadosGPS.altitude;
-          fetchComTimeout("https://doutor-cafe-production.up.railway.app/diagnostico",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bodyF)},TIMEOUT_MS)
-          .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultado(data,false);})
-          .catch(function(){document.getElementById("spinner").style.display="none";adicionarNaFila(item.foto,null,function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert("Sem conexão. Foto salva na fila!");}});});
+          document.getElementById("spinnerTexto").textContent="Analisando...";
+          document.getElementById("spinnerSub").textContent="Identificando sintomas";
+          var bodyF={imagem:item.foto,tipo:"image/jpeg"};
+          if(dadosGPS.regiao)bodyF.regiao=dadosGPS.regiao;
+          fetchComTimeout(BACKEND+"/diagnostico",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bodyF)},TIMEOUT_MS)
+          .then(function(r){return r.json();}).then(function(data){stopSpinnerProgress();document.getElementById("spinner").style.display="none";mostrarResultado(data,false);})
+          .catch(function(){stopSpinnerProgress();document.getElementById("spinner").style.display="none";adicionarNaFila(item.foto,null,function(ok){if(ok){renderAreaHistorico();}});});
         }
       };
     };
   });
 }
 
-function renderAreaHistorico() {
-  lerFila(function(fila) {
-    var tituloEl = document.getElementById("tituloSecaoHistorico");
-    var areaEl = document.getElementById("areaHistorico");
-    if (fila.length > 0) {
-      tituloEl.textContent = "\uD83D\uDCF8 Fotos Aguardando Análise";
-      var online = navigator.onLine;
-      var html = '<div class="card-fila"><div class="fila-header"><div class="fila-header-esq"><div class="fila-titulo">\uD83D\uDCF7 Fila Offline</div><div class="fila-sub"><span class="fila-contagem">'+fila.length+'</span> foto'+(fila.length>1?'s':'')+" aguardando sinal</div></div><button class=\"fila-limpar\" onclick=\"limparFila()\">Limpar tudo</button></div>";
-      if (!online) {
-        html += '<div class="offline-banner"><span class="offline-banner-icon">\uD83D\uDCF5</span><span class="offline-banner-txt">Sem internet. As fotos ficam salvas aqui. Quando chegar no sinal, toque na foto para analisar.</span></div>';
-      } else {
-        html += '<div class="offline-banner" style="background:#e8f5e9;margin-bottom:0"><span class="offline-banner-icon">\u2705</span><span class="offline-banner-txt" style="color:#1b5e20">Internet disponível! Toque em uma foto para analisar agora.</span></div>';
-      }
-      html += '<div class="fila-divisor" style="margin-top:12px"></div><div class="fila-grid">';
-      fila.forEach(function(item,idx) {
-        html += '<div class="fila-item" onclick="analisarDaFila('+item.id+')"><img src="data:image/jpeg;base64,'+item.foto+'" alt="foto '+(idx+1)+'">';
-        html += '<div class="fila-item-overlay"><div class="fila-item-hora">\uD83D\uDCC5 '+item.data+' '+item.hora+'</div><div class="fila-item-tap">'+(online?'\u25B6 Toque para analisar':'\u23F3 Aguardando sinal')+'</div></div>';
-        html += '<div class="fila-item-num">'+(item.isVideo?'\uD83C\uDFA5':(idx+1))+'</div>';
-        html += '<button class="fila-item-del" onclick="event.stopPropagation();removerDaFila('+item.id+')" title="Remover">\u2715</button></div>';
-      });
-      html += '</div></div>';
-      areaEl.innerHTML = html;
+function renderAreaHistorico(){
+  lerFila(function(fila){
+    var tituloEl=document.getElementById("tituloSecaoHistorico"),areaEl=document.getElementById("areaHistorico");
+    if(fila.length>0){
+      tituloEl.textContent="\uD83D\uDCF8 Fotos Aguardando Análise";
+      var online=navigator.onLine;
+      var html='<div class="card-fila"><div class="fila-header"><div class="fila-header-esq"><div class="fila-titulo">\uD83D\uDCF7 Fila Offline</div><div class="fila-sub"><span class="fila-contagem">'+fila.length+'</span> foto'+(fila.length>1?'s':'')+" aguardando</div></div><button class=\"fila-limpar\" onclick=\"limparFila()\">Limpar</button></div>";
+      html+=online?'<div class="offline-banner" style="background:#e8f5e9;margin-bottom:0"><span class="offline-banner-icon">\u2705</span><span class="offline-banner-txt" style="color:#1b5e20">Internet disponível! Toque para analisar.</span></div>':'<div class="offline-banner"><span class="offline-banner-icon">\uD83D\uDCF5</span><span class="offline-banner-txt">Sem internet. Toque quando chegar no sinal.</span></div>';
+      html+='<div class="fila-divisor" style="margin-top:12px"></div><div class="fila-grid">';
+      fila.forEach(function(item,idx){html+='<div class="fila-item" onclick="analisarDaFila('+item.id+')"><img src="data:image/jpeg;base64,'+item.foto+'" alt="foto '+(idx+1)+'"><div class="fila-item-overlay"><div class="fila-item-hora">\uD83D\uDCC5 '+item.data+' '+item.hora+'</div><div class="fila-item-tap">'+(online?'\u25B6 Analisar':'\u23F3 Aguardando')+'</div></div><div class="fila-item-num">'+(item.isVideo?'\uD83C\uDFA5':(idx+1))+'</div><button class="fila-item-del" onclick="event.stopPropagation();removerDaFila('+item.id+')">\u2715</button></div>';});
+      html+='</div></div>';
+      areaEl.innerHTML=html;
     } else {
-      tituloEl.textContent = "\uD83D\uDCCB Histórico de Análises";
+      tituloEl.textContent="\uD83D\uDCCB Histórico de Análises";
       renderHistoricoNaArea(areaEl);
     }
   });
 }
-function renderHistoricoNaArea(areaEl) {
-  try {
-    var hist = JSON.parse(localStorage.getItem(HIST_KEY) || "[]");
-    if (hist.length === 0) { areaEl.innerHTML = '<div class="card-historico"><div class="hist-vazio">Nenhuma análise ainda. Fotografe uma folha!</div></div>'; return; }
-    var html = '<div class="card-historico"><div class="hist-header"><div class="hist-titulo">\uD83D\uDCCB Últimas análises</div><button class="hist-limpar" onclick="limparHistorico()">Limpar</button></div><div class="hist-lista">';
-    hist.forEach(function(h) {
-      var thumbHtml = h.foto ? '<img class="hist-thumb" src="data:image/jpeg;base64,'+h.foto+'" alt="foto">' : '<div class="hist-thumb-placeholder">'+(h.emoji||"\uD83C\uDF3F")+'</div>';
-      var nomes = h.diags ? h.diags.map(function(d){return d.diagnostico.replace(/_/g," ");}).join(", ") : h.diag.replace(/_/g," ");
-      html += '<div class="hist-item">'+thumbHtml+'<div class="hist-info"><div class="hist-nome">'+nomes+'</div><div class="hist-data">'+h.data+(h.regiao?" \u00b7 "+h.regiao:"")+'</div></div></div>';
-    });
-    html += '</div></div>';
-    areaEl.innerHTML = html;
-  } catch(e) { areaEl.innerHTML = '<div class="card-historico"><div class="hist-vazio">Histórico não disponível.</div></div>'; }
+
+function renderHistoricoNaArea(areaEl){
+  try{
+    var hist=JSON.parse(localStorage.getItem(HIST_KEY)||"[]");
+    if(hist.length===0){areaEl.innerHTML='<div class="card-historico"><div class="hist-vazio">Nenhuma análise ainda. Fotografe uma folha!</div></div>';return;}
+    var html='<div class="card-historico"><div class="hist-header"><div class="hist-titulo">\uD83D\uDCCB Últimas análises</div><button class="hist-limpar" onclick="limparHistorico()">Limpar</button></div><div class="hist-lista">';
+    hist.forEach(function(h){var thumbHtml=h.foto?'<img class="hist-thumb" src="data:image/jpeg;base64,'+h.foto+'" alt="foto">':"<div class='hist-thumb-placeholder'>"+(h.emoji||"\uD83C\uDF3F")+"</div>";var nomes=h.diags?h.diags.map(function(d){return d.diagnostico.replace(/_/g," ");}).join(", "):h.diag.replace(/_/g," ");html+='<div class="hist-item">'+thumbHtml+'<div class="hist-info"><div class="hist-nome">'+nomes+'</div><div class="hist-data">'+h.data+(h.regiao?" · "+h.regiao:"")+'</div></div></div>';});
+    html+='</div></div>';
+    areaEl.innerHTML=html;
+  }catch(e){areaEl.innerHTML='<div class="card-historico"><div class="hist-vazio">Histórico não disponível.</div></div>';}
 }
-function limparHistorico() {
-  try { localStorage.removeItem(HIST_KEY); } catch(e) {}
-  renderAreaHistorico();
-}
+function limparHistorico(){try{localStorage.removeItem(HIST_KEY);}catch(e){}renderAreaHistorico();}
 
 // ── CLIMA ──
-function calcularRiscoFerrugem(temp, umidade, chuva) {
-  var pontos = 0;
-  if (temp>=18&&temp<=22) pontos+=3; else if (temp>=15&&temp<=25) pontos+=1;
-  if (umidade>=80) pontos+=3; else if (umidade>=70) pontos+=2; else if (umidade>=60) pontos+=1;
-  if (chuva>5) pontos+=2; else if (chuva>0) pontos+=1;
-  if (pontos>=7) return {nivel:"critico",txt:"Risco Crítico de Ferrugem",desc:"Condições ideais para infecção. Aplique fungicida imediatamente.",icon:"\uD83D\uDD34"};
-  if (pontos>=5) return {nivel:"alto",txt:"Risco Alto de Ferrugem",desc:"Alta umidade e temperatura favorável. Aplique fungicida preventivo.",icon:"\uD83D\uDFE0"};
-  if (pontos>=3) return {nivel:"medio",txt:"Risco Médio de Ferrugem",desc:"Condições parcialmente favoráveis. Monitore as folhas.",icon:"\uD83D\uDFE1"};
-  return {nivel:"baixo",txt:"Risco Baixo de Ferrugem",desc:"Condições desfavoráveis para ferrugem hoje.",icon:"\uD83D\uDFE2"};
-}
-function obterClima(lat, lon) {
-  fetch("https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lon+"&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&timezone=America/Sao_Paulo")
-  .then(function(r){return r.json();}).then(function(d) {
-    var c=d.current,temp=Math.round(c.temperature_2m),umidade=Math.round(c.relative_humidity_2m),chuva=c.precipitation||0,wcode=c.weather_code;
-    var climaIcon=wcode<=1?"\u2600\uFE0F":wcode<=3?"\u26C5":wcode<=49?"\uD83C\uDF2B\uFE0F":wcode<=67?"\uD83C\uDF27\uFE0F":wcode<=77?"\u2744\uFE0F":wcode<=82?"\uD83C\uDF26\uFE0F":"\u26C8\uFE0F";
-    var risco=calcularRiscoFerrugem(temp,umidade,chuva);
-    var html='<div class="clima-topo"><span style="font-size:13px;font-weight:600;color:var(--marrom)">'+climaIcon+' Agora</span><span style="font-size:11px;color:var(--cinza)">Atualizado agora</span></div>';
-    html+='<div class="clima-dados"><div class="clima-item"><div class="clima-valor">'+temp+'\u00b0C</div><div class="clima-label">Temperatura</div></div>';
-    html+='<div class="clima-item"><div class="clima-valor">'+umidade+'%</div><div class="clima-label">Umidade</div></div>';
-    html+='<div class="clima-item"><div class="clima-valor">'+chuva.toFixed(1)+'mm</div><div class="clima-label">Chuva</div></div></div>';
-    html+='<div class="risco-box risco-'+risco.nivel+'"><span class="risco-icon">'+risco.icon+'</span><div class="risco-info"><div class="risco-titulo">'+risco.txt+'</div><div class="risco-desc">'+risco.desc+'</div></div></div>';
-    document.getElementById("cardClima").innerHTML=html;
-  }).catch(function(){document.getElementById("cardClima").innerHTML='<div class="clima-topo"><span style="font-size:13px;color:var(--cinza)">Clima não disponível</span></div>';});
-}
+function calcularRiscoFerrugem(temp,umidade,chuva){var p=0;if(temp>=18&&temp<=22)p+=3;else if(temp>=15&&temp<=25)p+=1;if(umidade>=80)p+=3;else if(umidade>=70)p+=2;else if(umidade>=60)p+=1;if(chuva>5)p+=2;else if(chuva>0)p+=1;if(p>=7)return{nivel:"critico",txt:"Risco Crítico de Ferrugem",desc:"Condições ideais para infecção. Aplique fungicida imediatamente.",icon:"\uD83D\uDD34"};if(p>=5)return{nivel:"alto",txt:"Risco Alto de Ferrugem",desc:"Alta umidade e temperatura favorável. Aplique fungicida preventivo.",icon:"\uD83D\uDFE0"};if(p>=3)return{nivel:"medio",txt:"Risco Médio de Ferrugem",desc:"Condições parcialmente favoráveis. Monitore as folhas.",icon:"\uD83D\uDFE1"};return{nivel:"baixo",txt:"Risco Baixo de Ferrugem",desc:"Condições desfavoráveis para ferrugem hoje.",icon:"\uD83D\uDFE2"};}
+function obterClima(lat,lon){fetch("https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lon+"&current=temperature_2m,relative_humidity_2m,precipitation,weather_code&timezone=America/Sao_Paulo").then(function(r){return r.json();}).then(function(d){var c=d.current,temp=Math.round(c.temperature_2m),umidade=Math.round(c.relative_humidity_2m),chuva=c.precipitation||0,wcode=c.weather_code;var ci=wcode<=1?"\u2600\uFE0F":wcode<=3?"\u26C5":wcode<=49?"\uD83C\uDF2B\uFE0F":wcode<=67?"\uD83C\uDF27\uFE0F":"\u26C8\uFE0F";var risco=calcularRiscoFerrugem(temp,umidade,chuva);var html='<div class="clima-topo"><span style="font-size:13px;font-weight:600;color:var(--marrom)">'+ci+' Agora</span></div><div class="clima-dados"><div class="clima-item"><div class="clima-valor">'+temp+'\u00b0C</div><div class="clima-label">Temp.</div></div><div class="clima-item"><div class="clima-valor">'+umidade+'%</div><div class="clima-label">Umidade</div></div><div class="clima-item"><div class="clima-valor">'+chuva.toFixed(1)+'mm</div><div class="clima-label">Chuva</div></div></div><div class="risco-box risco-'+risco.nivel+'"><span class="risco-icon">'+risco.icon+'</span><div class="risco-info"><div class="risco-titulo">'+risco.txt+'</div><div class="risco-desc">'+risco.desc+'</div></div></div>';document.getElementById("cardClima").innerHTML=html;}).catch(function(){document.getElementById("cardClima").innerHTML='<div class="clima-topo"><span style="font-size:13px;color:var(--cinza)">Clima não disponível</span></div>';});}
 
 // ── CALENDÁRIO ──
-var CALENDARIO = {
-  0:{fase:"granacao",faseTxt:"\uD83D\uDFE2 Granção",alertas:[{nivel:"alto",txt:"\uD83D\uDFE0 Ferrugem — alta umidade favorece infecção"},{nivel:"alto",txt:"\uD83E\uDEB2 Bicho-mineiro — pico populacional"},{nivel:"medio",txt:"\uD83D\uDFE3 Mancha aureolada — ventos e chuvas"}],acoes:["\u2705 Aplicar fungicida preventivo para ferrugem","\u2705 Monitorar folhas para trilhas de bicho-mineiro","\u2705 Adubação de cobertura — N e K parcelados"]},
-  1:{fase:"granacao",faseTxt:"\uD83D\uDFE2 Granção",alertas:[{nivel:"alto",txt:"\uD83D\uDFE0 Ferrugem — período crítico"},{nivel:"alto",txt:"\uD83E\uDEB2 Bicho-mineiro — alta incidência"},{nivel:"medio",txt:"\uD83E\uDED9 Antracnose — chuvas intensas"}],acoes:["\u2705 Reaplicar fungicida (21 dias após última aplicação)","\u2705 Controle de bicho-mineiro se >30% folhas com minas","\u2705 Verificar adubação fosfatada"]},
-  2:{fase:"maturacao",faseTxt:"\uD83D\uDD34 Maturação",alertas:[{nivel:"alto",txt:"\uD83D\uDFE0 Ferrugem — frutos pesados reduzem resistência"},{nivel:"medio",txt:"\uD83D\uDD73\uFE0F Broca — monitorar frutos"},{nivel:"medio",txt:"\uD83E\uDEB2 Bicho-mineiro — continua ativo"}],acoes:["\u2705 Monitorar broca nos frutos","\u2705 Aplicar fungicida se necessário","\u2705 Preparar equipamentos para colheita"]},
-  3:{fase:"colheita",faseTxt:"\u2615 Colheita",alertas:[{nivel:"medio",txt:"\uD83D\uDD73\uFE0F Broca — pico nos frutos maduros"},{nivel:"medio",txt:"\uD83D\uDFE0 Ferrugem — desfolha pós-colheita"},{nivel:"alto",txt:"\u26A0\uFE0F Colha no ponto certo — 80% frutos verdes = perda de 20 sacas a cada 100"}],acoes:["\u2705 Colheita seletiva — cereja e passa separados","\u2705 Controle biológico da broca (Beauveria bassiana)","\u2705 Processar café rapidamente após colheita","\u26A0\uFE0F Evite colheita antecipada — prejuízo no peso e qualidade"]},
-  4:{fase:"colheita",faseTxt:"\u2615 Colheita",alertas:[{nivel:"medio",txt:"\uD83D\uDD73\uFE0F Broca — reinfestação em frutos remanescentes"},{nivel:"medio",txt:"\uD83D\uDFE0 Ferrugem — lesões visíveis pós-colheita"},{nivel:"alto",txt:"\u26A0\uFE0F 50% frutos verdes = perda de 13 sacas a cada 100"}],acoes:["\u2705 Recolher todos os frutos caídos (repasse)","\u2705 Aplicar fungicida curativo pós-colheita","\u2705 Iniciar poda de formação e limpeza","\u26A0\uFE0F Aguarde ponto ideal: mínimo 80% cereja/passa"]},
-  5:{fase:"pos",faseTxt:"\uD83C\uDF3F Pós-colheita",alertas:[{nivel:"medio",txt:"\uD83D\uDFE0 Ferrugem — lesões tardias"},{nivel:"medio",txt:"\uD83D\uDFE1 Deficiência de Mg — período seco"}],acoes:["\u2705 Realizar poda e esqueletamento se necessário","\u2705 Calagem e adubação de solo","\u2705 Análise de solo para planejar próxima safra"]},
-  6:{fase:"pos",faseTxt:"\uD83C\uDF3F Pós-colheita",alertas:[{nivel:"medio",txt:"\uD83D\uDFEB Ácaro vermelho — período seco favorece"},{nivel:"medio",txt:"\uD83D\uDFE1 Deficiências nutricionais — solo seco"}],acoes:["\u2705 Monitorar ácaros (folha bronzeada)","\u2705 Adubação fosfatada e potássica","\u2705 Irrigação se disponível"]},
-  7:{fase:"repouso",faseTxt:"\uD83D\uDE34 Repouso vegetativo",alertas:[{nivel:"medio",txt:"\uD83D\uDFEB Ácaro vermelho — pico em período seco"},{nivel:"medio",txt:"\uD83E\uDD0D Cochonilha — favorecida pelo estresse hírico"}],acoes:["\u2705 Aplicar acaricida se necessário","\u2705 Adubação foliar de micronutrientes","\u2705 Revisar sistema de irrigação"]},
-  8:{fase:"florada",faseTxt:"\uD83C\uDF38 Florada",alertas:[{nivel:"alto",txt:"\uD83C\uDF38 NÃO aplicar inseticidas na florada — proteger abelhas"},{nivel:"medio",txt:"\uD83D\uDFE0 Ferrugem — início das chuvas"},{nivel:"medio",txt:"\u26AB Phoma — regiões acima de 900m"}],acoes:["\u26A0\uFE0F EVITAR agrotóxicos durante a florada","\u2705 Fungicida preventivo ANTES da florada","\u2705 Adubação nitrogenada de cobertura"]},
-  9:{fase:"florada",faseTxt:"\uD83C\uDF38 Florada/Chumbinho",alertas:[{nivel:"alto",txt:"\uD83D\uDFE0 Ferrugem — chuvas reiniciadas, risco alto"},{nivel:"alto",txt:"\uD83E\uDEB2 Bicho-mineiro — nova geração"},{nivel:"medio",txt:"\uD83D\uDFE3 Aureolada — ventos e chuvas"}],acoes:["\u2705 Aplicar fungicida sistêmico para ferrugem","\u2705 Monitorar bicho-mineiro nas folhas novas","\u2705 Adubação NPK completa"]},
-  10:{fase:"granacao",faseTxt:"\uD83D\uDFE2 Granção",alertas:[{nivel:"alto",txt:"\uD83D\uDFE0 Ferrugem — período de máximo risco"},{nivel:"alto",txt:"\uD83E\uDEB2 Bicho-mineiro — alta infestação"},{nivel:"medio",txt:"\u26AB Phoma — em regiões altas"}],acoes:["\u2705 Reaplicar fungicida (intervalo 21 dias)","\u2705 Controle de bicho-mineiro","\u2705 Monitorar deficiência de boro nos ponteiros"]},
-  11:{fase:"granacao",faseTxt:"\uD83D\uDFE2 Granção",alertas:[{nivel:"alto",txt:"\uD83D\uDFE0 Ferrugem — frutos em desenvolvimento"},{nivel:"alto",txt:"\uD83E\uDEB2 Bicho-mineiro — pico"},{nivel:"medio",txt:"\uD83D\uDFE3 Aureolada — ventos de verão"}],acoes:["\u2705 Fungicida preventivo — não deixar passar intervalo","\u2705 Adubação potássica para granção","\u2705 Monitorar broca nos primeiros frutos"]}
-};
-function renderCalendario() {
-  var mes=new Date().getMonth(),cal=CALENDARIO[mes];
-  var html='<div class="cal-header"><div class="cal-mes">\uD83D\uDCC5 '+MESES[mes]+'</div><div class="cal-fase fase-'+cal.fase+'">'+cal.faseTxt+'</div></div>';
-  html+='<div class="cal-divisor"></div><div class="cal-alertas"><h4>\u26A0\uFE0F Alertas deste mês</h4>';
-  cal.alertas.forEach(function(a){html+='<div class="alerta-item"><span class="alerta-'+a.nivel+'">'+a.txt+'</span></div>';});
-  html+='</div><div class="cal-divisor"></div><div class="cal-acoes"><h4>\uD83D\uDCCB O que fazer agora</h4>';
-  cal.acoes.forEach(function(a){html+='<div class="acao-item">'+a+'</div>';});
-  html+='</div>';
-  document.getElementById("cardCalendario").innerHTML=html;
-}
+var CALENDARIO={0:{fase:"granacao",faseTxt:"\uD83D\uDFE2 Granação",alertas:[{nivel:"alto",txt:"\uD83D\uDFE0 Ferrugem — alta umidade"},{nivel:"alto",txt:"\uD83E\uDEB2 Bicho-mineiro — pico"}],acoes:["\u2705 Aplicar fungicida preventivo","\u2705 Monitorar bicho-mineiro","\u2705 Adubação de cobertura N e K"]},1:{fase:"granacao",faseTxt:"\uD83D\uDFE2 Granação",alertas:[{nivel:"alto",txt:"\uD83D\uDFE0 Ferrugem — período crítico"},{nivel:"alto",txt:"\uD83E\uDEB2 Bicho-mineiro — alta incidência"}],acoes:["\u2705 Reaplicar fungicida (21 dias)","\u2705 Controle bicho-mineiro se >30% folhas","\u2705 Verificar adubação fosfatada"]},2:{fase:"maturacao",faseTxt:"\uD83D\uDD34 Maturação",alertas:[{nivel:"alto",txt:"\uD83D\uDFE0 Ferrugem — frutos pesados"},{nivel:"medio",txt:"\uD83D\uDD73\uFE0F Broca — monitorar frutos"}],acoes:["\u2705 Monitorar broca nos frutos","\u2705 Preparar para colheita"]},3:{fase:"colheita",faseTxt:"\u2615 Colheita",alertas:[{nivel:"medio",txt:"\uD83D\uDD73\uFE0F Broca — pico nos frutos maduros"},{nivel:"alto",txt:"\u26A0\uFE0F Colha no ponto certo — 80% cereja mínimo"}],acoes:["\u2705 Colheita seletiva","\u2705 Beauveria bassiana contra broca","\u2705 Processar rápido após colheita"]},4:{fase:"colheita",faseTxt:"\u2615 Colheita",alertas:[{nivel:"medio",txt:"\uD83D\uDD73\uFE0F Broca — reinfestação"},{nivel:"alto",txt:"\u26A0\uFE0F 50% verdes = perda de 13 sacas/100"}],acoes:["\u2705 Recolher frutos caídos","\u2705 Fungicida curativo pós-colheita","\u2705 Iniciar poda"]},5:{fase:"pos",faseTxt:"\uD83C\uDF3F Pós-colheita",alertas:[{nivel:"medio",txt:"\uD83D\uDFE0 Ferrugem — lesões tardias"}],acoes:["\u2705 Poda e esqueletamento","\u2705 Calagem e adubação de solo"]},6:{fase:"pos",faseTxt:"\uD83C\uDF3F Pós-colheita",alertas:[{nivel:"medio",txt:"\uD83D\uDFEB Ácaro vermelho — período seco"}],acoes:["\u2705 Monitorar ácaros","\u2705 Adubação fosfatada e potássica"]},7:{fase:"repouso",faseTxt:"\uD83D\uDE34 Repouso vegetativo",alertas:[{nivel:"medio",txt:"\uD83D\uDFEB Ácaro — pico em seco"}],acoes:["\u2705 Acaricida se necessário","\u2705 Adubação foliar de micronutrientes"]},8:{fase:"florada",faseTxt:"\uD83C\uDF38 Florada",alertas:[{nivel:"alto",txt:"\uD83C\uDF38 NÃO aplicar inseticidas — proteger abelhas"},{nivel:"medio",txt:"\uD83D\uDFE0 Ferrugem — início das chuvas"}],acoes:["\u26A0\uFE0F EVITAR agrotóxicos na florada","\u2705 Fungicida preventivo ANTES da florada"]},9:{fase:"florada",faseTxt:"\uD83C\uDF38 Florada/Chumbinho",alertas:[{nivel:"alto",txt:"\uD83D\uDFE0 Ferrugem — chuvas reiniciadas"},{nivel:"alto",txt:"\uD83E\uDEB2 Bicho-mineiro — nova geração"}],acoes:["\u2705 Fungicida sistêmico para ferrugem","\u2705 Monitorar bicho-mineiro"]},10:{fase:"granacao",faseTxt:"\uD83D\uDFE2 Granação",alertas:[{nivel:"alto",txt:"\uD83D\uDFE0 Ferrugem — máximo risco"},{nivel:"alto",txt:"\uD83E\uDEB2 Bicho-mineiro — alta infestação"}],acoes:["\u2705 Reaplicar fungicida (21 dias)","\u2705 Controle bicho-mineiro"]},11:{fase:"granacao",faseTxt:"\uD83D\uDFE2 Granação",alertas:[{nivel:"alto",txt:"\uD83D\uDFE0 Ferrugem — frutos em desenvolvimento"},{nivel:"alto",txt:"\uD83E\uDEB2 Bicho-mineiro — pico"}],acoes:["\u2705 Fungicida preventivo","\u2705 Adubação potássica"]}};
 
-function salvarHistorico(diags, fotoBase64, regiao) {
-  try {
-    var hist=JSON.parse(localStorage.getItem(HIST_KEY)||"[]");
-    var agora=new Date();
-    var data=agora.getDate()+"/"+(agora.getMonth()+1)+"/"+agora.getFullYear()+" "+agora.getHours()+":"+String(agora.getMinutes()).padStart(2,"0");
-    var primeiro=diags[0];
-    hist.unshift({diag:primeiro.diagnostico,emoji:EMOJIS[primeiro.diagnostico]||"\uD83C\uDF3F",diags:diags,data:data,regiao:regiao||"",foto:fotoBase64||null});
-    if (hist.length>10) hist=hist.slice(0,10);
-    localStorage.setItem(HIST_KEY,JSON.stringify(hist));
-  } catch(e) {}
-  renderAreaHistorico();
-}
-
-// ── GPS ──
-var dadosGPS={lat:null,lon:null,regiao:null,altitude:null};
-function identificarRegiao(lat,lon) {
-  if (lat>=-20.5&&lat<=-15.0&&lon>=-50.0&&lon<=-44.0) return "Cerrado Mineiro";
-  if (lat>=-22.5&&lat<=-19.5&&lon>=-46.5&&lon<=-43.5) return "Sul de Minas";
-  if (lat>=-21.5&&lat<=-19.0&&lon>=-48.5&&lon<=-46.0) return "Mogiana";
-  if (lat>=-20.0&&lat<=-17.0&&lon>=-42.5&&lon<=-40.0) return "Matas de Minas";
-  if (lat>=-15.0&&lat<=-10.0&&lon>=-41.5&&lon<=-38.5) return "Chapada Diamantina";
-  if (lat>=-12.0&&lat<=-8.0&&lon>=-40.0&&lon<=-36.0) return "Planalto da Bahia";
-  if (lat>=-12.0&&lat<=-6.0&&lon>=-62.0&&lon<=-56.0) return "Rondônia";
-  if (lat>=-22.0&&lat<=-19.0&&lon>=-52.0&&lon<=-48.0) return "Alta Paulista";
-  if (lat>=-25.0&&lat<=-21.0&&lon>=-54.0&&lon<=-49.0) return "Norte do Paraná";
-  if (lat>=-21.0&&lat<=-17.0&&lon>=-41.5&&lon<=-39.0) return "Espírito Santo";
-  return "Região Cafeeira";
-}
-function obterGPS() {
-  if (!navigator.geolocation) { document.getElementById("regiaoTag").textContent="\uD83D\uDCCD GPS não disponível"; return; }
-  navigator.geolocation.getCurrentPosition(function(pos) {
-    dadosGPS.lat=pos.coords.latitude; dadosGPS.lon=pos.coords.longitude;
-    dadosGPS.altitude=pos.coords.altitude?Math.round(pos.coords.altitude):null;
-    dadosGPS.regiao=identificarRegiao(dadosGPS.lat,dadosGPS.lon);
-    var tag="\uD83D\uDCCD "+dadosGPS.regiao; if (dadosGPS.altitude) tag+=" \u00b7 "+dadosGPS.altitude+"m";
-    document.getElementById("regiaoTag").textContent=tag;
-    obterClima(dadosGPS.lat,dadosGPS.lon);
-  }, function() {
-    document.getElementById("regiaoTag").textContent="\uD83D\uDCCD Localização não obtida";
-    document.getElementById("cardClima").innerHTML='<div class="clima-topo"><span style="font-size:13px;color:var(--cinza)">Ative o GPS para ver o clima</span></div>';
-  }, {timeout:8000,enableHighAccuracy:false});
-}
-
-// ── CALCULADORA FUNGICIDA ──
-function buildCalcFungicida(fungicidas, diagIdx) {
-  if (!fungicidas||fungicidas.length===0) return "";
-  var html='<div class="calc-box"><div class="calc-titulo">\uD83E\uDDEA Calcular Dosagem</div>';
-  fungicidas.forEach(function(f,fi) {
-    var badgeClass="calc-tipo-"+(f.tipo||"protetor");
-    var badgeTxt=f.tipo==="sistemico"?"Sistêmico":f.tipo==="biologico"?"Biológico":f.tipo==="acaricida"?"Acaricida":f.tipo==="inseticida"?"Inseticida":"Protetor";
-    var inputId="calc_"+diagIdx+"_"+fi;
-    var resTanque=(f.proporcao_por_litro*20).toFixed(1);
-    html+='<div class="calc-produto"><div class="calc-produto-nome">\uD83E\uDDF4 '+f.nome+' <span class="calc-tipo-badge '+badgeClass+'">'+badgeTxt+'</span></div>';
-    html+='<div class="calc-inputs">';
-    html+='<div class="calc-input-group"><label>Área (hectares)</label><input type="number" id="'+inputId+'_ha" value="1" min="0.1" step="0.1" oninput="calcular(\'\'\'\'\'\'\'\'"+inputId+"\'\'\'\'\'\'\'\'",'+f.dose_min+','+f.dose_max+','+f.proporcao_por_litro+',\'\'\'\'\'\'\'\'"+f.unidade+"\'\'\'\'\'\'\'\'",\'\'\'\'\'\'\'\'"+( f.unidade_proporcao||"g")+"\'\'\'\'\'\'\'\'")"></div>';
-    html+='<div class="calc-input-group"><label>Tanque (litros)</label><input type="number" id="'+inputId+'_tanque" value="20" min="1" step="1" oninput="calcular(\'\'\'\'\'\'\'\'"+inputId+"\'\'\'\'\'\'\'\'",'+f.dose_min+','+f.dose_max+','+f.proporcao_por_litro+',\'\'\'\'\'\'\'\'"+f.unidade+"\'\'\'\'\'\'\'\'",\'\'\'\'\'\'\'\'"+( f.unidade_proporcao||"g")+"\'\'\'\'\'\'\'\'")"></div>';
-    html+='</div><div class="calc-resultado" id="'+inputId+'_res">';
-    html+='<div class="calc-resultado-linha"><span class="calc-resultado-label">Dose total no hectare</span><span class="calc-resultado-valor">'+f.dose_min+'\u2013'+f.dose_max+' '+f.unidade+'</span></div>';
-    html+='<div class="calc-resultado-linha"><span class="calc-resultado-label">Por tanque de 20L</span><span class="calc-resultado-valor">'+resTanque+' '+(f.unidade_proporcao||'g')+'</span></div>';
-    html+='<div class="calc-aviso">\u26A0\uFE0F Confirme sempre no rótulo do produto comprado</div>';
-    html+='</div></div>';
-  });
-  html+='</div>';
-  return html;
-}
-function calcular(inputId,doseMin,doseMax,propPorLitro,unidade,unidadeProp) {
-  var haEl=document.getElementById(inputId+"_ha"),tanqueEl=document.getElementById(inputId+"_tanque"),resEl=document.getElementById(inputId+"_res");
-  if (!haEl||!tanqueEl||!resEl) return;
-  var ha=parseFloat(haEl.value)||1,tanque=parseFloat(tanqueEl.value)||20;
-  resEl.innerHTML=
-    '<div class="calc-resultado-linha"><span class="calc-resultado-label">Dose total ('+ha+' ha)</span><span class="calc-resultado-valor">'+(doseMin*ha).toFixed(2)+'\u2013'+(doseMax*ha).toFixed(2)+' '+unidade+'</span></div>'+
-    '<div class="calc-resultado-linha"><span class="calc-resultado-label">Por tanque de '+tanque+'L</span><span class="calc-resultado-valor">'+(propPorLitro*tanque).toFixed(1)+' '+unidadeProp+'</span></div>'+
-    '<div class="calc-aviso">\u26A0\uFE0F Confirme sempre no rótulo do produto comprado</div>';
-}
-
-// ── PROCESSAR ARQUIVOS ──
-function processar(file, isVideo) {
-  // Verificar se esgotou análises
-  if (!podeanalisarComCadastro()) {
-    abrirModal(true);
-    return;
-  }
-  document.getElementById("spinner").style.display="block";
-  document.getElementById("resultado").style.display="none";
-  document.getElementById("spinnerTexto").textContent="Analisando...";
-  document.getElementById("spinnerSub").textContent="Identificando sintomas e comparando padrões";
-  var reader=new FileReader();
-  reader.onload=function(e) {
-    var b64=e.target.result.split(",")[1]; ultimaFotoBase64=b64;
-    if (!navigator.onLine) {
-      document.getElementById("spinner").style.display="none";
-      adicionarNaFila(b64,null,function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});}});
-      return;
-    }
-    var body={imagem:b64,tipo:file.type};
-    if (dadosGPS.regiao) body.regiao=dadosGPS.regiao;
-    if (dadosGPS.altitude) body.altitude=dadosGPS.altitude;
-    fetchComTimeout("https://doutor-cafe-production.up.railway.app/diagnostico",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)},TIMEOUT_MS)
-    .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultado(data,isVideo);})
-    .catch(function(err){document.getElementById("spinner").style.display="none";adicionarNaFila(b64,null,function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert("Foto salva na fila!\n\n[DEBUG] Erro: " + (err.name||"desconhecido") + "\nDetalhe: " + (err.message||"sem detalhe") + "\nTempo: " + new Date().toLocaleTimeString());}});});
-  };
-  reader.readAsDataURL(file);
-}
-function processarSolo(file) {
-  document.getElementById("spinner").style.display="block";
-  document.getElementById("resultado").style.display="none";
-  document.getElementById("spinnerTexto").textContent="Lendo laudo de solo...";
-  document.getElementById("spinnerSub").textContent="Interpretando valores e calculando recomendações";
-  var reader=new FileReader();
-  reader.onload=function(e) {
-    var b64=e.target.result.split(",")[1]; ultimaFotoBase64=b64;
-    var body={imagem:b64,tipo:file.type};
-    if (dadosGPS.regiao) body.regiao=dadosGPS.regiao;
-    fetchComTimeout("https://doutor-cafe-production.up.railway.app/analise-solo",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)},TIMEOUT_MS)
-    .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultadoSolo(data);})
-    .catch(function(){document.getElementById("spinner").style.display="none";mostrarErro();});
-  };
-  reader.readAsDataURL(file);
-}
-function processarDaninha(file) {
-  document.getElementById("spinner").style.display="block";
-  document.getElementById("resultado").style.display="none";
-  document.getElementById("spinnerTexto").textContent="Identificando planta daninha...";
-  document.getElementById("spinnerSub").textContent="Lendo o que ela revela sobre o seu solo";
-  var reader=new FileReader();
-  reader.onload=function(e) {
-    var b64=e.target.result.split(",")[1]; ultimaFotoBase64=b64;
-    var body={imagem:b64,tipo:file.type};
-    if (dadosGPS.regiao) body.regiao=dadosGPS.regiao;
-    fetchComTimeout("https://doutor-cafe-production.up.railway.app/identifica-daninha",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)},TIMEOUT_MS)
-    .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultadoDaninha(data);})
-    .catch(function(){document.getElementById("spinner").style.display="none";mostrarErro();});
-  };
-  reader.readAsDataURL(file);
-}
-function processarVideo(file) {
-  document.getElementById("spinner").style.display="block";
-  document.getElementById("resultado").style.display="none";
-  document.getElementById("spinnerTexto").textContent="Extraindo frames do vídeo...";
-  document.getElementById("spinnerSub").textContent="Analisando múltiplos ângulos";
-  var video=document.createElement("video"),canvas=document.getElementById("canvas"),ctx=canvas.getContext("2d"),url=URL.createObjectURL(file);
-  video.src=url; video.muted=true;
-  video.addEventListener("loadedmetadata",function() {
-    var duration=video.duration,frames=[],tempos=[duration*0.15,duration*0.35,duration*0.60,duration*0.85],idx=0;
-    function capturarFrame(){if(idx>=tempos.length){URL.revokeObjectURL(url);enviarFrames(frames);return;}video.currentTime=tempos[idx];}
-    video.addEventListener("seeked",function(){canvas.width=640;canvas.height=480;ctx.drawImage(video,0,0,640,480);var frameB64=canvas.toDataURL("image/jpeg",0.7).split(",")[1];if(idx===0)ultimaFotoBase64=frameB64;frames.push(frameB64);idx++;capturarFrame();});
-    capturarFrame();
-  });
-  video.load();
-}
-function enviarFrames(frames) {
-  if (!navigator.onLine) {
-    document.getElementById("spinner").style.display="none";
-    adicionarNaFila(frames[0],frames,function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});}});
-    return;
-  }
-  document.getElementById("spinnerTexto").textContent="Analisando "+frames.length+" ângulos...";
-  var body={frames:frames,tipo:"image/jpeg"};
-  if (dadosGPS.regiao) body.regiao=dadosGPS.regiao;
-  if (dadosGPS.altitude) body.altitude=dadosGPS.altitude;
-  fetchComTimeout("https://doutor-cafe-production.up.railway.app/diagnostico-video",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)},TIMEOUT_MS)
-  .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultado(data,true);})
-  .catch(function(){document.getElementById("spinner").style.display="none";adicionarNaFila(frames[0],frames,function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert("Sem conexão ou tempo esgotado. Vídeo salvo na fila!");}});});
-}
-
-// ── COMPARTILHAR ──
-function compartilhar(diagsJson,regiao) {
-  var diags=JSON.parse(diagsJson),texto="\uD83C\uDF3F *Doutor Café \u2014 Diagnóstico*\n\n";
-  if (regiao) texto+="\uD83D\uDCCD "+regiao+"\n\n";
-  diags.forEach(function(d){texto+=(EMOJIS[d.diagnostico]||"\uD83C\uDF3F")+" *"+(NOMES_VOZ[d.diagnostico]||d.diagnostico)+"*\n\uD83D\uDCCB "+d.acao+"\n\n";});
-  texto+="_Diagnóstico realizado pelo app Doutor Café_";
-  window.open("https://wa.me/?text="+encodeURIComponent(texto),"_blank");
-}
-
-// ── MOSTRAR RESULTADOS ──
-function buildPlanoAcao(plano) {
-  if (!plano) return "";
-  var out = "";
-
-  // Card de resumo geral (diagnóstico em linguagem simples)
-  if (plano.resumo_geral) {
-    out += '<div class="resumo-diag-card">';
-    out += '<div class="resumo-diag-titulo">🔍 O que sua planta tem</div>';
-    out += '<div class="resumo-diag-texto">' + plano.resumo_geral + '</div>';
-    out += '</div>';
-  }
-
-  var html = '<div class="plano-acao-card">';
-  html += '<div class="plano-acao-header">';
-  html += '<div class="plano-acao-titulo">📋 Plano de Ação</div>';
-  if (plano.resumo) html += '<div class="plano-acao-resumo">' + plano.resumo + '</div>';
-  html += '</div>';
-  if (plano.urgente) {
-    html += '<div class="plano-acao-item plano-acao-urgente">';
-    html += '<div class="plano-acao-icone">🚨</div>';
-    html += '<div><div class="plano-acao-label">Faça essa semana</div>';
-    html += '<div class="plano-acao-texto">' + plano.urgente + '</div></div></div>';
-  }
-  if (plano.em_21_dias) {
-    html += '<div class="plano-acao-item plano-acao-21dias">';
-    html += '<div class="plano-acao-icone">📅</div>';
-    html += '<div><div class="plano-acao-label">Em 21 dias</div>';
-    html += '<div class="plano-acao-texto">' + plano.em_21_dias + '</div></div></div>';
-  }
-  if (plano.nutricao) {
-    html += '<div class="plano-acao-item plano-acao-nutricao">';
-    html += '<div class="plano-acao-icone">🌱</div>';
-    html += '<div><div class="plano-acao-label">Nutrição</div>';
-    html += '<div class="plano-acao-texto">' + plano.nutricao + '</div></div></div>';
-  }
-  html += '</div>';
-  return out + html;
-}
-
-function mostrarResultado(data, isVideo) {
-  var div=document.getElementById("resultado"); div.style.display="block";
-  var diags=data.diagnosticos||[{diagnostico:data.diagnostico||"saudavel",estagio:data.estagio||1,confianca:data.confianca||"media",visto:data.visto||"",acao:data.acao||"Tente novamente.",fungicidas:[]}];
-  var planoAcao=data.plano_acao||null;
-  var regiao=dadosGPS.regiao||"";
-  salvarHistorico(diags,ultimaFotoBase64,regiao);
-  var thumbHtml=ultimaFotoBase64?'<img class="multi-foto" src="data:image/jpeg;base64,'+ultimaFotoBase64+'" alt="foto">':"<div class='multi-foto-placeholder'>\uD83C\uDF3F</div>";
-  var qtd=diags.length>1?diags.length+" problemas detectados":"1 diagnóstico";
-  var html='<div class="card-resultado"><div class="multi-header">'+thumbHtml+'<div class="multi-titulo"><h3>Resultado da Análise</h3><p>'+qtd;
-  if (regiao) html+=' \u00b7 \uD83D\uDCCD '+regiao;
-  if (isVideo) html+=' \u00b7 \uD83C\uDFA5 Vídeo';
-  html+='</p></div></div>';
-  // Plano de ação no topo
-  if (planoAcao) html+=buildPlanoAcao(planoAcao);
-  diags.forEach(function(d,diagIdx) {
-    var diag=d.diagnostico||"saudavel",estagio=d.estagio||1,confianca=d.confianca||"media";
-    var badgeTexto=confianca==="alta"?"\u2713 Alta":confianca==="media"?"\u007e Média":"! Baixa";
-    var barras=""; for(var i=1;i<=5;i++) barras+='<div class="diag-seg" style="background:'+(i<=estagio?CORES_ESTAGIO[estagio-1]:"#e8e8e8")+'"></div>';
-    html+='<div class="diag-item"><div class="diag-item-topo"><span style="font-size:28px">'+(EMOJIS[diag]||"\uD83C\uDF3F")+'</span><div><div class="diag-nome">'+diag.replace(/_/g," ")+'</div><div class="diag-cat">'+(CATEGORIAS[diag]||"Análise")+'</div></div></div>';
-    html+='<div class="diag-badges"><span class="badge badge-estagio">\uD83D\uDCCA Estágio '+estagio+'/5</span><span class="badge badge-confianca-'+confianca+'">'+badgeTexto+' confiança</span></div>';
-    html+='<div class="diag-bar">'+barras+'</div>';
-    if (d.visto) html+='<div class="diag-visto">"'+ d.visto +'"</div>';
-    html+='<div class="diag-acao">'+(d.acao||"")+'</div>';
-    if (d.fungicidas&&d.fungicidas.length>0) html+=buildCalcFungicida(d.fungicidas,diagIdx);
-    html+='</div>';
-  });
-  var textoVoz=diags.map(function(d){return(NOMES_VOZ[d.diagnostico]||d.diagnostico)+". "+d.acao;}).join(". ");
-  _textoParaFalar = textoVoz;
-  html+='<div class="btns-resultado"><button class="btn-voz" onclick="falarTextoAtual()">🔊 Ouvir</button>'';
-  html+='<button class="btn-share" onclick="compartilhar(\'\'\'\'\'\'\'\'"+JSON.stringify(diags).replace(/\'/g,"\\\'")+"\'\'\'\'\'\'\'\'",\'\'\'\'\'\'\'\'"+regiao+"\'\'\'\'\'\'\'\'")">\uD83D\uDCE4 WhatsApp</button>';
-  html+='<button class="btn-nova" onclick="resetar()">\uD83D\uDCF7 Nova</button></div></div>';
-  div.innerHTML=html; falar(textoVoz); div.scrollIntoView({behavior:"smooth",block:"start"});
-  // Verificar se deve abrir cadastro após esta análise
-  setTimeout(function(){
-    if (deveAbrirCadastroAposAnalise()) { abrirModalCadastro(); }
-    else if (!podeanalisarComCadastro()) { abrirModal(true); }
-  }, 2000);
-}
-
-function mostrarResultadoSolo(data) {
-  var div=document.getElementById("resultado"); div.style.display="block";
-  var acao=data.acao||"Consulte um agrônomo para mais detalhes.";
-  var textoVoz="Análise de solo. "+acao;
-  var thumbHtml=ultimaFotoBase64?'<img class="card-foto-thumb" src="data:image/jpeg;base64,'+ultimaFotoBase64+'" alt="laudo">':"<div class='card-foto-thumb-placeholder'>\uD83E\uDDEA</div>";
-  var html='<div class="card-resultado"><div class="card-topo">'+thumbHtml+'<div class="card-titulo"><h2>Análise de Solo</h2><div class="categoria">Recomendação para Café</div></div></div>';
-  html+='<div class="badges"><span class="badge badge-solo">\uD83C\uDF31 Laudo Interpretado</span>';
-  if (dadosGPS.regiao) html+='<span class="badge badge-regiao">\uD83D\uDCCD '+dadosGPS.regiao+'</span>';
-  html+='</div>';
-  if (data.valores) {
-    html+='<div class="solo-grid">';
-    for (var k in data.valores) { var v=data.valores[k],sc=v.status==="ok"?"solo-ok":v.status==="baixo"?"solo-baixo":"solo-alto",st=v.status==="ok"?"\u2713 Adequado":v.status==="baixo"?"\u2193 Baixo":"\u2191 Alto"; html+='<div class="solo-item"><div class="solo-label">'+k+'</div><div class="solo-valor">'+v.valor+'</div><div class="solo-status '+sc+'">'+st+'</div></div>'; }
-    html+='</div>';
-  }
-  html+='<div class="divisor"></div><div class="acao-box"><h3>Recomendação</h3><p>'+acao+'</p></div>';
-  html+='<div class="btns-resultado"><button class="btn-voz" onclick="falar(\'\'\'\'\'\'\'\'"+textoVoz.replace(/\'/g,"\\\'")+"\'\'\'\'\'\'\'\'")">\uD83D\uDD0A Ouvir</button><button class="btn-nova" onclick="resetar()">\uD83D\uDCF7 Nova análise</button></div></div>';
-  div.innerHTML=html; falar(textoVoz); div.scrollIntoView({behavior:"smooth",block:"start"});
-}
-
-function mostrarResultadoDaninha(data) {
-  var div=document.getElementById("resultado"); div.style.display="block";
-
-  // Suporte ao formato antigo e novo
-  var nome = data.nome || "Planta não identificada";
-  var nomeCientifico = data.nome_cientifico || "";
-  var indicador = data.indicador || "";
-  var acao = data.acao || "";
-  var alerta = data.alerta || "";
-  var manejoPreventivo = data.manejo_preventivo || "";
-  var urgencia = data.urgencia || "media";
-  var tipoControle = data.tipo_controle || "integrado";
-  var produtos = data.produtos || [];
-
-  // Cor do card de indicador baseado no conteúdo
-  var alertaClass = "daninha-alerta-compactado";
-  if (indicador.indexOf("cido")>-1||indicador.indexOf("ACIDO")>-1||indicador.indexOf("pH")>-1) alertaClass="daninha-alerta-acido";
-  else if (indicador.indexOf("rtil")>-1||indicador.indexOf("fertil")>-1||indicador.indexOf("Fertil")>-1) alertaClass="daninha-alerta-fertil";
-  else if (indicador.indexOf("umidade")>-1||indicador.indexOf("encharcado")>-1||indicador.indexOf("drenagem")>-1) alertaClass="daninha-alerta-umidade";
-  else if (indicador.indexOf("degradado")>-1||indicador.indexOf("glifosato")>-1||indicador.indexOf("resistente")>-1) alertaClass="daninha-alerta-degradado";
-  else if (indicador.indexOf("compacta")>-1||indicador.indexOf("pisoteado")>-1) alertaClass="daninha-alerta-compactado";
-  else if (indicador.indexOf("magnesio")>-1||indicador.indexOf("Mg")>-1) alertaClass="daninha-alerta-mag";
-
-  // Badge de urgência
-  var urgBadge = urgencia==="alta"
-    ? '<span style="background:#fce4ec;color:#c62828;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700">🔴 Urgência Alta</span>'
-    : urgencia==="media"
-    ? '<span style="background:#fff8e1;color:#f57f17;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700">🟡 Urgência Média</span>'
-    : '<span style="background:#e8f5e9;color:#2e7d32;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700">🟢 Urgência Baixa</span>';
-
-  // Badge de tipo de controle
-  var ctrlBadge = '<span style="background:#e8eaf6;color:#283593;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700">⚙️ '+tipoControle.charAt(0).toUpperCase()+tipoControle.slice(1)+'</span>';
-
-  var textoVoz = "Planta identificada: "+nome+". "+indicador+". "+acao;
-  var thumbHtml = ultimaFotoBase64
-    ? '<img class="card-foto-thumb" src="data:image/jpeg;base64,'+ultimaFotoBase64+'" alt="planta">'
-    : "<div class='card-foto-thumb-placeholder'>🌾</div>";
-
-  var html = '<div class="card-resultado">';
-  html += '<div class="card-topo">'+thumbHtml+'<div class="card-titulo"><h2>'+nome+'</h2>';
-  if (nomeCientifico) html += '<div class="categoria" style="font-style:italic">'+nomeCientifico+'</div>';
-  html += '<div class="categoria">Planta Daninha Indicadora</div></div></div>';
-
-  // Badges
-  html += '<div class="badges"><span class="badge badge-daninha">🌾 Leitura do Solo</span>';
-  if (dadosGPS.regiao) html += '<span class="badge badge-regiao">📍 '+dadosGPS.regiao+'</span>';
-  html += urgBadge+ctrlBadge+'</div>';
-
-  // Card indicador de solo
-  html += '<div class="daninha-alerta '+alertaClass+'">';
-  html += '<div class="daninha-alerta-titulo">🔍 O que indica no solo</div>';
-  html += '<div class="daninha-alerta-desc">'+indicador+'</div></div>';
-
-  // Ação recomendada
-  html += '<div class="divisor"></div><div class="acao-box"><h3>📋 Como controlar</h3><p>'+acao+'</p></div>';
-
-  // Produtos com doses
-  if (produtos && produtos.length > 0) {
-    html += '<div class="divisor"></div>';
-    html += '<div style="padding:14px 20px"><div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--cinza);margin-bottom:10px">🧪 Produtos Recomendados</div>';
-    produtos.forEach(function(p) {
-      var momentoBadge = p.momento && p.momento.indexOf("pre")>-1
-        ? '<span style="background:#fff3e0;color:#e65100;border-radius:10px;padding:2px 7px;font-size:10px;font-weight:600">Pré-emergência</span>'
-        : p.momento && p.momento.indexOf("pos")>-1
-        ? '<span style="background:#e8eaf6;color:#283593;border-radius:10px;padding:2px 7px;font-size:10px;font-weight:600">Pós-emergência</span>'
-        : '<span style="background:#e8f5e9;color:#2e7d32;border-radius:10px;padding:2px 7px;font-size:10px;font-weight:600">Qualquer fase</span>';
-      html += '<div style="background:#f5f0e8;border-radius:12px;padding:12px 14px;margin-bottom:8px">';
-      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
-      html += '<span style="font-size:15px">🧴</span>';
-      html += '<span style="font-size:14px;font-weight:700;color:var(--marrom)">'+p.nome+'</span>';
-      html += momentoBadge+'</div>';
-      if (p.dose) html += '<div style="background:var(--verde);color:white;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:700;margin-bottom:6px">📏 '+p.dose+'</div>';
-      if (p.como_usar) html += '<div style="font-size:12px;color:#444;line-height:1.5">👨‍🌾 '+p.como_usar+'</div>';
-      html += '</div>';
-    });
-    html += '</div>';
-  }
-
-  // Alerta crítico
-  if (alerta) {
-    html += '<div style="margin:0 20px 14px;background:#fce4ec;border-radius:12px;padding:10px 14px;border-left:4px solid #c62828">';
-    html += '<div style="font-size:13px;font-weight:700;color:#c62828;margin-bottom:4px">⚠️ Atenção</div>';
-    html += '<div style="font-size:12px;color:#555;line-height:1.5">'+alerta+'</div></div>';
-  }
-
-  // Manejo preventivo
-  if (manejoPreventivo) {
-    html += '<div style="margin:0 20px 14px;background:#e8f5e9;border-radius:12px;padding:10px 14px;border-left:4px solid #2e7d32">';
-    html += '<div style="font-size:13px;font-weight:700;color:#2e7d32;margin-bottom:4px">🛡️ Prevenção</div>';
-    html += '<div style="font-size:12px;color:#555;line-height:1.5">'+manejoPreventivo+'</div></div>';
-  }
-
-  // Botões
-  html += '<div class="btns-resultado">';
-  html += '<button class="btn-voz" onclick="falar(\''+textoVoz.replace(/\'/g,"\\\'")+'\')">';
-  html += '🔊 Ouvir</button>';
-  html += '<button class="btn-nova" onclick="resetar()">📷 Nova análise</button>';
-  html += '</div></div>';
-
-  div.innerHTML = html;
-  falar(textoVoz);
-  div.scrollIntoView({behavior:"smooth",block:"start"});
-  setTimeout(function(){
-    if (deveAbrirCadastroAposAnalise()) { abrirModalCadastro(); }
-    else if (!podeanalisarComCadastro()) { abrirModal(true); }
-  }, 2000);
-}
-
-function mostrarErro() {
-  var div=document.getElementById("resultado"); div.style.display="block";
-  div.innerHTML='<div class="card-resultado"><div class="acao-box"><p>\u26A0\uFE0F Erro ao analisar. Verifique sua conexão e tente novamente.</p></div><div class="btns-resultado"><button class="btn-nova" onclick="resetar()">\uD83D\uDCF7 Tentar novamente</button></div></div>';
-}
-
-// ── VOZ ──
-var _textoParaFalar = "";
-function falarTextoAtual() { falar(_textoParaFalar); }
-function falar(texto) {
-  if (!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  function executarFala(vozes) {
-    var msg = new SpeechSynthesisUtterance(texto);
-    msg.lang = "pt-BR"; msg.rate = 1.1; msg.pitch = 1.0;
-    var melhor = vozes.find(function(v){ return v.name.indexOf("Google") > -1 && v.lang === "pt-BR"; });
-    if (!melhor) melhor = vozes.find(function(v){ return v.name.indexOf("Francisca") > -1; });
-    if (!melhor) melhor = vozes.find(function(v){ return v.name.indexOf("Luciana") > -1; });
-    if (!melhor) melhor = vozes.find(function(v){ return v.lang === "pt-BR" && v.localService; });
-    if (!melhor) melhor = vozes.find(function(v){ return v.lang === "pt-BR"; });
-    if (!melhor) melhor = vozes.find(function(v){ return v.lang.startsWith("pt"); });
-    if (melhor) msg.voice = melhor;
-    window.speechSynthesis.speak(msg);
-  }
-  var vozes = window.speechSynthesis.getVoices();
-  if (vozes.length > 0) { executarFala(vozes); }
-  else { window.speechSynthesis.onvoiceschanged = function() { executarFala(window.speechSynthesis.getVoices()); window.speechSynthesis.onvoiceschanged = null; }; }
-}
-
-function resetar() { ultimaFotoBase64=null; document.getElementById("resultado").style.display="none"; window.scrollTo(0,0); }
-
-function enviarEmail() {
-  var assunto="Contato via app Doutor Café";
-  var corpo="Olá equipe Doutor Café,%0A%0AEscrevo para...%0A%0ARegião: "+(dadosGPS.regiao||"não informada");
-  window.open("mailto:doutorcafe.app@gmail.com?subject="+encodeURIComponent(assunto)+"&body="+corpo);
-}
-function abrirWhatsapp() {
-  var texto="Olá! Estou usando o app Doutor Café e gostaria de falar com o Gerente Comercial.";
-  window.open("https://wa.me/5535998823395?text="+encodeURIComponent(texto),"_blank");
-}
-
-// ── INPUTS DE ARQUIVO ──
-function criarInput(id,accept,capture) {
-  var old=document.getElementById(id),novo=document.createElement("input");
-  novo.type="file"; novo.id=id; novo.accept=accept;
-  if (capture) novo.setAttribute("capture",capture);
-  novo.style.display="none"; old.parentNode.replaceChild(novo,old); return novo;
-}
-function bindCam(){var inp=criarInput("cam","image/*","environment");inp.addEventListener("change",function(e){if(e.target.files[0])processar(e.target.files[0],false);bindCam();});}
-function bindGal(){var inp=criarInput("gal","image/*,video/*",null);inp.addEventListener("change",function(e){if(!e.target.files[0]){bindGal();return;}var file=e.target.files[0];if(file.type.startsWith("video/"))processarVideo(file);else processar(file,false);bindGal();});}
-function bindVid(){var inp=criarInput("vid","video/*","environment");inp.addEventListener("change",function(e){if(e.target.files[0])processarVideo(e.target.files[0]);bindVid();});}
-function bindSolo(){var inp=criarInput("solo","image/*","environment");inp.addEventListener("change",function(e){if(e.target.files[0])processarSolo(e.target.files[0]);bindSolo();});}
-function bindSoloGal(){var inp=criarInput("soloGal","image/*",null);inp.addEventListener("change",function(e){if(e.target.files[0])processarSolo(e.target.files[0]);bindSoloGal();});}
-function bindDaninha(){var inp=criarInput("daninha","image/*","environment");inp.addEventListener("change",function(e){if(e.target.files[0])processarDaninha(e.target.files[0]);bindDaninha();});}
-function bindDaninhaGal(){var inp=criarInput("daninaGal","image/*",null);inp.addEventListener("change",function(e){if(e.target.files[0])processarDaninha(e.target.files[0]);bindDaninhaGal();});}
-
-document.getElementById("btnCam").addEventListener("click",function(){document.getElementById("cam").click();});
-document.getElementById("btnGal").addEventListener("click",function(){document.getElementById("gal").click();});
-document.getElementById("btnVid").addEventListener("click",function(){document.getElementById("vid").click();});
-document.getElementById("btnSolo").addEventListener("click",function(){document.getElementById("solo").click();});
-document.getElementById("btnSoloGal").addEventListener("click",function(){document.getElementById("soloGal").click();});
-document.getElementById("btnDaninha").addEventListener("click",function(){document.getElementById("daninha").click();});
-document.getElementById("btnDaninhaGal").addEventListener("click",function(){document.getElementById("daninaGal").click();});
-
-bindCam(); bindGal(); bindVid(); bindSolo(); bindSoloGal(); bindDaninha(); bindDaninhaGal();
-window.addEventListener("online",function(){renderAreaHistorico();});
-window.addEventListener("offline",function(){renderAreaHistorico();});
-
-// ── PIX ──
-var planoPixAtual='',pixPaymentId=null,pixCheckInterval=null;
-function obterUserId(){var u=localStorage.getItem('doutorcafe_uid');if(!u){u='user_'+Date.now()+'_'+Math.random().toString(36).substr(2,9);localStorage.setItem('doutorcafe_uid',u);}return u;}
-function abrirPix(tipo){
-  planoPixAtual=tipo; fecharModal();
-  document.getElementById('modalPix').classList.add('ativo');
-  var nomes={basico_mensal:'Básico Mensal - R$ 32,90/mês',basico_anual:'Básico Anual - R$ 299,90/ano',pro_mensal:'Pro Mensal - R$ 49,90/mês',pro_anual:'Pro Anual - R$ 499,90/ano'};
-  document.getElementById('pixSubtitulo').textContent='Plano '+(nomes[tipo+'_'+cicloAtual]||tipo);
-  document.getElementById('pixArea').innerHTML='<label class="pix-form-label">Nome completo *</label><input class="pix-form-input" id="pixNome" type="text" placeholder="Ex: João da Silva"><label class="pix-form-label">CPF *</label><input class="pix-form-input" id="pixCpf" type="tel" placeholder="000.000.000-00" maxlength="14" oninput="mascararCpf(this)"><label class="pix-form-label">Email (opcional)</label><input class="pix-form-input" id="pixEmail" type="email" placeholder="seuemail@gmail.com"><button onclick="confirmarPix()" style="width:100%;padding:14px;background:linear-gradient(135deg,#2d8a3e,#1a5c2a);color:white;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px">Gerar QR Code PIX</button>';
-}
-function mascararCpf(input){var v=input.value.replace(/[^0-9]/g,'');if(v.length>3)v=v.slice(0,3)+'.'+v.slice(3);if(v.length>7)v=v.slice(0,7)+'.'+v.slice(7);if(v.length>11)v=v.slice(0,11)+'-'+v.slice(11,13);input.value=v;}
-function confirmarPix(){
-  var nome=document.getElementById('pixNome').value.trim(),cpf=document.getElementById('pixCpf').value.replace(/[^0-9]/g,''),email=document.getElementById('pixEmail').value.trim()||'produtor@doutorcafe.app';
-  if(!nome){alert('Informe seu nome completo.');return;}
-  if(cpf.length!==11){alert('CPF inválido. Digite os 11 dígitos.');return;}
-  document.getElementById('pixArea').innerHTML='<div class="pix-loading"><div class="pix-spinner"></div> Gerando QR Code...</div>';
-  fetch('https://doutor-cafe-production.up.railway.app/gerar-pix',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plano:planoPixAtual+'_'+cicloAtual,userId:obterUserId(),nome:nome,cpf:cpf,email:email})})
-  .then(function(r){return r.json();})
-  .then(function(d){
-    if(d.qr_code_base64){
-      pixPaymentId=d.id;
-      document.getElementById('pixArea').innerHTML='<div class="pix-qr-img"><img src="data:image/png;base64,'+d.qr_code_base64+'" alt="QR Code PIX"></div><div class="pix-codigo-box"><div class="pix-codigo-label">Código PIX:</div><div class="pix-codigo-txt" id="pixCodigoTxt">'+d.qr_code+'</div></div><div class="pix-status pix-status-aguardando" id="pixStatusTxt">Aguardando pagamento...</div><button class="btn-copiar-pix" onclick="copiarCodigoPix()">Copiar código PIX</button>';
-      iniciarVerificacaoPix();
-    } else {
-      document.getElementById('pixArea').innerHTML='<div class="pix-status pix-status-erro">Erro: '+(d.detalhe||d.erro||'Tente novamente.')+'<br><small style="font-size:10px;opacity:0.7">'+(d.debug||'')+'</small></div>';
-    }
-  })
-  .catch(function(){document.getElementById('pixArea').innerHTML='<div class="pix-status pix-status-erro">Erro de conexão. Tente novamente.</div>';});
-}
-function iniciarVerificacaoPix(){
-  if(pixCheckInterval)clearInterval(pixCheckInterval);
-  var t=0;
-  pixCheckInterval=setInterval(function(){
-    t++; if(t>72){clearInterval(pixCheckInterval);return;}
-    if(!pixPaymentId)return;
-    fetch('https://doutor-cafe-production.up.railway.app/verificar-pix/'+pixPaymentId)
-    .then(function(r){return r.json();})
-    .then(function(d){
-      if(d.aprovado){
-        clearInterval(pixCheckInterval);
-        var tipo=d.plano_id&&d.plano_id.indexOf('pro')>-1?'pro':'basico';
-        salvarPlano({tipo:tipo,planoId:d.plano_id,dataAssinatura:new Date().toISOString()});
-        localStorage.setItem(ANALISES_KEY,'0');
-        atualizarContador();
-        document.getElementById('pixArea').innerHTML='<div class="pix-status pix-status-aprovado">\u2705 Pagamento aprovado! Plano '+(tipo==='pro'?'Pro':'Básico')+' liberado!</div>';
-        setTimeout(function(){fecharPix();},3000);
-      }
-    }).catch(function(){});
-  },5000);
-}
-function copiarCodigoPix(){
-  var txt=document.getElementById('pixCodigoTxt');
-  if(!txt)return;
-  if(navigator.clipboard){navigator.clipboard.writeText(txt.textContent).then(function(){alert('Código PIX copiado!');});}
-  else{var el=document.createElement('textarea');el.value=txt.textContent;document.body.appendChild(el);el.select();document.execCommand('copy');document.body.removeChild(el);alert('Código PIX copiado!');}
-}
-function fecharPix(){if(pixCheckInterval)clearInterval(pixCheckInterval);pixPaymentId=null;document.getElementById('modalPix').classList.remove('ativo');}
-
-// ── INICIALIZAÇÃO ──
-atualizarContador();
-verificarRetornoPagamento();
-renderCalendario();
-renderAreaHistorico();
-obterGPS();
-</script>
-</body>
-</html>
+function renderCalendario(){var mes=new Date().getMonth(),cal=CALENDARIO[mes];var html='<div class="cal-header"><div class="cal-mes">\uD83D\uDCC5 '+MESES[mes]+'</div><div class="cal-fase fase-'+cal.fase+'">'+cal.faseTxt+'</div></div><div class="cal-divisor"></div><div class="cal-alertas"><h4>\u26A0\uFE0F Alertas deste mês</h4>';cal.alertas.forEach(
