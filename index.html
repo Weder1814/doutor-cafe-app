@@ -497,7 +497,7 @@ function verificarRetornoPagamento(){var params=new URLSearchParams(window.locat
 var ultimaFotoBase64 = null;
 var HIST_KEY = "doutorcafe_hist";
 var FILA_MAX = 50;
-var TIMEOUT_MS = 35000;
+var TIMEOUT_MS = 60000; // 60s — necessario para prompt com plano de acao
 
 // ── FETCH COM TIMEOUT ──
 function fetchComTimeout(url, opcoes, ms) {
@@ -1249,7 +1249,7 @@ function confirmarPix(){
       document.getElementById('pixArea').innerHTML='<div class="pix-qr-img"><img src="data:image/png;base64,'+d.qr_code_base64+'" alt="QR Code PIX"></div><div class="pix-codigo-box"><div class="pix-codigo-label">Código PIX:</div><div class="pix-codigo-txt" id="pixCodigoTxt">'+d.qr_code+'</div></div><div class="pix-status pix-status-aguardando" id="pixStatusTxt">Aguardando pagamento...</div><button class="btn-copiar-pix" onclick="copiarCodigoPix()">Copiar código PIX</button>';
       iniciarVerificacaoPix();
     } else {
-      document.getElementById('pixArea').innerHTML='<div class="pix-status pix-status-erro">Erro: '+(d.erro||'Tente novamente.')+'</div>';
+      document.getElementById('pixArea').innerHTML='<div class="pix-status pix-status-erro">Erro: '+(d.detalhe||d.erro||'Tente novamente.')+'<br><small style="font-size:10px;opacity:0.7">'+(d.debug||'')+'</small></div>';
     }
   })
   .catch(function(){document.getElementById('pixArea').innerHTML='<div class="pix-status pix-status-erro">Erro de conexão. Tente novamente.</div>';});
