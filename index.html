@@ -968,6 +968,16 @@ function compartilhar(diagsJson,regiao) {
 // ── MOSTRAR RESULTADOS ──
 function buildPlanoAcao(plano) {
   if (!plano) return "";
+  var out = "";
+
+  // Card de resumo geral (diagnóstico em linguagem simples)
+  if (plano.resumo_geral) {
+    out += '<div class="resumo-diag-card">';
+    out += '<div class="resumo-diag-titulo">🔍 O que sua planta tem</div>';
+    out += '<div class="resumo-diag-texto">' + plano.resumo_geral + '</div>';
+    out += '</div>';
+  }
+
   var html = '<div class="plano-acao-card">';
   html += '<div class="plano-acao-header">';
   html += '<div class="plano-acao-titulo">📋 Plano de Ação</div>';
@@ -992,7 +1002,7 @@ function buildPlanoAcao(plano) {
     html += '<div class="plano-acao-texto">' + plano.nutricao + '</div></div></div>';
   }
   html += '</div>';
-  return html;
+  return out + html;
 }
 
 function mostrarResultado(data, isVideo) {
