@@ -263,6 +263,67 @@ input[type="file"] { display: none; }
 .pix-codigo-txt { font-size:10px; color:var(--marrom); word-break:break-all; font-family:monospace; line-height:1.4; }
 .btn-copiar-pix { width:100%; padding:11px; background:var(--verde); color:white; border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:700; cursor:pointer; margin-bottom:8px; }
 .btn-fechar-pix { width:100%; padding:11px; background:white; color:var(--cinza); border:2px solid #e8e8e8; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; cursor:pointer; }
+.continuar-gratis-box { background: linear-gradient(135deg,#e8f5e9,#f1f8e9); border: 2px solid #2d8a3e; border-radius: 16px; padding: 16px 20px; margin: 16px 20px; text-align: center; }
+.continuar-gratis-txt { font-size: 13px; color: #2d8a3e; margin-bottom: 10px; }
+.btn-continuar-gratis { background: linear-gradient(135deg,#2d8a3e,#1a5c2a); color: white; border: none; border-radius: 12px; padding: 12px 24px; font-size: 15px; font-weight: 700; cursor: pointer; width: 100%; }
+
+/* ── TALHÕES ─────────────────────────── */
+.talhoes-section { margin: 24px 16px 0; }
+.talhoes-titulo { font-size: 11px; font-weight: 700; color: var(--verde-escuro); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+.talhoes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.talhao-card { background: white; border-radius: 16px; padding: 14px; border: 1.5px solid #e0ede0; cursor: pointer; transition: all 0.2s; }
+.talhao-card:active { transform: scale(0.97); }
+.talhao-card.alerta { border-color: #ef6c00; background: #fff8f3; }
+.talhao-nome { font-size: 15px; font-weight: 700; color: var(--verde-escuro); margin-bottom: 2px; }
+.talhao-var { font-size: 11px; color: #888; margin-bottom: 8px; }
+.talhao-ultima { font-size: 11px; color: #555; }
+.talhao-status { display: inline-block; font-size: 10px; font-weight: 700; border-radius: 8px; padding: 2px 8px; margin-top: 6px; }
+.talhao-status.pendente { background: #fff3e0; color: #e65100; }
+.talhao-status.ok { background: #e8f5e9; color: #2e7d32; }
+.btn-novo-talhao { width: 100%; margin-top: 10px; padding: 12px; background: transparent; border: 2px dashed #2d8a3e; border-radius: 16px; color: #2d8a3e; font-size: 14px; font-weight: 700; cursor: pointer; }
+
+/* ── MODAL SELEÇÃO DE TALHÃO ──────────── */
+.modal-talhao-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 500; align-items: flex-end; }
+.modal-talhao-overlay.ativo { display: flex; }
+.modal-talhao-box { background: white; border-radius: 24px 24px 0 0; padding: 20px 16px 32px; width: 100%; max-height: 80vh; overflow-y: auto; }
+.modal-talhao-titulo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--verde-escuro); margin-bottom: 4px; }
+.modal-talhao-sub { font-size: 13px; color: #888; margin-bottom: 16px; }
+.talhao-opcao { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 14px; border: 1.5px solid #e0ede0; margin-bottom: 8px; cursor: pointer; transition: all 0.15s; }
+.talhao-opcao:active { background: #e8f5e9; border-color: #2d8a3e; }
+.talhao-opcao-nome { font-size: 15px; font-weight: 700; color: #1a1a1a; }
+.talhao-opcao-detalhe { font-size: 12px; color: #888; }
+.talhao-opcao-icone { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg,#2d8a3e,#1a5c2a); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.btn-criar-talhao-modal { width: 100%; padding: 14px; background: linear-gradient(135deg,#2d8a3e,#1a5c2a); color: white; border: none; border-radius: 16px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 8px; }
+
+/* ── MODAL CRIAR TALHÃO ───────────────── */
+.modal-criar-talhao { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 600; align-items: flex-end; }
+.modal-criar-talhao.ativo { display: flex; }
+.criar-talhao-box { background: white; border-radius: 24px 24px 0 0; padding: 24px 16px 32px; width: 100%; }
+.criar-talhao-titulo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--verde-escuro); margin-bottom: 16px; }
+.criar-talhao-label { font-size: 12px; font-weight: 700; color: #555; margin-bottom: 4px; margin-top: 12px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+.criar-talhao-input { width: 100%; padding: 12px 14px; border: 1.5px solid #ddd; border-radius: 12px; font-size: 15px; box-sizing: border-box; }
+.criar-talhao-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.criar-talhao-select { width: 100%; padding: 12px 14px; border: 1.5px solid #ddd; border-radius: 12px; font-size: 14px; background: white; box-sizing: border-box; }
+.btn-salvar-talhao { width: 100%; padding: 14px; background: linear-gradient(135deg,#2d8a3e,#1a5c2a); color: white; border: none; border-radius: 16px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 16px; }
+.btn-cancelar-talhao { width: 100%; padding: 12px; background: transparent; border: none; color: #888; font-size: 14px; cursor: pointer; margin-top: 8px; }
+
+/* ── HISTÓRICO DO TALHÃO ──────────────── */
+.modal-hist-talhao { display: none; position: fixed; inset: 0; background: white; z-index: 700; overflow-y: auto; }
+.modal-hist-talhao.ativo { display: block; }
+.hist-talhao-header { background: linear-gradient(135deg,#1a5c2a,#2d8a3e); padding: 48px 20px 20px; }
+.hist-talhao-back { font-size: 22px; cursor: pointer; color: white; margin-bottom: 8px; display: inline-block; }
+.hist-talhao-nome { font-family: 'Playfair Display', serif; font-size: 26px; color: white; font-weight: 700; }
+.hist-talhao-info { font-size: 13px; color: rgba(255,255,255,0.75); margin-top: 4px; }
+.hist-analise-card { margin: 12px 16px; background: white; border-radius: 16px; border: 1.5px solid #e0ede0; overflow: hidden; }
+.hist-analise-header { display: flex; align-items: center; gap: 12px; padding: 12px 14px; }
+.hist-analise-foto { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+.hist-analise-data { font-size: 12px; color: #888; }
+.hist-analise-diags { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-top: 2px; }
+.hist-analise-status { padding: 8px 14px; border-top: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; }
+.btn-status-talhao { font-size: 12px; font-weight: 700; border: none; border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+.btn-status-pendente { background: #fff3e0; color: #e65100; }
+.btn-status-ok { background: #e8f5e9; color: #2e7d32; }
+
 canvas { display: none; }
 .aviso-servidor { margin: 0 20px 12px; background: #fff3e0; border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; font-size: 12px; color: #bf360c; font-weight: 500; }
 .modal-cad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 1000; align-items: flex-end; justify-content: center; }
@@ -289,6 +350,8 @@ canvas { display: none; }
 
 /* RESUMO DIAGNOSTICO */
 .resumo-diag-card { background: linear-gradient(135deg, #1a5c2a, #2d7a3a); border-radius: 18px; padding: 18px; margin-bottom: 10px; color: white; }
+.resumo-diag-secao { font-size: 13px; color: rgba(255,255,255,0.75); margin: 6px 0 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.resumo-diag-linha { font-size: 14px; color: white; padding: 3px 0; display: flex; align-items: center; gap: 6px; }
 .resumo-diag-titulo { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.75); margin-bottom: 8px; }
 .resumo-diag-texto { font-size: 15px; line-height: 1.6; color: white; font-weight: 500; }
 /* PLANO DE ACAO */
@@ -473,6 +536,63 @@ canvas { display: none; }
   </div>
 </div>
 
+
+<!-- ══ MODAL SELEÇÃO DE TALHÃO ══ -->
+<div class="modal-talhao-overlay" id="modalTalhaoOverlay">
+  <div class="modal-talhao-box">
+    <div class="modal-talhao-titulo">🌿 Qual Talhão?</div>
+    <div class="modal-talhao-sub">Selecione o talhão que será analisado</div>
+    <div id="listaTalhoesModal"></div>
+    <button class="btn-criar-talhao-modal" onclick="abrirCriarTalhao()">+ Criar Novo Talhão</button>
+  </div>
+</div>
+
+<!-- ══ MODAL CRIAR TALHÃO ══ -->
+<div class="modal-criar-talhao" id="modalCriarTalhao">
+  <div class="criar-talhao-box">
+    <div class="criar-talhao-titulo">🌱 Novo Talhão</div>
+    <label class="criar-talhao-label">Nome do Talhão *</label>
+    <input class="criar-talhao-input" id="ctNome" type="text" placeholder="Ex: Baixada, Talhão do Meio, Terreirão">
+    <label class="criar-talhao-label">Variedade</label>
+    <select class="criar-talhao-select" id="ctVariedade">
+      <option value="">Selecionar...</option>
+      <option>Catuaí Vermelho</option>
+      <option>Catuaí Amarelo</option>
+      <option>Mundo Novo</option>
+      <option>Arara</option>
+      <option>Bourbon Amarelo</option>
+      <option>Bourbon Vermelho</option>
+      <option>Topázio</option>
+      <option>Acauã</option>
+      <option>Catucaí</option>
+      <option>Paraíso MG</option>
+      <option>Outra</option>
+    </select>
+    <div class="criar-talhao-row">
+      <div>
+        <label class="criar-talhao-label">Idade (anos)</label>
+        <input class="criar-talhao-input" id="ctIdade" type="number" placeholder="Ex: 5" min="1" max="50">
+      </div>
+      <div>
+        <label class="criar-talhao-label">Área (ha)</label>
+        <input class="criar-talhao-input" id="ctArea" type="number" placeholder="Ex: 3.5" step="0.1">
+      </div>
+    </div>
+    <button class="btn-salvar-talhao" onclick="salvarNovoTalhao()">✅ Criar Talhão</button>
+    <button class="btn-cancelar-talhao" onclick="fecharCriarTalhao()">Cancelar</button>
+  </div>
+</div>
+
+<!-- ══ MODAL HISTÓRICO DO TALHÃO ══ -->
+<div class="modal-hist-talhao" id="modalHistTalhao">
+  <div class="hist-talhao-header">
+    <div class="hist-talhao-back" onclick="fecharHistTalhao()">← Voltar</div>
+    <div class="hist-talhao-nome" id="histTalhaoNome">Talhão</div>
+    <div class="hist-talhao-info" id="histTalhaoInfo"></div>
+  </div>
+  <div id="histTalhaoLista" style="padding-bottom:32px"></div>
+</div>
+
 <!-- MODAL PLANOS -->
 <div class="modal-overlay" id="modalPlanos">
   <div class="modal-planos">
@@ -521,7 +641,11 @@ canvas { display: none; }
       <ul class="plano-features"><li>Cooperativas e revendas</li><li>Multi-usu&#225;rio</li><li>Dashboard e relat&#243;rios</li><li>Contrato personalizado</li><li>R$300 a R$2.000/m&#234;s</li></ul>
       <button class="btn-assinar" onclick="contatoEmpresarial()" style="background:linear-gradient(135deg,#795548,#4e342e)">Falar com Gerente Comercial</button>
     </div>
-    <button class="btn-fechar-modal" onclick="fecharModal()">Continuar com plano gratuito</button>
+    <div class="continuar-gratis-box">
+  <div class="continuar-gratis-txt">&#127807; Plano Gratuito &mdash; <strong id="restantesModal">15</strong> an&aacute;lises restantes</div>
+  <button class="btn-continuar-gratis" onclick="fecharModal()">Continuar usando gr&aacute;tis &#8594;</button>
+  <p style="font-size:11px;color:#888;margin-top:8px">Sem cart&atilde;o de cr&eacute;dito</p>
+</div>
   </div>
 </div>
 
@@ -590,7 +714,15 @@ canvas { display: none; }
   <div class="card-calendario" id="cardCalendario"></div>
 
   <div class="secao-titulo" style="margin-top:4px" id="tituloSecaoHistorico">&#128203; Hist&#243;rico de An&#225;lises</div>
-  <div id="areaHistorico"></div>
+  
+<!-- ── SEÇÃO MEUS TALHÕES ── -->
+<div class="talhoes-section" id="secaoTalhoes">
+  <div class="talhoes-titulo">🗺️ Meus Talhões</div>
+  <div class="talhoes-grid" id="talhoesList"></div>
+  <button class="btn-novo-talhao" onclick="abrirCriarTalhaoSemFoto()">+ Cadastrar Novo Talhão</button>
+</div>
+
+<div id="areaHistorico"></div>
 
   <div class="secao-titulo" style="margin-top:4px">&#128172; Fale Conosco</div>
   <div class="dica" style="flex-direction:column;gap:10px">
@@ -844,7 +976,8 @@ function removerDaFila(id) {
     if (!db) return;
     var tx = db.transaction("fila", "readwrite");
     tx.objectStore("fila").delete(id);
-    tx.oncomplete = function() { renderAreaHistorico(); };
+    tx.oncomplete = function() { renderAreaHistorico();
+renderTalhoes(); };
   });
 }
 function limparFila() {
@@ -1123,11 +1256,17 @@ function processar(file, isVideo) {
         try {
           var ev = JSON.parse(linha.slice(6));
           if(ev.tipo==="diag") {
+            // Parcial: adiciona card imediatamente com nome+estagio
             diagsStream.push(ev.diag);
             document.getElementById("spinner").style.display="none";
             document.getElementById("resultado").style.display="block";
             mostrarResultadoStreaming(diagsStream, b64, isVideo);
-            document.getElementById("spinnerTexto").textContent="Buscando mais problemas...";
+            document.getElementById("resultado").scrollIntoView({behavior:"smooth",block:"start"});
+          } else if(ev.tipo==="diag_completo") {
+            // Completo: substituir o card parcial pelo card completo
+            if(ev.index < diagsStream.length) diagsStream[ev.index] = ev.diag;
+            else diagsStream.push(ev.diag);
+            mostrarResultadoStreaming(diagsStream, b64, isVideo);
           } else if(ev.tipo==="fim") {
             document.getElementById("spinner").style.display="none";
             var diags = (ev.resultado && ev.resultado.diagnosticos) || diagsStream;
@@ -1139,12 +1278,11 @@ function processar(file, isVideo) {
               fetch("https://doutor-cafe-production.up.railway.app/plano-acao",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bp)})
               .then(function(r2){return r2.json();})
               .then(function(plano){
-                var cardRes=document.querySelector(".card-resultado");
-                if(cardRes&&plano&&(plano.urgente||plano.resumo_geral)){
+                var container=document.getElementById("planoAcaoContainer");
+                if(container&&plano&&(plano.urgente||plano.resumo_geral)){
                   var ph=buildPlanoAcao(plano);
-                  var mh=cardRes.querySelector(".multi-header");
-                  if(mh&&ph){var dv=document.createElement("div");dv.innerHTML=ph;dv.style.animation="slideUp 0.4s ease";mh.parentNode.insertBefore(dv,mh.nextSibling);}
-                  var pv=[];if(plano.resumo_geral)pv.push("Sua planta tem: "+plano.resumo_geral);if(plano.urgente)pv.push("Faca essa semana: "+plano.urgente);_textoParaFalar=pv.concat([_textoParaFalar]).join(". ");
+                  if(ph){container.innerHTML=ph;container.style.animation="slideUp 0.5s ease";}
+                  var pv=[];if(plano.urgente)pv.push("Esta semana: "+plano.urgente);if(plano.em_21_dias)pv.push("Em 21 dias: "+plano.em_21_dias);_textoParaFalar=pv.concat([_textoParaFalar]).join(". ");
                 }
               }).catch(function(){});
             }
@@ -1205,6 +1343,11 @@ function mostrarResultadoStreaming(diags, fotoBase64, isVideo) {
   if (regiao) html += ' · 📍 ' + regiao;
   if (isVideo) html += ' · 🎥 Vídeo';
   html += '</p></div></div>';
+  // 1. RESUMO — o que a planta tem
+  html += buildResumo(diags);
+  // 2. PLANO DE AÇÃO — container fixo (haiku injeta aqui depois)
+  html += '<div id="planoAcaoContainer"></div>';
+  // 3. CARDS DETALHADOS de cada doença
   diags.forEach(function(d, diagIdx) {
     var diag = d.diagnostico||"saudavel", estagio = d.estagio||1, confianca = d.confianca||"media";
     var badgeTexto = confianca==="alta"?"✓ Alta":confianca==="media"?"~ Média":"! Baixa";
@@ -1213,8 +1356,12 @@ function mostrarResultadoStreaming(diags, fotoBase64, isVideo) {
     html+='<div class="diag-badges"><span class="badge badge-estagio">📊 Estágio '+estagio+'/5</span><span class="badge badge-confianca-'+confianca+'">'+badgeTexto+' confiança</span></div>';
     html+='<div class="diag-bar">'+barras+'</div>';
     if(d.visto) html+='<div class="diag-visto">"'+d.visto+'"</div>';
-    html+='<div class="diag-acao">'+(d.acao||"")+'</div>';
-    if(d.fungicidas&&d.fungicidas.length>0) html+=buildCalcFungicida(d.fungicidas,diagIdx);
+    if(d.parcial){
+      html+='<div class="diag-acao" style="color:#aaa;font-style:italic">&#9203; Carregando detalhes...</div>';
+    } else {
+      html+='<div class="diag-acao">'+(d.acao||"")+'</div>';
+      if(d.fungicidas&&d.fungicidas.length>0) html+=buildCalcFungicida(d.fungicidas,diagIdx);
+    }
     html+='</div>';
   });
   var textoVoz = diags.map(function(d){ return (NOMES_VOZ[d.diagnostico]||d.diagnostico)+". "+d.acao; }).join(". ");
@@ -1224,6 +1371,7 @@ function mostrarResultadoStreaming(diags, fotoBase64, isVideo) {
   html+='<button class="btn-nova" onclick="resetar()">📷 Nova</button></div></div>';
   div.innerHTML = html;
   salvarHistorico(diags, fotoBase64, regiao);
+  salvarAnaliseTalhao(diags, fotoBase64);
   setTimeout(function(){ if(deveAbrirCadastroAposAnalise()){abrirModalCadastro();}else if(!podeanalisarComCadastro()){abrirModal(true);} }, 2000);
 }
 
@@ -1282,6 +1430,36 @@ function mostrarResultadoDaninha(data){
 function mostrarErro(){var div=document.getElementById("resultado");div.style.display="block";div.innerHTML='<div class="card-resultado"><div class="acao-box"><p>⚠️ Erro ao analisar. Verifique sua conexão e tente novamente.</p></div><div class="btns-resultado"><button class="btn-nova" onclick="resetar()">📷 Tentar novamente</button></div></div>';}
 
 // ── PLANO DE AÇÃO ──
+function buildResumo(diags) {
+  if(!diags || diags.length === 0) return "";
+  var doencas = diags.filter(function(d){ return d.diagnostico !== "saudavel" && CATEGORIAS[d.diagnostico] !== "Deficiência Nutricional" && CATEGORIAS[d.diagnostico] !== "Deficiencia Nutricional"; });
+  var nutricao = diags.filter(function(d){ return CATEGORIAS[d.diagnostico] === "Deficiência Nutricional" || CATEGORIAS[d.diagnostico] === "Deficiencia Nutricional"; });
+  var saudavel = diags.length === 1 && diags[0].diagnostico === "saudavel";
+
+  var html = '<div class="resumo-diag-card">';
+  html += '<div class="resumo-diag-titulo">🔬 Diagnóstico do seu cafeeiro</div>';
+
+  if(saudavel) {
+    html += '<div class="resumo-diag-linha">✅ Nenhum problema detectado — planta saudável!</div>';
+  } else {
+    if(doencas.length > 0) {
+      html += '<div class="resumo-diag-secao">🦠 ' + doencas.length + ' doença(s) detectada(s):</div>';
+      doencas.forEach(function(d) {
+        var cor = d.estagio >= 4 ? "#e53935" : d.estagio >= 3 ? "#ef6c00" : "#f9a825";
+        html += '<div class="resumo-diag-linha"><span style="color:' + cor + '">' + (EMOJIS[d.diagnostico]||"🌿") + '</span> <strong>' + d.diagnostico.replace(/_/g," ") + '</strong> <span style="color:#aaa;font-size:12px">— Estágio ' + d.estagio + '/5</span>' + (d.parcial ? ' <span style="font-size:11px;color:#bbb">⏳</span>' : '') + '</div>';
+      });
+    }
+    if(nutricao.length > 0) {
+      html += '<div class="resumo-diag-secao" style="margin-top:8px">⚗️ ' + nutricao.length + ' deficiência(s) nutricional(is):</div>';
+      nutricao.forEach(function(d) {
+        html += '<div class="resumo-diag-linha">' + (EMOJIS[d.diagnostico]||"🔥") + ' <strong>' + d.diagnostico.replace(/_/g," ") + '</strong>' + (d.parcial ? ' <span style="font-size:11px;color:#bbb">⏳</span>' : '') + '</div>';
+      });
+    }
+  }
+  html += '</div>';
+  return html;
+}
+
 function buildPlanoAcao(plano){
   if(!plano)return "";
   var html='<div class="plano-acao-card"><div class="plano-acao-header"><div class="plano-acao-titulo">📋 O que sua planta precisa</div></div>';
@@ -1330,9 +1508,11 @@ function bindSoloGal(){var inp=criarInput("soloGal","image/*",null);inp.addEvent
 function bindDaninha(){var inp=criarInput("daninha","image/*","environment");inp.addEventListener("change",function(e){if(e.target.files[0])processarDaninha(e.target.files[0]);bindDaninha();});}
 function bindDaninhaGal(){var inp=criarInput("daninaGal","image/*",null);inp.addEventListener("change",function(e){if(e.target.files[0])processarDaninha(e.target.files[0]);bindDaninhaGal();});}
 
-document.getElementById("btnCam").addEventListener("click",function(){document.getElementById("cam").click();});
-document.getElementById("btnGal").addEventListener("click",function(){document.getElementById("gal").click();});
-document.getElementById("btnVid").addEventListener("click",function(){document.getElementById("vid").click();});
+// Botões de folha/vídeo passam pelo selecionarTalhao primeiro
+document.getElementById("btnCam").addEventListener("click",function(){ selecionarTalhao(function(){ document.getElementById("cam").click(); }); });
+document.getElementById("btnGal").addEventListener("click",function(){ selecionarTalhao(function(){ document.getElementById("gal").click(); }); });
+document.getElementById("btnVid").addEventListener("click",function(){ selecionarTalhao(function(){ document.getElementById("vid").click(); }); });
+// Solo e daninhas abrem direto (sem talhão obrigatório)
 document.getElementById("btnSolo").addEventListener("click",function(){document.getElementById("solo").click();});
 document.getElementById("btnSoloGal").addEventListener("click",function(){document.getElementById("soloGal").click();});
 document.getElementById("btnDaninha").addEventListener("click",function(){document.getElementById("daninha").click();});
@@ -1388,6 +1568,191 @@ function entrarNoApp(nome) {
 
 function verificarCadastroInicial() {
   try { return JSON.parse(localStorage.getItem(CADASTRO_INICIAL_KEY)); } catch(e){ return null; }
+}
+
+
+// ══ TALHÕES ══════════════════════════════════════════════
+var TALHOES_KEY = "dc_talhoes_v1";
+var talhaoAtual = null;   // talhão selecionado para próxima análise
+var acaoAposTalhao = null; // função a executar após selecionar talhão
+
+function getTalhoes() {
+  try { return JSON.parse(localStorage.getItem(TALHOES_KEY) || "[]"); } catch(e) { return []; }
+}
+function saveTalhoes(talhoes) {
+  localStorage.setItem(TALHOES_KEY, JSON.stringify(talhoes));
+}
+
+// Abrir modal de seleção ANTES de tirar foto
+function selecionarTalhao(acaoFn) {
+  acaoAposTalhao = acaoFn;
+  var talhoes = getTalhoes();
+  var lista = document.getElementById("listaTalhoesModal");
+  lista.innerHTML = "";
+  if(talhoes.length === 0) {
+    lista.innerHTML = '<div style="text-align:center;color:#aaa;padding:20px 0;font-size:14px">Nenhum talhão cadastrado ainda.<br>Crie o primeiro abaixo!</div>';
+  } else {
+    talhoes.forEach(function(t) {
+      var ultAnalise = t.analises && t.analises.length > 0 ? t.analises[t.analises.length-1] : null;
+      var statusPendente = ultAnalise && ultAnalise.statusAcao === "pendente";
+      var detalhe = [t.variedade, t.idade ? t.idade+"a" : "", t.area ? t.area+"ha" : ""].filter(Boolean).join(" · ");
+      var div = document.createElement("div");
+      div.className = "talhao-opcao";
+      div.innerHTML = '<div class="talhao-opcao-icone">🌿</div>' +
+        '<div style="flex:1"><div class="talhao-opcao-nome">' + t.nome + '</div>' +
+        '<div class="talhao-opcao-detalhe">' + (detalhe || "Sem detalhes") + '</div></div>' +
+        (statusPendente ? '<span style="font-size:11px;color:#e65100;font-weight:700">⚠️ Pendente</span>' : '<span style="font-size:11px;color:#2e7d32">✓</span>');
+      div.onclick = function() { confirmarTalhao(t); };
+      lista.appendChild(div);
+    });
+  }
+  document.getElementById("modalTalhaoOverlay").classList.add("ativo");
+}
+
+function confirmarTalhao(talhao) {
+  talhaoAtual = talhao;
+  document.getElementById("modalTalhaoOverlay").classList.remove("ativo");
+  if(acaoAposTalhao) { acaoAposTalhao(); acaoAposTalhao = null; }
+}
+
+function fecharModalTalhao() {
+  document.getElementById("modalTalhaoOverlay").classList.remove("ativo");
+  acaoAposTalhao = null;
+}
+
+// Criar novo talhão
+function abrirCriarTalhao() {
+  document.getElementById("modalTalhaoOverlay").classList.remove("ativo");
+  document.getElementById("ctNome").value = "";
+  document.getElementById("ctVariedade").value = "";
+  document.getElementById("ctIdade").value = "";
+  document.getElementById("ctArea").value = "";
+  document.getElementById("modalCriarTalhao").classList.add("ativo");
+}
+
+function abrirCriarTalhaoSemFoto() {
+  acaoAposTalhao = null;
+  document.getElementById("ctNome").value = "";
+  document.getElementById("ctVariedade").value = "";
+  document.getElementById("ctIdade").value = "";
+  document.getElementById("ctArea").value = "";
+  document.getElementById("modalCriarTalhao").classList.add("ativo");
+}
+
+function fecharCriarTalhao() {
+  document.getElementById("modalCriarTalhao").classList.remove("ativo");
+  if(acaoAposTalhao) { document.getElementById("modalTalhaoOverlay").classList.add("ativo"); }
+}
+
+function salvarNovoTalhao() {
+  var nome = document.getElementById("ctNome").value.trim();
+  if(!nome) { alert("Informe o nome do talhão."); return; }
+  var novo = {
+    id: "t_" + Date.now(),
+    nome: nome,
+    variedade: document.getElementById("ctVariedade").value,
+    idade: parseInt(document.getElementById("ctIdade").value) || null,
+    area: parseFloat(document.getElementById("ctArea").value) || null,
+    criadoEm: new Date().toISOString(),
+    analises: []
+  };
+  var talhoes = getTalhoes();
+  talhoes.push(novo);
+  saveTalhoes(talhoes);
+  document.getElementById("modalCriarTalhao").classList.remove("ativo");
+  renderTalhoes();
+  if(acaoAposTalhao) { confirmarTalhao(novo); }
+  else { alert('Talh\u00e3o ' + nome + ' criado!'); }
+}
+
+// Salvar análise no talhão
+function salvarAnaliseTalhao(diagnosticos, fotoBase64) {
+  if(!talhaoAtual) return;
+  var talhoes = getTalhoes();
+  var idx = talhoes.findIndex(function(t){ return t.id === talhaoAtual.id; });
+  if(idx === -1) return;
+  var analise = {
+    id: "a_" + Date.now(),
+    data: new Date().toISOString(),
+    foto: fotoBase64 ? fotoBase64.substring(0, 200) : null, // miniatura
+    fotoFull: fotoBase64,
+    diagnosticos: diagnosticos,
+    statusAcao: "pendente"
+  };
+  talhoes[idx].analises = talhoes[idx].analises || [];
+  talhoes[idx].analises.unshift(analise);
+  saveTalhoes(talhoes);
+  renderTalhoes();
+}
+
+// Renderizar seção Meus Talhões
+function renderTalhoes() {
+  var lista = document.getElementById("talhoesList");
+  if(!lista) return;
+  var talhoes = getTalhoes();
+  if(talhoes.length === 0) {
+    lista.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#aaa;font-size:13px;padding:16px 0">Nenhum talhão cadastrado ainda.</div>';
+    return;
+  }
+  lista.innerHTML = talhoes.map(function(t) {
+    var analises = t.analises || [];
+    var ult = analises[0];
+    var pendentes = analises.filter(function(a){ return a.statusAcao==="pendente"; }).length;
+    var ultimaData = ult ? new Date(ult.data).toLocaleDateString("pt-BR") : "Sem análises";
+    var ultDiags = ult && ult.diagnosticos ? ult.diagnosticos.slice(0,2).map(function(d){ return d.diagnostico; }).join(", ") : "";
+    var detalhe = [t.variedade, t.area ? t.area+"ha" : ""].filter(Boolean).join(" · ");
+    return '<div class="talhao-card' + (pendentes>0?" alerta":"") + '" onclick="abrirHistTalhao(\'' + t.id + '\')">' +
+      '<div class="talhao-nome">🌿 ' + t.nome + '</div>' +
+      '<div class="talhao-var">' + (detalhe||"Talhão") + '</div>' +
+      '<div class="talhao-ultima">📅 ' + ultimaData + '</div>' +
+      (ultDiags ? '<div style="font-size:11px;color:#888;margin-top:2px">' + ultDiags + '</div>' : '') +
+      '<span class="talhao-status ' + (pendentes>0?"pendente":"ok") + '">' + (pendentes>0?"⚠️ "+pendentes+" pendente(s)":"✓ Em dia") + '</span>' +
+      '</div>';
+  }).join("");
+}
+
+// Histórico do talhão
+function abrirHistTalhao(talhaoId) {
+  var talhoes = getTalhoes();
+  var t = talhoes.find(function(x){ return x.id===talhaoId; });
+  if(!t) return;
+  document.getElementById("histTalhaoNome").textContent = "🌿 " + t.nome;
+  var info = [t.variedade, t.idade?t.idade+" anos":"", t.area?t.area+" ha":""].filter(Boolean).join(" · ");
+  document.getElementById("histTalhaoInfo").textContent = info || "Talhão cadastrado";
+  var lista = document.getElementById("histTalhaoLista");
+  var analises = t.analises || [];
+  if(analises.length === 0) {
+    lista.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#aaa">Nenhuma análise registrada neste talhão ainda.</div>';
+  } else {
+    lista.innerHTML = analises.map(function(a, ai) {
+      var data = new Date(a.data).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"});
+      var diags = (a.diagnosticos||[]).map(function(d){ return (EMOJIS[d.diagnostico]||"🌿")+" "+d.diagnostico.replace(/_/g," "); }).join(", ");
+      var fotoHtml = a.fotoFull ? '<img class="hist-analise-foto" src="data:image/jpeg;base64,'+a.fotoFull+'">' : '<div class="hist-analise-foto" style="background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:22px">🌿</div>';
+      return '<div class="hist-analise-card">' +
+        '<div class="hist-analise-header">' + fotoHtml +
+        '<div><div class="hist-analise-data">📅 ' + data + '</div>' +
+        '<div class="hist-analise-diags">' + (diags||"Planta saudável") + '</div></div></div>' +
+        '<div class="hist-analise-status">' +
+        '<span style="font-size:12px;color:#555">Tratamento:</span>' +
+        '<button class="btn-status-talhao ' + (a.statusAcao==="pendente"?"btn-status-pendente":"btn-status-ok") + '" onclick="toggleStatusAnalise(\'' + t.id + '\',' + ai + ')">' +
+        (a.statusAcao==="pendente" ? "⚠️ Pendente — marcar como feito" : "✅ Concluído") + '</button></div></div>';
+    }).join("");
+  }
+  document.getElementById("modalHistTalhao").classList.add("ativo");
+}
+
+function fecharHistTalhao() {
+  document.getElementById("modalHistTalhao").classList.remove("ativo");
+}
+
+function toggleStatusAnalise(talhaoId, analiseIdx) {
+  var talhoes = getTalhoes();
+  var t = talhoes.find(function(x){ return x.id===talhaoId; });
+  if(!t || !t.analises[analiseIdx]) return;
+  t.analises[analiseIdx].statusAcao = t.analises[analiseIdx].statusAcao==="pendente" ? "concluido" : "pendente";
+  saveTalhoes(talhoes);
+  abrirHistTalhao(talhaoId);
+  renderTalhoes();
 }
 
 // ── KEEP-ALIVE ──
