@@ -527,6 +527,11 @@ canvas { display: none; }
     <button class="btn-cad-submit" onclick="submeterCadastroInicial()">
       ✅ Liberar Minhas 15 Análises
     </button>
+    <div style="text-align:center;margin-top:16px">
+      <button onclick="abrirLoginCpf()" style="background:none;border:none;color:#2d8a3e;font-size:14px;font-weight:600;cursor:pointer;text-decoration:underline">
+        Já tenho conta — Entrar com CPF
+      </button>
+    </div>
     <span class="cad-voltar" onclick="voltarParaLanding()">← Voltar</span>
   </div>
   <div class="cad-beneficios">
@@ -544,6 +549,9 @@ canvas { display: none; }
     <div class="modal-talhao-sub">Selecione o talhão que será analisado</div>
     <div id="listaTalhoesModal"></div>
     <button class="btn-criar-talhao-modal" onclick="abrirCriarTalhao()">+ Criar Novo Talhão</button>
+    <button onclick="continuarSemTalhao()" style="width:100%;padding:12px;background:none;border:none;color:#888;font-size:14px;cursor:pointer;margin-top:4px">
+      Continuar sem talhão →
+    </button>
   </div>
 </div>
 
@@ -593,6 +601,34 @@ canvas { display: none; }
   <div id="histTalhaoLista" style="padding-bottom:32px"></div>
 </div>
 
+
+<!-- ══ MODAL LOGIN CPF ══ -->
+<div class="modal-talhao-overlay" id="modalLoginCpf">
+  <div class="modal-talhao-box">
+    <div class="modal-talhao-titulo">🔐 Entrar com CPF</div>
+    <div class="modal-talhao-sub">Digite seu CPF para recuperar sua conta</div>
+    <div class="cad-field" style="margin-top:16px">
+      <label style="font-size:12px;font-weight:700;color:#555;text-transform:uppercase">Celular *</label>
+      <input type="tel" id="loginCelularInput" placeholder="(00) 00000-0000" maxlength="15"
+        oninput="mascararCelular(this)"
+        style="width:100%;padding:14px;border:1.5px solid #ddd;border-radius:12px;font-size:16px;box-sizing:border-box;margin-top:6px">
+    </div>
+    <div class="cad-field" style="margin-top:12px">
+      <label style="font-size:12px;font-weight:700;color:#555;text-transform:uppercase">PIN de 4 dígitos *</label>
+      <input type="tel" id="loginPinInput" placeholder="••••" maxlength="4"
+        oninput="this.value=this.value.replace(/[^0-9]/g,'').substr(0,4)"
+        onkeydown="if(event.key==='Enter')confirmarLoginPin()"
+        style="width:100%;padding:14px;border:1.5px solid #ddd;border-radius:12px;font-size:28px;font-weight:700;text-align:center;letter-spacing:10px;box-sizing:border-box;margin-top:6px">
+    </div>
+    <div id="loginCpfErro" style="color:#e53935;font-size:13px;text-align:center;min-height:20px;margin-bottom:8px"></div>
+    <button onclick="confirmarLoginPin()" style="width:100%;padding:14px;background:linear-gradient(135deg,#2d8a3e,#1a5c2a);color:white;border:none;border-radius:16px;font-size:15px;font-weight:700;cursor:pointer">
+      ✅ Entrar na minha conta
+    </button>
+    <button onclick="fecharLoginCpf()" style="width:100%;padding:12px;background:none;border:none;color:#888;font-size:14px;cursor:pointer;margin-top:8px">
+      Cancelar
+    </button>
+  </div>
+</div>
 <!-- MODAL PLANOS -->
 <div class="modal-overlay" id="modalPlanos">
   <div class="modal-planos">
@@ -918,7 +954,7 @@ function confirmarCadastro() {
   fetch('https://doutor-cafe-production.up.railway.app/cadastrar-usuario', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ userId: obterUserId(), nome: nome, celular: celular, regiao: regiao, email: email })
+    body: JSON.stringify({ userId: obterUserId(), nome: nome, celular: celular, regiao: regiao, email: email, cpf: cpf, pin: pin })
   })
   .then(function(r) { return r.json(); })
   .then(function(d) {
@@ -1541,9 +1577,11 @@ function submeterCadastroInicial() {
   var cpfRaw  = (document.getElementById('cadIniCpf')||{value:''}).value.replace(/[^0-9]/g,'');
   var celRaw  = (document.getElementById('cadIniCelular')||{value:''}).value.replace(/[^0-9]/g,'');
   var email   = (document.getElementById('cadIniEmail')||{value:''}).value.trim();
+  var pin = (document.getElementById('cadIniPin')||{value:''}).value.replace(/[^0-9]/g,'');
   if (!nome)           { alert('Informe seu nome completo.'); return; }
-  if (cpfRaw.length!==11){ alert('CPF invalido. Digite os 11 digitos.'); return; }
-  if (celRaw.length<10)  { alert('Celular invalido.'); return; }
+  if (cpfRaw.length!==11){ alert('CPF inválido. Digite os 11 dígitos.'); return; }
+  if (celRaw.length<10)  { alert('Celular inválido.'); return; }
+  if (pin.length!==4)    { alert('Crie um PIN de 4 dígitos para acessar sua conta.'); return; }
   var btn = document.querySelector('#tela-cadastro-inicial .btn-cad-submit');
   if (btn) { btn.textContent='Registrando...'; btn.disabled=true; }
   var dados = { nome:nome, cpf:cpfRaw, celular:celRaw, email:email||'', origem:'cadastro_inicial', userId:obterUserId() };
@@ -1607,6 +1645,12 @@ function selecionarTalhao(acaoFn) {
     });
   }
   document.getElementById("modalTalhaoOverlay").classList.add("ativo");
+}
+
+function continuarSemTalhao() {
+  talhaoAtual = null;
+  document.getElementById("modalTalhaoOverlay").classList.remove("ativo");
+  if(acaoAposTalhao) { acaoAposTalhao(); acaoAposTalhao = null; }
 }
 
 function confirmarTalhao(talhao) {
@@ -1753,6 +1797,50 @@ function toggleStatusAnalise(talhaoId, analiseIdx) {
   saveTalhoes(talhoes);
   abrirHistTalhao(talhaoId);
   renderTalhoes();
+}
+
+
+// ── LOGIN POR CPF ──────────────────────────────────────
+function abrirLoginCpf() {
+  if(document.getElementById("loginCelularInput")) document.getElementById("loginCelularInput").value = "";
+  if(document.getElementById("loginPinInput")) document.getElementById("loginPinInput").value = "";
+  document.getElementById("loginCpfErro").textContent = "";
+  document.getElementById("modalLoginCpf").classList.add("ativo");
+  setTimeout(function(){ document.getElementById("loginCpfInput").focus(); }, 300);
+}
+function fecharLoginCpf() {
+  document.getElementById("modalLoginCpf").classList.remove("ativo");
+}
+function confirmarLoginPin() {
+  var celular = (document.getElementById("loginCelularInput").value||"").replace(/[^0-9]/g,"");
+  var pin = (document.getElementById("loginPinInput").value||"").replace(/[^0-9]/g,"");
+  var erroEl = document.getElementById("loginCpfErro");
+  if(celular.length < 10) { erroEl.textContent = "Informe seu celular."; return; }
+  if(pin.length !== 4) { erroEl.textContent = "PIN deve ter 4 dígitos."; return; }
+  erroEl.textContent = "🔄 Verificando...";
+
+  fetch("https://doutor-cafe-production.up.railway.app/entrar", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ celular: celular, pin: pin })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if(!d.ok) { erroEl.textContent = d.erro || "CPF não encontrado."; return; }
+    // Salvar dados no localStorage e entrar no app
+    var cadastro = {
+      userId: d.userId, nome: d.nome, celular: d.celular,
+      email: d.email, regiao: d.regiao, cpf: cpf
+    };
+    localStorage.setItem(CADASTRO_INICIAL_KEY, JSON.stringify(cadastro));
+    // Restaurar plano
+    if(d.plano && d.plano !== "gratuito") {
+      salvarPlano({ tipo: d.plano, planoId: d.planoId });
+    }
+    document.getElementById("modalLoginCpf").classList.remove("ativo");
+    entrarNoApp(d.nome);
+  })
+  .catch(function(){ erroEl.textContent = "Erro de conexão. Verifique sua internet."; });
 }
 
 // ── KEEP-ALIVE ──
