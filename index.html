@@ -485,10 +485,10 @@ canvas { display: none; }
     </div>
     <div class="plano-card">
       <div class="plano-nome">&#127807; Plano B&#225;sico</div>
-      <div class="plano-preco"><span class="plano-valor" id="precoBasico">R$32,90</span><span class="plano-periodo">/m&#234;s</span></div>
+      <div class="plano-preco"><span class="plano-valor" id="precoBasico">R$29,90</span><span class="plano-periodo">/m&#234;s</span></div>
       <div class="plano-anual-desc" id="descBasico" style="display:none">R$299,90/ano &#8212; equivale a 2 meses gr&#225;tis!</div>
       <ul class="plano-features">
-        <li>120 an&#225;lises por m&#234;s</li><li>Diagn&#243;stico de doen&#231;as e pragas</li><li>Calculadora de fungicida</li><li>An&#225;lise de solo</li><li>Plantas daninhas</li><li>Suporte via WhatsApp</li>
+        <li>150 an&#225;lises por m&#234;s</li><li>Diagn&#243;stico de doen&#231;as e pragas</li><li>Calculadora de fungicida</li><li>An&#225;lise de solo</li><li>Plantas daninhas</li><li>Suporte via WhatsApp</li>
       </ul>
       <button class="btn-assinar" onclick="assinar('basico')">&#128179; Assinar com Cart&#227;o</button>
       <button class="btn-pix-plano" onclick="abrirPix('basico')">&#9889; Pagar via PIX</button>
@@ -496,13 +496,24 @@ canvas { display: none; }
     <div class="plano-card destaque">
       <div class="plano-badge">&#11088; Mais Popular</div>
       <div class="plano-nome">&#128640; Plano Pro</div>
-      <div class="plano-preco"><span class="plano-valor" id="precoPro">R$49,90</span><span class="plano-periodo">/m&#234;s</span></div>
+      <div class="plano-preco"><span class="plano-valor" id="precoPro">R$39,90</span><span class="plano-periodo">/m&#234;s</span></div>
       <div class="plano-anual-desc" id="descPro" style="display:none">R$499,90/ano &#8212; equivale a 2 meses gr&#225;tis!</div>
       <ul class="plano-features">
         <li>300 an&#225;lises por m&#234;s</li><li>Tudo do B&#225;sico</li><li>Hist&#243;rico completo</li><li>Atendimento priorit&#225;rio</li><li>Acesso a novos recursos primeiro</li>
       </ul>
       <button class="btn-assinar" onclick="assinar('pro')">&#128179; Assinar com Cart&#227;o</button>
       <button class="btn-pix-plano" onclick="abrirPix('pro')">&#9889; Pagar via PIX</button>
+    </div>
+    <div class="plano-card">
+      <div class="plano-badge" style="background:linear-gradient(135deg,#b8860b,#daa520)">&#128081; Premium</div>
+      <div class="plano-nome">&#128081; Plano Premium</div>
+      <div class="plano-preco"><span class="plano-valor" id="precoPremium">R$49,90</span><span class="plano-periodo">/m&#234;s</span></div>
+      <div class="plano-anual-desc" id="descPremium" style="display:none">R$499,90/ano &#8212; equivale a 2 meses gr&#225;tis!</div>
+      <ul class="plano-features">
+        <li>450 an&#225;lises por m&#234;s</li><li>Tudo do Pro</li><li>Prioridade m&#225;xima no suporte</li><li>Relat&#243;rio mensal da lavoura</li><li>Acesso antecipado a novidades</li>
+      </ul>
+      <button class="btn-assinar" onclick="assinar('premium')">&#128179; Assinar com Cart&#227;o</button>
+      <button class="btn-pix-plano" onclick="abrirPix('premium')">&#9889; Pagar via PIX</button>
     </div>
     <div class="plano-card">
       <div class="plano-nome">&#127970; Empresarial</div>
@@ -644,19 +655,22 @@ canvas { display: none; }
 <script>
 // ── PLANOS E PAGAMENTO ──
 var PLANO_KEY="doutorcafe_plano",ANALISES_KEY="doutorcafe_analises",LIMITE_GRATIS=15,cicloAtual="mensal";
+var LIMITE_BASICO=150,LIMITE_PRO=300,LIMITE_PREMIUM=450;
 
 function getPlano(){try{return JSON.parse(localStorage.getItem(PLANO_KEY))||{tipo:"gratuito"};}catch(e){return{tipo:"gratuito"};}}
 function salvarPlano(p){try{localStorage.setItem(PLANO_KEY,JSON.stringify(p));}catch(e){}}
 function getAnalisesUsadas(){return parseInt(localStorage.getItem(ANALISES_KEY)||"0");}
 function incrementarAnalise(){var u=getAnalisesUsadas()+1;localStorage.setItem(ANALISES_KEY,u.toString());atualizarContador();return u;}
-function podeanalisar(){var p=getPlano();if(p.tipo!=="gratuito")return true;return getAnalisesUsadas()<LIMITE_GRATIS;}
+function podeanalisar(){var p=getPlano();if(p.tipo==="pro")return getAnalisesUsadas()%(LIMITE_PRO+1)<LIMITE_PRO;if(p.tipo==="premium")return getAnalisesUsadas()%(LIMITE_PREMIUM+1)<LIMITE_PREMIUM;if(p.tipo==="basico")return getAnalisesUsadas()%(LIMITE_BASICO+1)<LIMITE_BASICO;return getAnalisesUsadas()<LIMITE_GRATIS;}
 
 function atualizarContador(){
   var p=getPlano(),usado=getAnalisesUsadas(),txt=document.getElementById("contadorTxt"),fill=document.getElementById("contadorFill");
   if(!txt||!fill)return;
   var cad = getCadastro();
   if(p.tipo==="pro"){txt.textContent="Plano Pro — 300 análises/mês";fill.style.width="100%";fill.className="contador-fill";}
-  else if(p.tipo==="basico"){var r=120-(usado%120);txt.textContent=r+" análises restantes";fill.style.width=(r/120*100)+"%";fill.className="contador-fill";}
+  else if(p.tipo==="premium"){var r=LIMITE_PREMIUM-(usado%LIMITE_PREMIUM);txt.textContent=r+" análises restantes (Premium)";fill.style.width=(r/LIMITE_PREMIUM*100)+"%";fill.className="contador-fill";}
+  else if(p.tipo==="pro"){var r=LIMITE_PRO-(usado%LIMITE_PRO);txt.textContent=r+" análises restantes (Pro)";fill.style.width=(r/LIMITE_PRO*100)+"%";fill.className="contador-fill";}
+  else if(p.tipo==="basico"){var r=LIMITE_BASICO-(usado%LIMITE_BASICO);txt.textContent=r+" análises restantes (Básico)";fill.style.width=(r/LIMITE_BASICO*100)+"%";fill.className="contador-fill";}
   else if(cad){
     var r=Math.max(0,TOTAL_GRATIS_COM_CAD-usado);
     txt.textContent=r+" análises grátis restantes";
@@ -669,13 +683,15 @@ function atualizarContador(){
 
 function abrirModal(esgotado){document.getElementById("modalPlanos").classList.add("ativo");document.getElementById("modalEsgotado").style.display=esgotado?"block":"none";document.getElementById("modalSubtitulo").textContent=esgotado?"Continue diagnosticando sua lavoura sem limites":"Escolha o plano ideal para sua lavoura";}
 function fecharModal(){document.getElementById("modalPlanos").classList.remove("ativo");}
-function setCiclo(c){cicloAtual=c;document.getElementById("btnMensal").className="toggle-btn"+(c==="mensal"?" ativo":"");document.getElementById("btnAnual").className="toggle-btn"+(c==="anual"?" ativo":"");document.getElementById("precoBasico").textContent=c==="mensal"?"R$32,90":"R$24,92";document.getElementById("precoPro").textContent=c==="mensal"?"R$49,90":"R$41,66";document.getElementById("descBasico").style.display=c==="anual"?"block":"none";document.getElementById("descPro").style.display=c==="anual"?"block":"none";}
+function setCiclo(c){cicloAtual=c;document.getElementById("btnMensal").className="toggle-btn"+(c==="mensal"?" ativo":"");document.getElementById("btnAnual").className="toggle-btn"+(c==="anual"?" ativo":"");document.getElementById("precoBasico").textContent=c==="mensal"?"R$29,90":"R$24,92";document.getElementById("precoPro").textContent=c==="mensal"?"R$39,90":"R$33,25";var pp=document.getElementById("precoPremium");if(pp)pp.textContent=c==="mensal"?"R$49,90":"R$41,58";document.getElementById("descBasico").style.display=c==="anual"?"block":"none";document.getElementById("descPro").style.display=c==="anual"?"block":"none";var dp=document.getElementById("descPremium");if(dp)dp.style.display=c==="anual"?"block":"none";}
 function assinar(tipo){
   var links={
     basico_mensal:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=3bdcbffc028a4d259f32fe37a96ae224",
     basico_anual:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=bd08a04de79f4213886611769b6c9486",
     pro_mensal:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=106181c5ed584a65af06403bd1af0608",
-    pro_anual:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=661a046d15c9415a9508970d2f45c819"
+    pro_anual:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=661a046d15c9415a9508970d2f45c819",
+    premium_mensal:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=5bcfb2b27c6241b8a433b3ec0fb2a5c7",
+    premium_anual:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=346f4589aca84ba3b4e76351563fdbe1"
   };
   var url=links[tipo+"_"+cicloAtual];
   if(url)window.open(url,"_blank");
@@ -1395,7 +1411,7 @@ function acordarServidor(callback) {
 // ── PIX / USER ID ──
 var planoPixAtual = '', pixPaymentId = null, pixCheckInterval = null;
 function obterUserId(){var u=localStorage.getItem('doutorcafe_uid');if(!u){u='user_'+Date.now()+'_'+Math.random().toString(36).substr(2,9);localStorage.setItem('doutorcafe_uid',u);}return u;}
-function abrirPix(tipo){planoPixAtual=tipo;fecharModal();document.getElementById('modalPix').classList.add('ativo');var nomes={basico_mensal:'Básico Mensal - R$ 32,90/mês',basico_anual:'Básico Anual - R$ 299,90/ano',pro_mensal:'Pro Mensal - R$ 49,90/mês',pro_anual:'Pro Anual - R$ 499,90/ano'};document.getElementById('pixSubtitulo').textContent='Plano '+(nomes[tipo+'_'+cicloAtual]||tipo);document.getElementById('pixArea').innerHTML='<label class="pix-form-label">Nome completo *</label><input class="pix-form-input" id="pixNome" type="text" placeholder="Ex: João da Silva"><label class="pix-form-label">CPF *</label><input class="pix-form-input" id="pixCpf" type="tel" placeholder="000.000.000-00" maxlength="14" oninput="mascararCpf(this)"><label class="pix-form-label">Email (opcional)</label><input class="pix-form-input" id="pixEmail" type="email" placeholder="seuemail@gmail.com"><button onclick="confirmarPix()" style="width:100%;padding:14px;background:linear-gradient(135deg,#2d8a3e,#1a5c2a);color:white;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px">Gerar QR Code PIX</button>';}
+function abrirPix(tipo){planoPixAtual=tipo;fecharModal();document.getElementById('modalPix').classList.add('ativo');var nomes={basico_mensal:'Básico Mensal - R$ 29,90/mês',basico_anual:'Básico Anual - R$ 299,90/ano',pro_mensal:'Pro Mensal - R$ 39,90/mês',pro_anual:'Pro Anual - R$ 399,90/ano',premium_mensal:'Premium Mensal - R$ 49,90/mês',premium_anual:'Premium Anual - R$ 499,90/ano'};document.getElementById('pixSubtitulo').textContent='Plano '+(nomes[tipo+'_'+cicloAtual]||tipo);document.getElementById('pixArea').innerHTML='<label class="pix-form-label">Nome completo *</label><input class="pix-form-input" id="pixNome" type="text" placeholder="Ex: João da Silva"><label class="pix-form-label">CPF *</label><input class="pix-form-input" id="pixCpf" type="tel" placeholder="000.000.000-00" maxlength="14" oninput="mascararCpf(this)"><label class="pix-form-label">Email (opcional)</label><input class="pix-form-input" id="pixEmail" type="email" placeholder="seuemail@gmail.com"><button onclick="confirmarPix()" style="width:100%;padding:14px;background:linear-gradient(135deg,#2d8a3e,#1a5c2a);color:white;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px">Gerar QR Code PIX</button>';}
 function mascararCpf(input){var v=input.value.replace(/[^0-9]/g,'');if(v.length>3)v=v.slice(0,3)+'.'+v.slice(3);if(v.length>7)v=v.slice(0,7)+'.'+v.slice(7);if(v.length>11)v=v.slice(0,11)+'-'+v.slice(11,13);input.value=v;}
 function confirmarPix(){var nome=document.getElementById('pixNome').value.trim(),cpf=document.getElementById('pixCpf').value.replace(/[^0-9]/g,''),email=document.getElementById('pixEmail').value.trim()||'produtor@doutorcafe.app';if(!nome){alert('Informe seu nome completo.');return;}if(cpf.length!==11){alert('CPF inválido.');return;}document.getElementById('pixArea').innerHTML='<div class="pix-loading"><div class="pix-spinner"></div> Gerando QR Code...</div>';fetch('https://doutor-cafe-production.up.railway.app/gerar-pix',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plano:planoPixAtual+'_'+cicloAtual,userId:obterUserId(),nome:nome,cpf:cpf,email:email})}).then(function(r){return r.json();}).then(function(d){if(d.qr_code_base64){pixPaymentId=d.id;document.getElementById('pixArea').innerHTML='<div class="pix-qr-img"><img src="data:image/png;base64,'+d.qr_code_base64+'" alt="QR PIX"></div><div class="pix-codigo-box"><div class="pix-codigo-label">Código PIX:</div><div class="pix-codigo-txt" id="pixCodigoTxt">'+d.qr_code+'</div></div><div class="pix-status pix-status-aguardando" id="pixStatusTxt">Aguardando pagamento...</div><button class="btn-copiar-pix" onclick="copiarCodigoPix()">Copiar código PIX</button>';iniciarVerificacaoPix();}else{document.getElementById('pixArea').innerHTML='<div class="pix-status pix-status-erro">Erro: '+(d.erro||'Tente novamente.')+'</div>';}}).catch(function(){document.getElementById('pixArea').innerHTML='<div class="pix-status pix-status-erro">Erro de conexão.</div>';});}
 function iniciarVerificacaoPix(){if(pixCheckInterval)clearInterval(pixCheckInterval);var t=0;pixCheckInterval=setInterval(function(){t++;if(t>72){clearInterval(pixCheckInterval);return;}if(!pixPaymentId)return;fetch('https://doutor-cafe-production.up.railway.app/verificar-pix/'+pixPaymentId).then(function(r){return r.json();}).then(function(d){if(d.aprovado){clearInterval(pixCheckInterval);var tipo=d.plano_id&&d.plano_id.indexOf('pro')>-1?'pro':'basico';salvarPlano({tipo:tipo,planoId:d.plano_id,dataAssinatura:new Date().toISOString()});localStorage.setItem(ANALISES_KEY,'0');atualizarContador();document.getElementById('pixArea').innerHTML='<div class="pix-status pix-status-aprovado">✅ Pagamento aprovado! Plano liberado!</div>';setTimeout(function(){fecharPix();},3000);}}).catch(function(){});},5000);}
