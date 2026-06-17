@@ -1256,7 +1256,7 @@ function falar(texto) {
   window.speechSynthesis.cancel();
   function executarFala(vozes) {
     var msg = new SpeechSynthesisUtterance(texto);
-    msg.lang = "pt-BR"; msg.rate = 0.85; msg.pitch = 1.0;
+    msg.lang = "pt-BR"; msg.rate = 0.90; msg.pitch = 1.0;
     var melhor = vozes.find(function(v){ return v.name.indexOf("Google") > -1 && v.lang === "pt-BR"; });
     if (!melhor) melhor = vozes.find(function(v){ return v.name.indexOf("Francisca") > -1; });
     if (!melhor) melhor = vozes.find(function(v){ return v.name.indexOf("Luciana") > -1; });
