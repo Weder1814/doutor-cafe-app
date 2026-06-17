@@ -1305,7 +1305,11 @@ function processar(file, isVideo) {
             mostrarResultadoStreaming(diagsStream, b64, isVideo);
           } else if(ev.tipo==="fim") {
             document.getElementById("spinner").style.display="none";
-            var diags = (ev.resultado && ev.resultado.diagnosticos) || diagsStream;
+            var diagsFim = (ev.resultado && ev.resultado.diagnosticos) || [];
+            // Se o fim traz só o fallback "saudável baixa confiança" mas já temos
+            // diagnósticos reais do streaming, manter os do streaming
+            var isFallback = diagsFim.length===1 && diagsFim[0].diagnostico==="saudavel" && diagsFim[0].confianca==="baixa";
+            var diags = (isFallback && diagsStream.length > 0) ? diagsStream : (diagsFim.length > 0 ? diagsFim : diagsStream);
             mostrarResultadoStreaming(diags, b64, isVideo);
             incrementarAnalise();
             var todosSaudaveis = diags.every(function(d){ return d.diagnostico==="saudavel"; });
