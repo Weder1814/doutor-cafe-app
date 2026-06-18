@@ -1262,45 +1262,64 @@ function processar(file, isVideo) {
     var body={imagem:b64,tipo:file.type};
     if (dadosGPS.regiao) body.regiao=dadosGPS.regiao;
     if (dadosGPS.altitude) body.altitude=dadosGPS.altitude;
-    // Análise simples e confiável — JSON direto
-    fetchComTimeout("https://doutor-cafe-production.up.railway.app/diagnostico",{
-      method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)
-    }, TIMEOUT_MS)
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      document.getElementById("spinner").style.display="none";
-      var diags = data.diagnosticos || [];
-      mostrarResultadoStreaming(diags, b64, isVideo);
-      incrementarAnalise();
-      // Plano de ação separado via haiku
-      var todosSaudaveis = diags.every(function(d){ return d.diagnostico==="saudavel"; });
-      if(diags.length > 0 && !todosSaudaveis){
-        var bp={diagnosticos:diags}; if(dadosGPS.regiao) bp.regiao=dadosGPS.regiao;
-        fetch("https://doutor-cafe-production.up.railway.app/plano-acao",{
-          method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bp)
-        }).then(function(r2){return r2.json();})
-        .then(function(plano){
-          var ct=document.getElementById("planoAcaoContainer");
-          if(ct&&plano&&(plano.urgente||plano.resumo_geral)){
-            var ph=buildPlanoAcao(plano);
-            if(ph){ct.innerHTML=ph;ct.style.animation="slideUp 0.4s ease";}
-            var pv=[];
-            if(plano.urgente) pv.push("Esta semana: "+plano.urgente);
-            if(plano.em_21_dias) pv.push("Em 21 dias: "+plano.em_21_dias);
-            _textoParaFalar=pv.concat([_textoParaFalar]).join(". ");
-          }
+    // STREAMING SSE — mantém conexão viva, resultados progressivos
+    var diagsSSE = [];
+    fetch("https://doutor-cafe-production.up.railway.app/diagnostico",{
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(body)
+    })
+    .then(function(r){
+      var reader=r.body.getReader(), dec=new TextDecoder(), sseBuf="";
+      function ler(){
+        reader.read().then(function(res2){
+          if(res2.done) return;
+          sseBuf+=dec.decode(res2.value,{stream:true});
+          var lns=sseBuf.split("\n"); sseBuf=lns.pop();
+          lns.forEach(function(linha){
+            if(linha.startsWith(":")) return;
+            if(!linha.startsWith("data: ")) return;
+            try {
+              var ev=JSON.parse(linha.slice(6));
+              if(ev.tipo==="diag"){
+                diagsSSE.push(ev.diag);
+                document.getElementById("spinner").style.display="none";
+                mostrarResultadoStreaming(diagsSSE,b64,isVideo);
+              } else if(ev.tipo==="diag_completo"){
+                if(ev.index<diagsSSE.length) diagsSSE[ev.index]=ev.diag; else diagsSSE.push(ev.diag);
+                mostrarResultadoStreaming(diagsSSE,b64,isVideo);
+              } else if(ev.tipo==="fim"){
+                document.getElementById("spinner").style.display="none";
+                var dF=(ev.resultado&&ev.resultado.diagnosticos)||[];
+                var fb=dF.length===1&&dF[0].diagnostico==="saudavel"&&dF[0].confianca==="baixa";
+                var diags=fb&&diagsSSE.length>0?diagsSSE:dF.length>0?dF:diagsSSE;
+                mostrarResultadoStreaming(diags,b64,isVideo);
+                incrementarAnalise();
+                var ok=diags.every(function(d){return d.diagnostico==="saudavel";});
+                if(diags.length>0&&!ok){
+                  var bp={diagnosticos:diags}; if(dadosGPS.regiao) bp.regiao=dadosGPS.regiao;
+                  fetch("https://doutor-cafe-production.up.railway.app/plano-acao",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bp)})
+                  .then(function(r2){return r2.json();})
+                  .then(function(plano){
+                    var ct=document.getElementById("planoAcaoContainer");
+                    if(ct&&plano&&(plano.urgente||plano.resumo_geral)){
+                      var ph=buildPlanoAcao(plano);
+                      if(ph){ct.innerHTML=ph;ct.style.animation="slideUp 0.4s ease";}
+                      var pv=[];if(plano.urgente)pv.push("Esta semana: "+plano.urgente);
+                      _textoParaFalar=pv.concat([_textoParaFalar]).join(". ");
+                    }
+                  }).catch(function(){});
+                }
+              }
+            } catch(e){}
+          });
+          ler();
         }).catch(function(){});
       }
+      ler();
     })
-    .catch(function(err){
+    .catch(function(){
       document.getElementById("spinner").style.display="none";
-      adicionarNaFila(b64,null,function(ok){
-        if(ok){
-          renderAreaHistorico();
-          document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});
-          alert("Sem internet. Foto salva na fila para envio automático!");
-        }
-      });
+      adicionarNaFila(b64,null,function(ok){ if(ok){renderAreaHistorico();alert("Sem conexão. Foto salva na fila!");} });
     });
   };
   reader.readAsDataURL(file);
