@@ -1257,11 +1257,8 @@ function processar(file, isVideo) {
   var reader=new FileReader();
   reader.onload=function(e) {
     var b64=e.target.result.split(",")[1]; ultimaFotoBase64=b64;
-    if (!navigator.onLine) {
-      document.getElementById("spinner").style.display="none";
-      adicionarNaFila(b64,null,function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});}});
-      return;
-    }
+    // navigator.onLine removido — retorna false incorretamente no iOS com WiFi
+    // Se não tiver internet, o fetch falha no .catch() e salva na fila
     var body={imagem:b64,tipo:file.type};
     if (dadosGPS.regiao) body.regiao=dadosGPS.regiao;
     if (dadosGPS.altitude) body.altitude=dadosGPS.altitude;
