@@ -1276,11 +1276,31 @@ function processar(file, isVideo) {
     })
     .then(function(r){
       clearTimeout(streamTimeout);
+      // Verificar se SSE/ReadableStream é suportado (alguns iOS mais antigos não suportam)
+      if (!r.body || !r.body.getReader) {
+        // Fallback: ler como JSON normal
+        return r.json().then(function(data){
+          document.getElementById("spinner").style.display="none";
+          mostrarResultadoStreaming(data.diagnosticos||[], b64, isVideo);
+          incrementarAnalise();
+          var diags = data.diagnosticos||[];
+          var todosSaudaveis = diags.every(function(d){ return d.diagnostico==="saudavel"; });
+          if(diags.length > 0 && !todosSaudaveis) {
+            var bp={diagnosticos:diags}; if(dadosGPS.regiao) bp.regiao=dadosGPS.regiao;
+            fetch("https://doutor-cafe-production.up.railway.app/plano-acao",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bp)})
+            .then(function(r2){return r2.json();}).then(function(plano){
+              var ct=document.getElementById("planoAcaoContainer");
+              if(ct&&plano&&(plano.urgente||plano.resumo_geral)){var ph=buildPlanoAcao(plano);if(ph){ct.innerHTML=ph;}}
+            }).catch(function(){});
+          }
+        });
+      }
       var reader2 = r.body.getReader();
       var dec = new TextDecoder();
       var sseBuf2 = "";
 
       function processSSE(linha) {
+        if(linha.startsWith(":")) return; // ignorar comentários keep-alive
         if(!linha.startsWith("data: ")) return;
         try {
           var ev = JSON.parse(linha.slice(6));
@@ -1329,9 +1349,27 @@ function processar(file, isVideo) {
           sseBuf2+=dec.decode(res2.value,{stream:true});
           var lns=sseBuf2.split("\n"); sseBuf2=lns.pop();
           lns.forEach(processSSE); lerStream();
-        }).catch(function(){});
+        }).catch(function(err){
+          // Se streaming falhou mas já temos diagnósticos parciais, manter
+          if(diagsStream.length > 0) {
+            mostrarResultadoStreaming(diagsStream, b64, isVideo);
+            incrementarAnalise();
+          }
+        });
       }
-      lerStream();
+      try { lerStream(); } catch(e) {
+        // ReadableStream falhou — tentar fallback JSON
+        fetch("https://doutor-cafe-production.up.railway.app/diagnostico-json",{
+          method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)
+        }).then(function(r2){return r2.json();}).then(function(d){
+          document.getElementById("spinner").style.display="none";
+          mostrarResultadoStreaming(d.diagnosticos||[], b64, isVideo);
+          incrementarAnalise();
+        }).catch(function(){
+          document.getElementById("spinner").style.display="none";
+          adicionarNaFila(b64,null,function(ok){if(ok){renderAreaHistorico();}});
+        });
+      }
     })
     .catch(function(err){
       clearTimeout(streamTimeout);
