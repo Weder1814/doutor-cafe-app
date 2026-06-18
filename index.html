@@ -1304,10 +1304,12 @@ function processar(file, isVideo) {
                   .then(function(plano){
                     var ct=document.getElementById("planoAcaoContainer");
                     if(ct&&plano&&(plano.urgente||plano.resumo_geral)){
+                      _ultimoPlano = plano;
                       var ph=buildPlanoAcao(plano);
                       if(ph){ct.innerHTML=ph;ct.style.animation="slideUp 0.4s ease";}
-                      var pv=[];if(plano.urgente)pv.push("Esta semana: "+plano.urgente);
-                      _textoParaFalar=pv.concat([_textoParaFalar]).join(". ");
+                      // Voz: doenças já estão no início, adicionar plano no final
+                      if(plano.urgente) _textoParaFalar += " Esta semana: " + plano.urgente + ".";
+                      if(plano.em_21_dias) _textoParaFalar += " Em 21 dias: " + plano.em_21_dias + ".";
                     }
                   }).catch(function(){});
                 }
@@ -1351,6 +1353,7 @@ function compartilhar(diagsJson,regiao){var diags=JSON.parse(diagsJson),texto="�
 // ── MOSTRAR RESULTADOS ──
 var _textoParaFalar = "";
 var _ultimosDiags = [];
+var _ultimoPlano = null;
 
 function mostrarResultadoStreaming(diags, fotoBase64, isVideo) {
   var div = document.getElementById("resultado");
@@ -1383,7 +1386,10 @@ function mostrarResultadoStreaming(diags, fotoBase64, isVideo) {
     }
     html+='</div>';
   });
-  var textoVoz = diags.map(function(d){ return (NOMES_VOZ[d.diagnostico]||d.diagnostico)+". "+d.acao; }).join(". ");
+  var naoSaudavel = diags.filter(function(d){ return d.diagnostico !== "saudavel"; });
+  var nomesVoz = naoSaudavel.map(function(d){ return NOMES_VOZ[d.diagnostico]||d.diagnostico.replace(/_/g," "); }).join(", ");
+  var textoVoz = naoSaudavel.length > 0 ? "Sua planta tem: " + nomesVoz + ". " : "Planta saudável. ";
+  textoVoz += naoSaudavel.map(function(d){ return d.acao; }).filter(Boolean).join(". ");
   _textoParaFalar = textoVoz;
   html+='<div class="btns-resultado"><button class="btn-voz" onclick="falarTextoAtual()">🔊 Ouvir</button>';
   html+='<button class="btn-share" onclick="compartilharAtual()">📤 WhatsApp</button>';
@@ -1400,7 +1406,7 @@ function compartilharAtual(){
   if(dadosGPS.regiao) texto += "📍 " + dadosGPS.regiao + "\n";
   texto += "\n";
 
-  // Doenças e deficiências detectadas
+  // Doenças detectadas
   var doencas = (_ultimosDiags||[]).filter(function(d){ return d.diagnostico !== "saudavel"; });
   if(doencas.length > 0){
     texto += "🔬 *" + doencas.length + " problema(s) detectado(s):*\n";
@@ -1412,14 +1418,13 @@ function compartilharAtual(){
     texto += "\n";
   }
 
-  // Plano de ação (do _textoParaFalar)
-  if(_textoParaFalar){
-    var partes = _textoParaFalar.split(". ").filter(function(p){ return p.trim().length > 5; });
-    if(partes.length > 0){
-      texto += "📋 *Plano de Ação:*\n";
-      partes.slice(0,4).forEach(function(p){ texto += "• " + p.trim() + "\n"; });
-      texto += "\n";
-    }
+  // Plano de ação completo do objeto salvo
+  if(_ultimoPlano){
+    texto += "📋 *Plano de Ação:*\n";
+    if(_ultimoPlano.urgente) texto += "🔴 *Esta semana:* " + _ultimoPlano.urgente + "\n";
+    if(_ultimoPlano.em_21_dias) texto += "🟡 *Em 21 dias:* " + _ultimoPlano.em_21_dias + "\n";
+    if(_ultimoPlano.nutricao) texto += "🟢 *Nutrição:* " + _ultimoPlano.nutricao + "\n";
+    texto += "\n";
   }
 
   texto += "_Diagnóstico realizado pelo app Doutor Café_";
