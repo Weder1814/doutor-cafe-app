@@ -1261,6 +1261,7 @@ function processar(file, isVideo) {
     if (dadosGPS.altitude) body.altitude=dadosGPS.altitude;
     // STREAMING SSE — mantém conexão viva, resultados progressivos
     var diagsSSE = [];
+    var talhaoCapturado = talhaoAtual; // capturar agora, antes da análise
     fetch("https://doutor-cafe-production.up.railway.app/diagnostico",{
       method:"POST", headers:{"Content-Type":"application/json"},
       body:JSON.stringify(body)
@@ -1296,6 +1297,12 @@ function processar(file, isVideo) {
                 var diags=fb&&diagsSSE.length>0?diagsSSE:dF.length>0?dF:diagsSSE;
                 mostrarResultadoStreaming(diags,b64,isVideo);
                 incrementarAnalise();
+                // Salvar análise completa no talhão selecionado (uma única vez)
+                if(talhaoCapturado){
+                  talhaoAtual = talhaoCapturado;
+                  salvarAnaliseTalhao(diags, b64);
+                  talhaoAtual = null; // resetar após salvar
+                }
                 var ok=diags.every(function(d){return d.diagnostico==="saudavel";});
                 if(diags.length>0&&!ok){
                   var bp={diagnosticos:diags}; if(dadosGPS.regiao) bp.regiao=dadosGPS.regiao;
@@ -1396,8 +1403,8 @@ function mostrarResultadoStreaming(diags, fotoBase64, isVideo) {
   html+='<button class="btn-nova" onclick="resetar()">📷 Nova</button></div></div>';
   div.innerHTML = html;
   salvarHistorico(diags, fotoBase64, regiao);
-  salvarAnaliseTalhao(diags, fotoBase64);
   _ultimosDiags = diags;
+  // salvarAnaliseTalhao chamado só no tipo:"fim" com dados completos
   // Cadastro obrigatório na entrada — sem modal durante análise
 }
 
@@ -1737,20 +1744,22 @@ function salvarAnaliseTalhao(diagnosticos, fotoBase64) {
   var talhoes = getTalhoes();
   var idx = talhoes.findIndex(function(t){ return t.id === talhaoAtual.id; });
   if(idx === -1) return;
-  var analise = {
-    id: "a_" + Date.now(),
-    data: new Date().toISOString(),
-    foto: fotoBase64 ? fotoBase64.substring(0, 200) : null, // miniatura
-    fotoFull: fotoBase64,
-    diagnosticos: diagnosticos,
-    statusAcao: "pendente"
-  };
+  var agora = Date.now();
   talhoes[idx].analises = talhoes[idx].analises || [];
-  talhoes[idx].analises.unshift(analise);
+  // Evitar duplicatas: atualizar se já tem análise dos últimos 30s
+  var recente = talhoes[idx].analises.find(function(a){ return agora - new Date(a.data).getTime() < 30000; });
+  if(recente){
+    recente.diagnosticos = diagnosticos;
+    recente.fotoFull = fotoBase64;
+    saveTalhoes(talhoes); renderTalhoes(); return;
+  }
+  talhoes[idx].analises.unshift({
+    id: "a_"+agora, data: new Date().toISOString(),
+    fotoFull: fotoBase64, diagnosticos: diagnosticos, statusAcao: "pendente"
+  });
   saveTalhoes(talhoes);
   renderTalhoes();
 }
-
 // Renderizar seção Meus Talhões
 function renderTalhoes() {
   var lista = document.getElementById("talhoesList");
