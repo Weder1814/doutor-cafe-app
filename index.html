@@ -1262,116 +1262,45 @@ function processar(file, isVideo) {
     var body={imagem:b64,tipo:file.type};
     if (dadosGPS.regiao) body.regiao=dadosGPS.regiao;
     if (dadosGPS.altitude) body.altitude=dadosGPS.altitude;
-    // STREAMING — mostra cada diagnóstico conforme chega
-    var streamController = new AbortController();
-    var streamTimeout = setTimeout(function(){ streamController.abort(); }, TIMEOUT_MS);
-    var diagsStream = [];
-
-    fetch("https://doutor-cafe-production.up.railway.app/diagnostico",{
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(body), signal:streamController.signal
-    })
-    .then(function(r){
-      clearTimeout(streamTimeout);
-      // Verificar se SSE/ReadableStream é suportado (alguns iOS mais antigos não suportam)
-      if (!r.body || !r.body.getReader) {
-        // Fallback: ler como JSON normal
-        return r.json().then(function(data){
-          document.getElementById("spinner").style.display="none";
-          mostrarResultadoStreaming(data.diagnosticos||[], b64, isVideo);
-          incrementarAnalise();
-          var diags = data.diagnosticos||[];
-          var todosSaudaveis = diags.every(function(d){ return d.diagnostico==="saudavel"; });
-          if(diags.length > 0 && !todosSaudaveis) {
-            var bp={diagnosticos:diags}; if(dadosGPS.regiao) bp.regiao=dadosGPS.regiao;
-            fetch("https://doutor-cafe-production.up.railway.app/plano-acao",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bp)})
-            .then(function(r2){return r2.json();}).then(function(plano){
-              var ct=document.getElementById("planoAcaoContainer");
-              if(ct&&plano&&(plano.urgente||plano.resumo_geral)){var ph=buildPlanoAcao(plano);if(ph){ct.innerHTML=ph;}}
-            }).catch(function(){});
+    // Análise simples e confiável — JSON direto
+    fetchComTimeout("https://doutor-cafe-production.up.railway.app/diagnostico",{
+      method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)
+    }, TIMEOUT_MS)
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      document.getElementById("spinner").style.display="none";
+      var diags = data.diagnosticos || [];
+      mostrarResultadoStreaming(diags, b64, isVideo);
+      incrementarAnalise();
+      // Plano de ação separado via haiku
+      var todosSaudaveis = diags.every(function(d){ return d.diagnostico==="saudavel"; });
+      if(diags.length > 0 && !todosSaudaveis){
+        var bp={diagnosticos:diags}; if(dadosGPS.regiao) bp.regiao=dadosGPS.regiao;
+        fetch("https://doutor-cafe-production.up.railway.app/plano-acao",{
+          method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bp)
+        }).then(function(r2){return r2.json();})
+        .then(function(plano){
+          var ct=document.getElementById("planoAcaoContainer");
+          if(ct&&plano&&(plano.urgente||plano.resumo_geral)){
+            var ph=buildPlanoAcao(plano);
+            if(ph){ct.innerHTML=ph;ct.style.animation="slideUp 0.4s ease";}
+            var pv=[];
+            if(plano.urgente) pv.push("Esta semana: "+plano.urgente);
+            if(plano.em_21_dias) pv.push("Em 21 dias: "+plano.em_21_dias);
+            _textoParaFalar=pv.concat([_textoParaFalar]).join(". ");
           }
-        });
-      }
-      var reader2 = r.body.getReader();
-      var dec = new TextDecoder();
-      var sseBuf2 = "";
-
-      function processSSE(linha) {
-        if(linha.startsWith(":")) return; // ignorar comentários keep-alive
-        if(!linha.startsWith("data: ")) return;
-        try {
-          var ev = JSON.parse(linha.slice(6));
-          if(ev.tipo==="diag") {
-            // Parcial: adiciona card imediatamente com nome+estagio
-            diagsStream.push(ev.diag);
-            document.getElementById("spinner").style.display="none";
-            document.getElementById("resultado").style.display="block";
-            mostrarResultadoStreaming(diagsStream, b64, isVideo);
-            document.getElementById("resultado").scrollIntoView({behavior:"smooth",block:"start"});
-          } else if(ev.tipo==="diag_completo") {
-            // Completo: substituir o card parcial pelo card completo
-            if(ev.index < diagsStream.length) diagsStream[ev.index] = ev.diag;
-            else diagsStream.push(ev.diag);
-            mostrarResultadoStreaming(diagsStream, b64, isVideo);
-          } else if(ev.tipo==="fim") {
-            document.getElementById("spinner").style.display="none";
-            var diagsFim = (ev.resultado && ev.resultado.diagnosticos) || [];
-            // Se o fim traz só o fallback "saudável baixa confiança" mas já temos
-            // diagnósticos reais do streaming, manter os do streaming
-            var isFallback = diagsFim.length===1 && diagsFim[0].diagnostico==="saudavel" && diagsFim[0].confianca==="baixa";
-            var diags = (isFallback && diagsStream.length > 0) ? diagsStream : (diagsFim.length > 0 ? diagsFim : diagsStream);
-            mostrarResultadoStreaming(diags, b64, isVideo);
-            incrementarAnalise();
-            var todosSaudaveis = diags.every(function(d){ return d.diagnostico==="saudavel"; });
-            if(diags.length>0 && !todosSaudaveis) {
-              var bp={diagnosticos:diags}; if(dadosGPS.regiao) bp.regiao=dadosGPS.regiao;
-              fetch("https://doutor-cafe-production.up.railway.app/plano-acao",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bp)})
-              .then(function(r2){return r2.json();})
-              .then(function(plano){
-                var container=document.getElementById("planoAcaoContainer");
-                if(container&&plano&&(plano.urgente||plano.resumo_geral)){
-                  var ph=buildPlanoAcao(plano);
-                  if(ph){container.innerHTML=ph;container.style.animation="slideUp 0.5s ease";}
-                  var pv=[];if(plano.urgente)pv.push("Esta semana: "+plano.urgente);if(plano.em_21_dias)pv.push("Em 21 dias: "+plano.em_21_dias);_textoParaFalar=pv.concat([_textoParaFalar]).join(". ");
-                }
-              }).catch(function(){});
-            }
-          }
-        }catch(e){}
-      }
-
-      function lerStream(){
-        reader2.read().then(function(res2){
-          if(res2.done) return;
-          sseBuf2+=dec.decode(res2.value,{stream:true});
-          var lns=sseBuf2.split("\n"); sseBuf2=lns.pop();
-          lns.forEach(processSSE); lerStream();
-        }).catch(function(err){
-          // Se streaming falhou mas já temos diagnósticos parciais, manter
-          if(diagsStream.length > 0) {
-            mostrarResultadoStreaming(diagsStream, b64, isVideo);
-            incrementarAnalise();
-          }
-        });
-      }
-      try { lerStream(); } catch(e) {
-        // ReadableStream falhou — tentar fallback JSON
-        fetch("https://doutor-cafe-production.up.railway.app/diagnostico-json",{
-          method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)
-        }).then(function(r2){return r2.json();}).then(function(d){
-          document.getElementById("spinner").style.display="none";
-          mostrarResultadoStreaming(d.diagnosticos||[], b64, isVideo);
-          incrementarAnalise();
-        }).catch(function(){
-          document.getElementById("spinner").style.display="none";
-          adicionarNaFila(b64,null,function(ok){if(ok){renderAreaHistorico();}});
-        });
+        }).catch(function(){});
       }
     })
     .catch(function(err){
-      clearTimeout(streamTimeout);
       document.getElementById("spinner").style.display="none";
-      adicionarNaFila(b64,null,function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert("Foto salva na fila!");}});
+      adicionarNaFila(b64,null,function(ok){
+        if(ok){
+          renderAreaHistorico();
+          document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});
+          alert("Sem internet. Foto salva na fila para envio automático!");
+        }
+      });
     });
   };
   reader.readAsDataURL(file);
