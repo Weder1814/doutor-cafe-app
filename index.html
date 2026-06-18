@@ -1280,7 +1280,12 @@ function processar(file, isVideo) {
               if(ev.tipo==="diag"){
                 diagsSSE.push(ev.diag);
                 document.getElementById("spinner").style.display="none";
-                mostrarResultadoStreaming(diagsSSE,b64,isVideo);
+                try {
+                  mostrarResultadoStreaming(diagsSSE,b64,isVideo);
+                } catch(err) {
+                  document.getElementById("resultado").style.display="block";
+                  document.getElementById("resultado").innerHTML="<div style='padding:20px;color:red'>Erro: "+err.message+"</div>";
+                }
               } else if(ev.tipo==="diag_completo"){
                 if(ev.index<diagsSSE.length) diagsSSE[ev.index]=ev.diag; else diagsSSE.push(ev.diag);
                 mostrarResultadoStreaming(diagsSSE,b64,isVideo);
