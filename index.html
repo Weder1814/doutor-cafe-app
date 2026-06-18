@@ -1244,10 +1244,7 @@ function calcular(inputId,doseMin,doseMax,propPorLitro,unidade,unidadeProp) {
 // ── PROCESSAR ARQUIVOS ──
 function processar(file, isVideo) {
   // Verificar se esgotou análises
-  if (!podeanalisarComCadastro()) {
-    abrirModal(true);
-    return;
-  }
+  // Cadastro feito na entrada — sem bloqueio durante análise
   // Railway Hobby — servidor sempre ligado, não bloqueia análise
   if (!servidorAcordado) acordarServidor(null); // ping em background, sem bloquear
   document.getElementById("spinner").style.display="block";
@@ -1348,6 +1345,7 @@ function compartilhar(diagsJson,regiao){var diags=JSON.parse(diagsJson),texto="�
 
 // ── MOSTRAR RESULTADOS ──
 var _textoParaFalar = "";
+var _ultimosDiags = [];
 
 function mostrarResultadoStreaming(diags, fotoBase64, isVideo) {
   var div = document.getElementById("resultado");
@@ -1388,13 +1386,38 @@ function mostrarResultadoStreaming(diags, fotoBase64, isVideo) {
   div.innerHTML = html;
   salvarHistorico(diags, fotoBase64, regiao);
   salvarAnaliseTalhao(diags, fotoBase64);
-  setTimeout(function(){ if(deveAbrirCadastroAposAnalise()){abrirModalCadastro();}else if(!podeanalisarComCadastro()){abrirModal(true);} }, 2000);
+  _ultimosDiags = diags;
+  // Cadastro obrigatório na entrada — sem modal durante análise
 }
 
 function compartilharAtual(){
-  var texto = "🌿 *Doutor Café — Diagnóstico*\n\n";
-  if(dadosGPS.regiao) texto += "📍 "+dadosGPS.regiao+"\n\n";
-  texto += _textoParaFalar + "\n\n_Diagnóstico realizado pelo app Doutor Café_";
+  var texto = "🌿 *Doutor Café — Diagnóstico*\n";
+  if(dadosGPS.regiao) texto += "📍 " + dadosGPS.regiao + "\n";
+  texto += "\n";
+
+  // Doenças e deficiências detectadas
+  var doencas = (_ultimosDiags||[]).filter(function(d){ return d.diagnostico !== "saudavel"; });
+  if(doencas.length > 0){
+    texto += "🔬 *" + doencas.length + " problema(s) detectado(s):*\n";
+    doencas.forEach(function(d){
+      var emoji = EMOJIS[d.diagnostico] || "🌿";
+      var nome = NOMES_VOZ[d.diagnostico] || d.diagnostico.replace(/_/g," ");
+      texto += emoji + " " + nome + " — Estágio " + (d.estagio||1) + "/5\n";
+    });
+    texto += "\n";
+  }
+
+  // Plano de ação (do _textoParaFalar)
+  if(_textoParaFalar){
+    var partes = _textoParaFalar.split(". ").filter(function(p){ return p.trim().length > 5; });
+    if(partes.length > 0){
+      texto += "📋 *Plano de Ação:*\n";
+      partes.slice(0,4).forEach(function(p){ texto += "• " + p.trim() + "\n"; });
+      texto += "\n";
+    }
+  }
+
+  texto += "_Diagnóstico realizado pelo app Doutor Café_";
   window.open("https://wa.me/?text="+encodeURIComponent(texto),"_blank");
 }
 
@@ -1557,17 +1580,26 @@ function submeterCadastroInicial() {
   var cpfRaw  = (document.getElementById('cadIniCpf')||{value:''}).value.replace(/[^0-9]/g,'');
   var celRaw  = (document.getElementById('cadIniCelular')||{value:''}).value.replace(/[^0-9]/g,'');
   var email   = (document.getElementById('cadIniEmail')||{value:''}).value.trim();
-  var pin = (document.getElementById('cadIniPin')||{value:''}).value.replace(/[^0-9]/g,'');
-  if (!nome)           { alert('Informe seu nome completo.'); return; }
-  if (cpfRaw.length!==11){ alert('CPF inválido. Digite os 11 dígitos.'); return; }
-  if (celRaw.length<10)  { alert('Celular inválido.'); return; }
-  if (pin.length!==4)    { alert('Crie um PIN de 4 dígitos para acessar sua conta.'); return; }
-  var btn = document.querySelector('#tela-cadastro-inicial .btn-cad-submit');
-  if (btn) { btn.textContent='Registrando...'; btn.disabled=true; }
-  var dados = { nome:nome, cpf:cpfRaw, celular:celRaw, email:email||'', origem:'cadastro_inicial', userId:obterUserId() };
-  localStorage.setItem(CADASTRO_INICIAL_KEY, JSON.stringify({ nome:nome, cpf:cpfRaw, celular:celRaw, email:email, data:new Date().toISOString() }));
+  var pin     = (document.getElementById('cadIniPin')||{value:''}).value.replace(/[^0-9]/g,'');
+  if (!nome)              { alert('Informe seu nome completo.'); return; }
+  if (cpfRaw.length!==11) { alert('CPF inválido. Digite os 11 dígitos.'); return; }
+  if (celRaw.length<10)   { alert('Celular inválido.'); return; }
+  if (pin.length!==4)     { alert('Crie um PIN de 4 dígitos.'); return; }
+
+  // Salvar localmente e entrar — não depender do servidor para avançar
+  localStorage.setItem(CADASTRO_INICIAL_KEY, JSON.stringify({
+    nome:nome, cpf:cpfRaw, celular:celRaw, email:email, pin:pin,
+    userId:obterUserId(), data:new Date().toISOString()
+  }));
   localStorage.setItem(ANALISES_KEY,'0');
-  fetch('https://doutor-cafe-production.up.railway.app/cadastrar-usuario',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(dados) }).catch(function(){});
+
+  // Enviar para servidor em background (não bloqueia)
+  fetch('https://doutor-cafe-production.up.railway.app/cadastrar-usuario',{
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ userId:obterUserId(), nome:nome, cpf:cpfRaw, celular:celRaw, email:email, pin:pin })
+  }).catch(function(){});
+
+  // Entrar imediatamente sem esperar resposta do servidor
   entrarNoApp(nome);
 }
 
