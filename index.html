@@ -1261,7 +1261,12 @@ function processar(file, isVideo) {
     if (dadosGPS.altitude) body.altitude=dadosGPS.altitude;
     // STREAMING SSE — mantém conexão viva, resultados progressivos
     var diagsSSE = [];
-    var talhaoCapturado = talhaoAtual; // capturar agora, antes da análise
+    // Salvar ID do talhão no localStorage (mais confiável que closure)
+    if(talhaoAtual) {
+      localStorage.setItem("dc_analise_talhao_id", talhaoAtual.id);
+    } else {
+      localStorage.removeItem("dc_analise_talhao_id");
+    }
     fetch("https://doutor-cafe-production.up.railway.app/diagnostico",{
       method:"POST", headers:{"Content-Type":"application/json"},
       body:JSON.stringify(body)
@@ -1297,11 +1302,17 @@ function processar(file, isVideo) {
                 var diags=fb&&diagsSSE.length>0?diagsSSE:dF.length>0?dF:diagsSSE;
                 mostrarResultadoStreaming(diags,b64,isVideo);
                 incrementarAnalise();
-                // Salvar análise completa no talhão selecionado (uma única vez)
-                if(talhaoCapturado){
-                  talhaoAtual = talhaoCapturado;
-                  salvarAnaliseTalhao(diags, b64);
-                  talhaoAtual = null; // resetar após salvar
+                // Salvar análise completa no talhão (via localStorage ID)
+                var talhaoIdSalvo = localStorage.getItem("dc_analise_talhao_id");
+                if(talhaoIdSalvo) {
+                  var talhoes = getTalhoes();
+                  var talhaoEncontrado = talhoes.find(function(t){ return t.id === talhaoIdSalvo; });
+                  if(talhaoEncontrado) {
+                    talhaoAtual = talhaoEncontrado;
+                    salvarAnaliseTalhao(diags, b64);
+                    talhaoAtual = null;
+                  }
+                  localStorage.removeItem("dc_analise_talhao_id");
                 }
                 var ok=diags.every(function(d){return d.diagnostico==="saudavel";});
                 if(diags.length>0&&!ok){
