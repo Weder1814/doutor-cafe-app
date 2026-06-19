@@ -1258,6 +1258,13 @@ function processar(file, isVideo) {
   document.getElementById("resultado").style.display="none";
   document.getElementById("spinnerTexto").textContent="Analisando...";
   document.getElementById("spinnerSub").textContent="Identificando sintomas — resultado em ~15 segundos";
+  // Salvar ID do talhão AGORA (antes de qualquer async)
+  if(talhaoAtual) {
+    localStorage.setItem("dc_analise_talhao_id", talhaoAtual.id);
+  } else {
+    localStorage.removeItem("dc_analise_talhao_id");
+  }
+  talhaoAtual = null; // liberar para próxima seleção
   var reader=new FileReader();
   reader.onload=function(e) {
     var b64=e.target.result.split(",")[1]; ultimaFotoBase64=b64;
@@ -1268,12 +1275,6 @@ function processar(file, isVideo) {
     if (dadosGPS.altitude) body.altitude=dadosGPS.altitude;
     // STREAMING SSE — mantém conexão viva, resultados progressivos
     var diagsSSE = [];
-    // Salvar ID do talhão no localStorage (mais confiável que closure)
-    if(talhaoAtual) {
-      localStorage.setItem("dc_analise_talhao_id", talhaoAtual.id);
-    } else {
-      localStorage.removeItem("dc_analise_talhao_id");
-    }
     fetch("https://doutor-cafe-production.up.railway.app/diagnostico",{
       method:"POST", headers:{"Content-Type":"application/json"},
       body:JSON.stringify(body)
@@ -1309,18 +1310,36 @@ function processar(file, isVideo) {
                 var diags=fb&&diagsSSE.length>0?diagsSSE:dF.length>0?dF:diagsSSE;
                 mostrarResultadoStreaming(diags,b64,isVideo);
                 incrementarAnalise();
-                // Salvar análise completa no talhão (via localStorage ID)
-                var talhaoIdSalvo = localStorage.getItem("dc_analise_talhao_id");
-                if(talhaoIdSalvo) {
-                  var talhoes = getTalhoes();
-                  var talhaoEncontrado = talhoes.find(function(t){ return t.id === talhaoIdSalvo; });
-                  if(talhaoEncontrado) {
-                    talhaoAtual = talhaoEncontrado;
-                    salvarAnaliseTalhao(diags, b64);
-                    talhaoAtual = null;
+                // Salvar análise no talhão — direto no localStorage sem funções auxiliares
+                try {
+                  var tId = localStorage.getItem("dc_analise_talhao_id");
+                  if(tId) {
+                    var ts = JSON.parse(localStorage.getItem("dc_talhoes_v1") || "[]");
+                    var ti = -1;
+                    for(var qi=0; qi<ts.length; qi++){ if(ts[qi].id===tId){ ti=qi; break; } }
+                    if(ti >= 0) {
+                      if(!ts[ti].analises) ts[ti].analises = [];
+                      // Evitar duplicata (análise dos últimos 60s)
+                      var agr = Date.now();
+                      var dup = false;
+                      for(var qi2=0; qi2<ts[ti].analises.length; qi2++){
+                        if(agr - new Date(ts[ti].analises[qi2].data).getTime() < 60000){ dup=true; break; }
+                      }
+                      if(!dup) {
+                        ts[ti].analises.unshift({
+                          id: "a_"+agr,
+                          data: new Date().toISOString(),
+                          fotoFull: b64,
+                          diagnosticos: diags,
+                          statusAcao: "pendente"
+                        });
+                        localStorage.setItem("dc_talhoes_v1", JSON.stringify(ts));
+                        renderTalhoes();
+                      }
+                    }
+                    localStorage.removeItem("dc_analise_talhao_id");
                   }
-                  localStorage.removeItem("dc_analise_talhao_id");
-                }
+                } catch(errT){ console.error("Erro save talhao:", errT); }
                 var ok=diags.every(function(d){return d.diagnostico==="saudavel";});
                 if(diags.length>0&&!ok){
                   var bp={diagnosticos:diags}; if(dadosGPS.regiao) bp.regiao=dadosGPS.regiao;
