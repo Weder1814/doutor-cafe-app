@@ -524,6 +524,13 @@ canvas { display: none; }
       <label>E-mail <span class="opcional">(opcional)</span></label>
       <input type="email" id="cadIniEmail" placeholder="seuemail@gmail.com" autocomplete="email">
     </div>
+    <div class="cad-field">
+      <label>🔐 PIN de 4 dígitos *</label>
+      <input type="tel" id="cadIniPin" placeholder="••••" maxlength="4"
+        oninput="this.value=this.value.replace(/[^0-9]/g,'').substr(0,4)"
+        style="letter-spacing:12px;font-size:24px;font-weight:700;text-align:center;padding:14px">
+      <small style="color:#888;font-size:11px;margin-top:4px;display:block">Use para entrar em outro celular. Anote e guarde!</small>
+    </div>
     <button class="btn-cad-submit" onclick="submeterCadastroInicial()">
       ✅ Liberar Minhas 15 Análises
     </button>
