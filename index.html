@@ -422,7 +422,7 @@ canvas { display: none; }
       <div class="landing-feat"><div class="landing-feat-icon">🔬</div><div class="landing-feat-info"><h4>Diagnóstico por Foto ou Vídeo</h4><p>IA identifica ferrugem, cercosporiose, helmintosporiose e mais 30 doenças com alta precisão</p></div></div>
       <div class="landing-feat"><div class="landing-feat-icon">📋</div><div class="landing-feat-info"><h4>Plano de Ação com Dosagens</h4><p>Recebe o que fazer essa semana, em 21 dias e a dosagem exata por tanque de 20L</p></div></div>
       <div class="landing-feat"><div class="landing-feat-icon">🧪</div><div class="landing-feat-info"><h4>Análise de Solo e Daninhas</h4><p>Interpreta laudo de solo e identifica plantas daninhas indicadoras de problemas</p></div></div>
-      <div class="landing-feat"><div class="landing-feat-icon">📍</div><div class="landing-feat-info"><h4>Adaptado à Mogiana e Sul de Minas</h4><p>Considera altitude, época do ano e risco de ferrugem da sua região</p></div></div>
+      <div class="landing-feat"><div class="landing-feat-icon">📍</div><div class="landing-feat-info"><h4>Adaptado a Todas as Regiões Cafeeiras</h4><p>Mogiana, Sul de Minas, Cerrado Mineiro, Matas de Minas, Chapada Diamantina, Rondônia, Espírito Santo e mais</p></div></div>
     </div>
     <div class="landing-steps">
       <div class="landing-steps-title">Como funciona</div>
@@ -955,61 +955,75 @@ function processar(file, isVideo) {
     .then(function(r){
       var Readable = (typeof ReadableStream !== 'undefined') ? null : null;
       var reader2 = r.body.getReader(), dec=new TextDecoder(), sseBuf="";
-      function processarLinhas(buf){
-        var lns=buf.split("\n");
-        lns.forEach(function(linha){
-          if(linha.startsWith(":")) return;
-          if(!linha.startsWith("data: ")) return;
-          try {
-            var ev=JSON.parse(linha.slice(6));
-            if(ev.tipo==="diag"){
-              diagsSSE.push(ev.diag);
-              document.getElementById("spinner").style.display="none";
-              try { mostrarResultadoStreaming(diagsSSE,b64,isVideo); } catch(err) {}
-            } else if(ev.tipo==="diag_completo"){
-              if(ev.index<diagsSSE.length) diagsSSE[ev.index]=ev.diag; else diagsSSE.push(ev.diag);
-              mostrarResultadoStreaming(diagsSSE,b64,isVideo);
-            } else if(ev.tipo==="fim"){
-              var dF=(ev.resultado&&ev.resultado.diagnosticos)||[];
-              var fb=dF.length===1&&dF[0].diagnostico==="saudavel"&&dF[0].confianca==="baixa";
-              var diags;
-              if(fb&&diagsSSE.length>0){
-                diags=diagsSSE;
-              } else if(dF.length>0){
-                diags=dF.map(function(df,idx){
-                  var sse=diagsSSE[idx];
-                  if(df.acao&&df.acao.length>5&&!df.parcial) return df;
-                  if(sse&&sse.acao&&sse.acao.length>5&&!sse.parcial) return sse;
-                  return Object.assign({},sse||{},df,{
-                    acao:(df.acao&&df.acao.length>5&&df.acao!=="Analisando...")?df.acao:(sse&&sse.acao&&sse.acao!=="Analisando..."?sse.acao:""),
-                    fungicidas:(df.fungicidas&&df.fungicidas.length>0)?df.fungicidas:(sse&&sse.fungicidas?sse.fungicidas:[]),
-                    visto:df.visto||(sse&&sse.visto)||"",
-                    parcial:false
+      function processarEventos(buf){
+        // Dividir por \n\n — cada bloco SSE é um evento completo
+        var eventos=buf.split("\n\n");
+        eventos.forEach(function(bloco){
+          bloco.split("\n").forEach(function(linha){
+            if(linha.startsWith(":")) return;
+            if(!linha.startsWith("data: ")) return;
+            var jsonStr=linha.slice(6).trim();
+            if(!jsonStr) return;
+            try {
+              var ev=JSON.parse(jsonStr);
+              if(ev.tipo==="diag"){
+                diagsSSE.push(ev.diag);
+                document.getElementById("spinner").style.display="none";
+                try { mostrarResultadoStreaming(diagsSSE,b64,isVideo); } catch(err) {}
+              } else if(ev.tipo==="diag_completo"){
+                if(ev.index<diagsSSE.length) diagsSSE[ev.index]=ev.diag; else diagsSSE.push(ev.diag);
+                mostrarResultadoStreaming(diagsSSE,b64,isVideo);
+              } else if(ev.tipo==="fim"){
+                var dF=(ev.resultado&&ev.resultado.diagnosticos)||[];
+                var fb=dF.length===1&&dF[0].diagnostico==="saudavel"&&dF[0].confianca==="baixa";
+                var diags;
+                if(fb&&diagsSSE.length>0){
+                  diags=diagsSSE;
+                } else if(dF.length>0){
+                  diags=dF.map(function(df,idx){
+                    var sse=diagsSSE[idx];
+                    if(df.acao&&df.acao.length>5&&!df.parcial) return df;
+                    if(sse&&sse.acao&&sse.acao.length>5&&!sse.parcial) return sse;
+                    return Object.assign({},sse||{},df,{
+                      acao:(df.acao&&df.acao.length>5&&df.acao!=="Analisando...")?df.acao:(sse&&sse.acao&&sse.acao!=="Analisando..."?sse.acao:""),
+                      fungicidas:(df.fungicidas&&df.fungicidas.length>0)?df.fungicidas:(sse&&sse.fungicidas?sse.fungicidas:[]),
+                      visto:df.visto||(sse&&sse.visto)||"",
+                      parcial:false
+                    });
                   });
-                });
-              } else {
-                diags=diagsSSE;
+                } else {
+                  diags=diagsSSE;
+                }
+                finalizarAnalise(diags);
               }
-              finalizarAnalise(diags);
-            }
-          } catch(e){ console.error("SSE parse err:",e); }
+            } catch(e){ /* JSON incompleto — ignorar, virá no próximo chunk */ }
+          });
         });
       }
       function ler(){
         reader2.read().then(function(res2){
           if(res2.done){
             // Processar buffer restante
-            if(sseBuf.trim()) processarLinhas(sseBuf);
-            // Fallback: se tipo:fim nunca chegou mas temos diagnósticos, finalizar com diagsSSE
+            if(sseBuf.trim()) processarEventos(sseBuf);
+            // Fallback: se tipo:fim nunca chegou mas temos diagnósticos, finalizar
             if(!fimProcessado && diagsSSE.length>0){
-              console.warn("tipo:fim não recebido — usando fallback com diagsSSE");
+              console.warn("tipo:fim não recebido — fallback com diagsSSE");
               finalizarAnalise(diagsSSE);
+            } else if(!fimProcessado){
+              // Nenhum diagnóstico e nenhum fim — erro
+              document.getElementById("spinner").style.display="none";
+              mostrarErro();
             }
             return;
           }
           sseBuf+=dec.decode(res2.value,{stream:true});
-          var lns=sseBuf.split("\n"); sseBuf=lns.pop();
-          processarLinhas(lns.join("\n"));
+          // Processar apenas eventos completos (terminados com \n\n)
+          var posUltimoEvento=sseBuf.lastIndexOf("\n\n");
+          if(posUltimoEvento>=0){
+            var blocoCompleto=sseBuf.substring(0,posUltimoEvento+2);
+            sseBuf=sseBuf.substring(posUltimoEvento+2);
+            processarEventos(blocoCompleto);
+          }
           ler();
         }).catch(function(){});
       }
