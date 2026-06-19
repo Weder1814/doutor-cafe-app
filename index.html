@@ -1304,42 +1304,31 @@ function processar(file, isVideo) {
                 if(ev.index<diagsSSE.length) diagsSSE[ev.index]=ev.diag; else diagsSSE.push(ev.diag);
                 mostrarResultadoStreaming(diagsSSE,b64,isVideo);
               } else if(ev.tipo==="fim"){
-                document.getElementById("spinner").style.display="none";
                 var dF=(ev.resultado&&ev.resultado.diagnosticos)||[];
                 var fb=dF.length===1&&dF[0].diagnostico==="saudavel"&&dF[0].confianca==="baixa";
                 var diags=fb&&diagsSSE.length>0?diagsSSE:dF.length>0?dF:diagsSSE;
-                mostrarResultadoStreaming(diags,b64,isVideo);
-                incrementarAnalise();
-                // Salvar análise no talhão — direto no localStorage sem funções auxiliares
-                try {
-                  var tId = localStorage.getItem("dc_analise_talhao_id");
-                  if(tId) {
-                    var ts = JSON.parse(localStorage.getItem("dc_talhoes_v1") || "[]");
-                    var ti = -1;
-                    for(var qi=0; qi<ts.length; qi++){ if(ts[qi].id===tId){ ti=qi; break; } }
-                    if(ti >= 0) {
-                      if(!ts[ti].analises) ts[ti].analises = [];
-                      // Evitar duplicata (análise dos últimos 60s)
-                      var agr = Date.now();
-                      var dup = false;
-                      for(var qi2=0; qi2<ts[ti].analises.length; qi2++){
-                        if(agr - new Date(ts[ti].analises[qi2].data).getTime() < 60000){ dup=true; break; }
-                      }
-                      if(!dup) {
-                        ts[ti].analises.unshift({
-                          id: "a_"+agr,
-                          data: new Date().toISOString(),
-                          fotoFull: b64,
-                          diagnosticos: diags,
-                          statusAcao: "pendente"
-                        });
-                        localStorage.setItem("dc_talhoes_v1", JSON.stringify(ts));
-                        renderTalhoes();
+                // *** SALVAR NO TALHÃO PRIMEIRO — antes de qualquer código que possa falhar ***
+                var tId = localStorage.getItem("dc_analise_talhao_id");
+                if(tId) {
+                  try {
+                    var tsArr = JSON.parse(localStorage.getItem("dc_talhoes_v1")||"[]");
+                    for(var qx=0;qx<tsArr.length;qx++){
+                      if(tsArr[qx].id===tId){
+                        if(!tsArr[qx].analises) tsArr[qx].analises=[];
+                        tsArr[qx].analises.unshift({id:"a_"+Date.now(),data:new Date().toISOString(),fotoFull:b64,diagnosticos:diags,statusAcao:"pendente"});
+                        localStorage.setItem("dc_talhoes_v1",JSON.stringify(tsArr));
+                        localStorage.removeItem("dc_analise_talhao_id");
+                        setTimeout(renderTalhoes, 100);
+                        break;
                       }
                     }
-                    localStorage.removeItem("dc_analise_talhao_id");
-                  }
-                } catch(errT){ console.error("Erro save talhao:", errT); }
+                  } catch(eTalhao){ console.error("Talhao save err:",eTalhao); }
+                }
+                // Agora mostrar resultados
+                document.getElementById("spinner").style.display="none";
+                mostrarResultadoStreaming(diags,b64,isVideo);
+                incrementarAnalise();
+
                 var ok=diags.every(function(d){return d.diagnostico==="saudavel";});
                 if(diags.length>0&&!ok){
                   var bp={diagnosticos:diags}; if(dadosGPS.regiao) bp.regiao=dadosGPS.regiao;
