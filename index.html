@@ -929,7 +929,32 @@ function processar(file, isVideo) {
               } else if(ev.tipo==="fim"){
                 var dF=(ev.resultado&&ev.resultado.diagnosticos)||[];
                 var fb=dF.length===1&&dF[0].diagnostico==="saudavel"&&dF[0].confianca==="baixa";
-                var diags=fb&&diagsSSE.length>0?diagsSSE:dF.length>0?dF:diagsSSE;
+                // Mesclar: dF tem acao+fungicidas completos; diagsSSE tem os parciais recebidos no stream
+                // Para cada diag em dF, se diagsSSE tem versão mais completa, usar ela; senão usar dF
+                var diags;
+                if(fb&&diagsSSE.length>0){
+                  diags=diagsSSE;
+                } else if(dF.length>0){
+                  // Mesclar dF (completo) com diagsSSE (pode ter mais itens chegados via stream)
+                  diags=dF.map(function(df,idx){
+                    var sse=diagsSSE[idx];
+                    // Se dF tem acao e fungicidas, é mais completo — usar dF
+                    // Se dF ainda está parcial mas SSE tem dados, usar SSE
+                    if(df.acao&&df.acao.length>5&&!df.parcial) return df;
+                    if(sse&&sse.acao&&sse.acao.length>5&&!sse.parcial) return sse;
+                    // Mesclar campos: pegar o melhor de cada
+                    return Object.assign({},sse||{},df,{
+                      acao: (df.acao&&df.acao.length>5&&df.acao!=="Analisando...")?df.acao:(sse&&sse.acao&&sse.acao!=="Analisando..."?sse.acao:""),
+                      fungicidas: (df.fungicidas&&df.fungicidas.length>0)?df.fungicidas:(sse&&sse.fungicidas?sse.fungicidas:[]),
+                      visto: df.visto||( sse&&sse.visto)||"",
+                      parcial: false
+                    });
+                  });
+                } else {
+                  diags=diagsSSE;
+                }
+                // Garantir que nenhum parcial chega ao talhão
+                diags=diags.map(function(d){ return Object.assign({},d,{parcial:false}); });
                 // Salvar no talhão (usa dc_analise_talhao_id setado em confirmarTalhao)
                 var tId = localStorage.getItem("dc_analise_talhao_id");
                 if(tId) {
@@ -996,7 +1021,51 @@ var _textoParaFalar = "";
 var _ultimosDiags = [];
 var _ultimoPlano = null;
 
-function mostrarResultadoStreaming(diags,fotoBase64,isVideo){var div=document.getElementById("resultado");div.style.display="block";var regiao=dadosGPS.regiao||"";var thumbHtml=fotoBase64?'<img class="multi-foto" src="data:image/jpeg;base64,'+fotoBase64+'" alt="foto">':"<div class='multi-foto-placeholder'>🌿</div>";var qtd=diags.length>1?diags.length+" problemas detectados":"1 diagnóstico";var html='<div class="card-resultado"><div class="multi-header">'+thumbHtml+'<div class="multi-titulo"><h3>Resultado da Análise</h3><p>'+qtd;if(regiao)html+=' · 📍 '+regiao;if(isVideo)html+=' · 🎥 Vídeo';html+='</p></div></div>';html+=buildResumo(diags);html+='<div id="planoAcaoContainer"></div>';diags.forEach(function(d,diagIdx){var diag=d.diagnostico||"saudavel",estagio=d.estagio||1,confianca=d.confianca||"media";var badgeTexto=confianca==="alta"?"✓ Alta":confianca==="media"?"~ Média":"! Baixa";var barras="";for(var i=1;i<=5;i++)barras+='<div class="diag-seg" style="background:'+(i<=estagio?CORES_ESTAGIO[estagio-1]:"#e8e8e8")+'"></div>';html+='<div class="diag-item" style="animation:slideUp 0.4s ease"><div class="diag-item-topo"><span style="font-size:28px">'+(EMOJIS[diag]||"🌿")+'</span><div><div class="diag-nome">'+diag.replace(/_/g," ")+'</div><div class="diag-cat">'+(CATEGORIAS[diag]||"Análise")+'</div></div></div>';html+='<div class="diag-badges"><span class="badge badge-estagio">📊 Estágio '+estagio+'/5</span><span class="badge badge-confianca-'+confianca+'">'+badgeTexto+' confiança</span></div>';html+='<div class="diag-bar">'+barras+'</div>';if(d.visto)html+='<div class="diag-visto">"'+d.visto+'"</div>';if(d.parcial){html+='<div class="diag-acao" style="color:#aaa;font-style:italic">⏳ Carregando detalhes...</div>';}else{html+='<div class="diag-acao">'+(d.acao||"")+'</div>';if(d.fungicidas&&d.fungicidas.length>0)html+=buildCalcFungicida(d.fungicidas,diagIdx);}html+='</div>';});var naoSaudavel=diags.filter(function(d){return d.diagnostico!=="saudavel";});var nomesVoz=naoSaudavel.map(function(d){return NOMES_VOZ[d.diagnostico]||d.diagnostico.replace(/_/g," ");}).join(", ");var textoVoz=naoSaudavel.length>0?"Sua planta tem: "+nomesVoz+". ":"Planta saudável. ";textoVoz+=naoSaudavel.map(function(d){return d.acao;}).filter(Boolean).join(". ");_textoParaFalar=textoVoz;html+='<div class="btns-resultado"><button class="btn-voz" onclick="falarTextoAtual()">🔊 Ouvir</button>';html+='<button class="btn-share" onclick="compartilharAtual()">📤 WhatsApp</button>';html+='<button class="btn-nova" onclick="resetar()">📷 Nova</button></div></div>';div.innerHTML=html;salvarHistorico(diags,fotoBase64,regiao);_ultimosDiags=diags;}
+function mostrarResultadoStreaming(diags,fotoBase64,isVideo){
+  var div=document.getElementById("resultado");
+  div.style.display="block";
+  var regiao=dadosGPS.regiao||"";
+  // Preservar plano de ação já renderizado (não destruir ao re-renderizar durante stream)
+  var planoHtmlSalvo="";
+  var ctExistente=document.getElementById("planoAcaoContainer");
+  if(ctExistente&&ctExistente.innerHTML) planoHtmlSalvo=ctExistente.innerHTML;
+
+  var thumbHtml=fotoBase64?'<img class="multi-foto" src="data:image/jpeg;base64,'+fotoBase64+'" alt="foto">':"<div class='multi-foto-placeholder'>🌿</div>";
+  var qtd=diags.length>1?diags.length+" problemas detectados":"1 diagnóstico";
+  var html='<div class="card-resultado"><div class="multi-header">'+thumbHtml+'<div class="multi-titulo"><h3>Resultado da Análise</h3><p>'+qtd;
+  if(regiao)html+=' · 📍 '+regiao;
+  if(isVideo)html+=' · 🎥 Vídeo';
+  html+='</p></div></div>';
+  html+=buildResumo(diags);
+  html+='<div id="planoAcaoContainer">'+planoHtmlSalvo+'</div>';
+  diags.forEach(function(d,diagIdx){
+    var diag=d.diagnostico||"saudavel",estagio=d.estagio||1,confianca=d.confianca||"media";
+    var badgeTexto=confianca==="alta"?"✓ Alta":confianca==="media"?"~ Média":"! Baixa";
+    var barras="";for(var i=1;i<=5;i++)barras+='<div class="diag-seg" style="background:'+(i<=estagio?CORES_ESTAGIO[estagio-1]:"#e8e8e8")+'"></div>';
+    html+='<div class="diag-item" style="animation:slideUp 0.4s ease"><div class="diag-item-topo"><span style="font-size:28px">'+(EMOJIS[diag]||"🌿")+'</span><div><div class="diag-nome">'+diag.replace(/_/g," ")+'</div><div class="diag-cat">'+(CATEGORIAS[diag]||"Análise")+'</div></div></div>';
+    html+='<div class="diag-badges"><span class="badge badge-estagio">📊 Estágio '+estagio+'/5</span><span class="badge badge-confianca-'+confianca+'">'+badgeTexto+' confiança</span></div>';
+    html+='<div class="diag-bar">'+barras+'</div>';
+    if(d.visto)html+='<div class="diag-visto">"'+d.visto+'"</div>';
+    if(d.parcial){
+      html+='<div class="diag-acao" style="color:#aaa;font-style:italic">⏳ Carregando detalhes...</div>';
+    }else{
+      html+='<div class="diag-acao">'+(d.acao||"")+'</div>';
+      if(d.fungicidas&&d.fungicidas.length>0)html+=buildCalcFungicida(d.fungicidas,diagIdx);
+    }
+    html+='</div>';
+  });
+  var naoSaudavel=diags.filter(function(d){return d.diagnostico!=="saudavel";});
+  var nomesVoz=naoSaudavel.map(function(d){return NOMES_VOZ[d.diagnostico]||d.diagnostico.replace(/_/g," ");}).join(", ");
+  var textoVoz=naoSaudavel.length>0?"Sua planta tem: "+nomesVoz+". ":"Planta saudável. ";
+  textoVoz+=naoSaudavel.map(function(d){return d.acao;}).filter(Boolean).join(". ");
+  _textoParaFalar=textoVoz;
+  html+='<div class="btns-resultado"><button class="btn-voz" onclick="falarTextoAtual()">🔊 Ouvir</button>';
+  html+='<button class="btn-share" onclick="compartilharAtual()">📤 WhatsApp</button>';
+  html+='<button class="btn-nova" onclick="resetar()">📷 Nova</button></div></div>';
+  div.innerHTML=html;
+  salvarHistorico(diags,fotoBase64,regiao);
+  _ultimosDiags=diags;
+}
 
 function mostrarResultado(data,isVideo){var div=document.getElementById("resultado");div.style.display="block";var diags=data.diagnosticos||[{diagnostico:data.diagnostico||"saudavel",estagio:data.estagio||1,confianca:data.confianca||"media",visto:data.visto||"",acao:data.acao||"Tente novamente.",fungicidas:[]}];var regiao=dadosGPS.regiao||"";salvarHistorico(diags,ultimaFotoBase64,regiao);mostrarResultadoStreaming(diags,ultimaFotoBase64,isVideo);}
 
