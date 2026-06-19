@@ -966,13 +966,15 @@ function processar(file, isVideo) {
                         tsArr[qx].analises.unshift({id:"a_"+Date.now(),data:new Date().toISOString(),fotoFull:b64,diagnosticos:diags,statusAcao:"pendente"});
                         localStorage.setItem("dc_talhoes_v1",JSON.stringify(tsArr));
                         localStorage.removeItem("dc_analise_talhao_id");
-                        talhaoAtual = null; // limpar AQUI, após salvar com sucesso
+                        talhaoAtual = null;
                         setTimeout(renderTalhoes, 100);
                         break;
                       }
                     }
                   } catch(eTalhao){ console.error("Talhao save err:",eTalhao); }
                 }
+                // Salvar histórico UMA ÚNICA VEZ aqui com dados completos
+                salvarHistorico(diags,b64,dadosGPS.regiao||"");
                 document.getElementById("spinner").style.display="none";
                 mostrarResultadoStreaming(diags,b64,isVideo);
                 incrementarAnalise();
@@ -1047,7 +1049,7 @@ function mostrarResultadoStreaming(diags,fotoBase64,isVideo){
     html+='<div class="diag-bar">'+barras+'</div>';
     if(d.visto)html+='<div class="diag-visto">"'+d.visto+'"</div>';
     if(d.parcial){
-      html+='<div class="diag-acao" style="color:#aaa;font-style:italic">⏳ Carregando detalhes...</div>';
+      html+='<div class="diag-acao" style="color:#aaa;font-style:italic">⏳ Analisando...</div>';
     }else{
       html+='<div class="diag-acao">'+(d.acao||"")+'</div>';
       if(d.fungicidas&&d.fungicidas.length>0)html+=buildCalcFungicida(d.fungicidas,diagIdx);
@@ -1063,7 +1065,7 @@ function mostrarResultadoStreaming(diags,fotoBase64,isVideo){
   html+='<button class="btn-share" onclick="compartilharAtual()">📤 WhatsApp</button>';
   html+='<button class="btn-nova" onclick="resetar()">📷 Nova</button></div></div>';
   div.innerHTML=html;
-  salvarHistorico(diags,fotoBase64,regiao);
+  // NÃO salvar histórico aqui — só salvar uma vez no tipo:"fim" após dados completos
   _ultimosDiags=diags;
 }
 
