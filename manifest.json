@@ -11,26 +11,16 @@
   "categories": ["agriculture", "productivity"],
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "https://doutor-cafe-app.vercel.app/cafe.jpg.jpeg",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/jpeg",
+      "purpose": "any"
     },
     {
-      "src": "/icon-512.png",
+      "src": "https://doutor-cafe-app.vercel.app/cafe.jpg.jpeg",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
-  "screenshots": [],
-  "shortcuts": [
-    {
-      "name": "Nova Análise",
-      "short_name": "Analisar",
-      "description": "Fotografar planta para diagnóstico",
-      "url": "/?acao=analisar",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      "type": "image/jpeg",
+      "purpose": "any"
     }
   ]
 }
