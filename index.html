@@ -929,6 +929,20 @@ function processar(file, isVideo) {
       }
       // Salvar histórico UMA ÚNICA VEZ com dados completos
       salvarHistorico(diags,b64,dadosGPS.regiao||"");
+      // Sync análise com servidor em background
+      var cadSync=verificarCadastroInicial();
+      if(cadSync&&cadSync.userId){
+        var fotoThumb=b64?b64.substring(0,200):"";
+        fetch('https://doutor-cafe-production.up.railway.app/salvar-analise',{
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({userId:cadSync.userId,talhaoId:talhaoIdCapturado||null,diagnosticos:diags,fotoThumb:fotoThumb,regiao:dadosGPS.regiao||""})
+        }).catch(function(){});
+        // Sync talhão atualizado se houver
+        if(talhaoIdCapturado){
+          var ts=getTalhoes();var t=ts.find(function(x){return x.id===talhaoIdCapturado;});
+          if(t) fetch('https://doutor-cafe-production.up.railway.app/salvar-talhao',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:cadSync.userId,talhao:t})}).catch(function(){});
+        }
+      }
       document.getElementById("spinner").style.display="none";
       mostrarResultadoStreaming(diags,b64,isVideo);
       incrementarAnalise();
@@ -1275,7 +1289,13 @@ function abrirCriarTalhao(){document.getElementById("modalTalhaoOverlay").classL
 function abrirCriarTalhaoSemFoto(){acaoAposTalhao=null;document.getElementById("ctNome").value="";document.getElementById("ctVariedade").value="";document.getElementById("ctIdade").value="";document.getElementById("ctArea").value="";document.getElementById("modalCriarTalhao").classList.add("ativo");}
 function fecharCriarTalhao(){document.getElementById("modalCriarTalhao").classList.remove("ativo");if(acaoAposTalhao){document.getElementById("modalTalhaoOverlay").classList.add("ativo");}}
 
-function salvarNovoTalhao(){var nome=document.getElementById("ctNome").value.trim();if(!nome){alert("Informe o nome do talhão.");return;}var novo={id:"t_"+Date.now(),nome:nome,variedade:document.getElementById("ctVariedade").value,idade:parseInt(document.getElementById("ctIdade").value)||null,area:parseFloat(document.getElementById("ctArea").value)||null,criadoEm:new Date().toISOString(),analises:[]};var talhoes=getTalhoes();talhoes.push(novo);saveTalhoes(talhoes);document.getElementById("modalCriarTalhao").classList.remove("ativo");renderTalhoes();if(acaoAposTalhao){confirmarTalhao(novo);}else{alert('Talhão '+nome+' criado!');}}
+function salvarNovoTalhao(){var nome=document.getElementById("ctNome").value.trim();if(!nome){alert("Informe o nome do talhão.");return;}var novo={id:"t_"+Date.now(),nome:nome,variedade:document.getElementById("ctVariedade").value,idade:parseInt(document.getElementById("ctIdade").value)||null,area:parseFloat(document.getElementById("ctArea").value)||null,criadoEm:new Date().toISOString(),analises:[]};var talhoes=getTalhoes();talhoes.push(novo);saveTalhoes(talhoes);
+  // Sync com servidor em background
+  var cad=verificarCadastroInicial();
+  if(cad&&cad.userId){
+    fetch('https://doutor-cafe-production.up.railway.app/salvar-talhao',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:cad.userId,talhao:novo})}).catch(function(){});
+  }
+  document.getElementById("modalCriarTalhao").classList.remove("ativo");renderTalhoes();if(acaoAposTalhao){confirmarTalhao(novo);}else{alert('Talhão '+nome+' criado!');}}
 
 function renderTalhoes(){var lista=document.getElementById("talhoesList");if(!lista)return;var talhoes=getTalhoes();if(talhoes.length===0){lista.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#aaa;font-size:13px;padding:16px 0">Nenhum talhão cadastrado ainda.</div>';return;}lista.innerHTML=talhoes.map(function(t){var analises=t.analises||[];var ult=analises[0];var pendentes=analises.filter(function(a){return a.statusAcao==="pendente";}).length;var ultimaData=ult?new Date(ult.data).toLocaleDateString("pt-BR"):"Sem análises";var ultDiags=ult&&ult.diagnosticos?ult.diagnosticos.slice(0,2).map(function(d){return d.diagnostico;}).join(", "):"";var detalhe=[t.variedade,t.area?t.area+"ha":""].filter(Boolean).join(" · ");return'<div class="talhao-card'+(pendentes>0?" alerta":"")+'" onclick="abrirHistTalhao(\''+t.id+'\')">'+'<div class="talhao-nome">🌿 '+t.nome+'</div>'+'<div class="talhao-var">'+(detalhe||"Talhão")+'</div>'+'<div class="talhao-ultima">📅 '+ultimaData+'</div>'+(ultDiags?'<div style="font-size:11px;color:#888;margin-top:2px">'+ultDiags+'</div>':'')+'<span class="talhao-status '+(pendentes>0?"pendente":"ok")+'">'+(pendentes>0?"⚠️ "+pendentes+" pendente(s)":"✓ Em dia")+'</span></div>';}).join("");}
 
@@ -1297,7 +1317,23 @@ function confirmarLoginPin(){
   erroEl.textContent="🔄 Verificando...";
   fetch("https://doutor-cafe-production.up.railway.app/entrar",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({celular:celular,pin:pin})})
   .then(function(r){return r.json();})
-  .then(function(d){if(!d.ok){erroEl.textContent=d.erro||"Conta não encontrada.";return;}var cadastro={userId:d.userId,nome:d.nome,celular:d.celular,email:d.email,regiao:d.regiao};localStorage.setItem(CADASTRO_INICIAL_KEY,JSON.stringify(cadastro));if(d.plano&&d.plano!=="gratuito"){salvarPlano({tipo:d.plano,planoId:d.planoId});}document.getElementById("modalLoginCpf").classList.remove("ativo");entrarNoApp(d.nome);})
+  .then(function(d){if(!d.ok){erroEl.textContent=d.erro||"Conta não encontrada.";return;}var cadastro={userId:d.userId,nome:d.nome,celular:d.celular,email:d.email,regiao:d.regiao};localStorage.setItem(CADASTRO_INICIAL_KEY,JSON.stringify(cadastro));if(d.plano&&d.plano!=="gratuito"){salvarPlano({tipo:d.plano,planoId:d.planoId});}document.getElementById("modalLoginCpf").classList.remove("ativo");
+    // Recuperar talhões do servidor ao logar em novo dispositivo
+    fetch('https://doutor-cafe-production.up.railway.app/talhoes/'+d.userId)
+    .then(function(r2){return r2.json();})
+    .then(function(td){
+      if(td.talhoes&&td.talhoes.length>0){
+        var talhoesLocais=getTalhoes();
+        // Mesclar: adicionar os do servidor que não existem localmente
+        td.talhoes.forEach(function(ts){
+          if(!talhoesLocais.find(function(tl){return tl.id===ts.id;})){
+            talhoesLocais.push(ts);
+          }
+        });
+        saveTalhoes(talhoesLocais);
+      }
+    }).catch(function(){});
+    entrarNoApp(d.nome);})
   .catch(function(){erroEl.textContent="Erro de conexão. Verifique sua internet.";});
 }
 
