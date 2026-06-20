@@ -664,7 +664,7 @@ canvas { display: none; }
   <div class="secao-titulo" style="margin-top:4px" id="tituloSecaoHistorico">&#128203; Hist&#243;rico de An&#225;lises</div>
 
   <div class="talhoes-section" id="secaoTalhoes">
-    <div class="talhoes-titulo">🗺️ Meus Talhões</div>
+    <div class="talhoes-titulo">🗺️ Meus Talhões <button onclick="limparTodosTalhoes()" style="background:none;border:none;font-size:11px;color:#aaa;cursor:pointer;text-decoration:underline;font-weight:400;letter-spacing:0;text-transform:none;margin-left:8px">Limpar tudo</button></div>
     <div class="talhoes-grid" id="talhoesList"></div>
     <button class="btn-novo-talhao" onclick="abrirCriarTalhaoSemFoto()">+ Cadastrar Novo Talhão</button>
   </div>
@@ -902,19 +902,20 @@ function processar(file, isVideo) {
     if (dadosGPS.regiao) body.regiao=dadosGPS.regiao;
     if (dadosGPS.altitude) body.altitude=dadosGPS.altitude;
     var diagsSSE = [];
-    var fimProcessado = false;  // flag para garantir que o fim é processado uma única vez
+    var fimProcessado = false;
+    // Capturar talhaoId AGORA em closure — não depender do localStorage durante o SSE
+    var talhaoIdCapturado = localStorage.getItem("dc_analise_talhao_id") || null;
 
     function finalizarAnalise(diags) {
-      if(fimProcessado) return;  // já processou, ignorar
+      if(fimProcessado) return;
       fimProcessado = true;
       diags = diags.map(function(d){ return Object.assign({},d,{parcial:false}); });
-      // Salvar no talhão
-      var tId=localStorage.getItem("dc_analise_talhao_id");
-      if(tId){
+      // Salvar no talhão usando o ID capturado no início da análise
+      if(talhaoIdCapturado){
         try{
           var tsArr=JSON.parse(localStorage.getItem("dc_talhoes_v1")||"[]");
           for(var qx=0;qx<tsArr.length;qx++){
-            if(tsArr[qx].id===tId){
+            if(tsArr[qx].id===talhaoIdCapturado){
               if(!tsArr[qx].analises) tsArr[qx].analises=[];
               tsArr[qx].analises.unshift({id:"a_"+Date.now(),data:new Date().toISOString(),fotoFull:b64,diagnosticos:diags,statusAcao:"pendente"});
               localStorage.setItem("dc_talhoes_v1",JSON.stringify(tsArr));
@@ -1171,6 +1172,13 @@ var acaoAposTalhao = null;
 
 function getTalhoes(){try{return JSON.parse(localStorage.getItem(TALHOES_KEY)||"[]");}catch(e){return[];}}
 function saveTalhoes(talhoes){localStorage.setItem(TALHOES_KEY,JSON.stringify(talhoes));}
+function limparTodosTalhoes(){
+  if(!confirm("Apagar TODOS os talhões e suas análises?\nEssa ação não pode ser desfeita.")) return;
+  localStorage.removeItem(TALHOES_KEY);
+  localStorage.removeItem("dc_analise_talhao_id");
+  talhaoAtual=null;
+  renderTalhoes();
+}
 
 function selecionarTalhao(acaoFn){
   acaoAposTalhao=acaoFn;
