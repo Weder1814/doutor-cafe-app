@@ -1123,7 +1123,55 @@ function mostrarResultado(data,isVideo){var div=document.getElementById("resulta
 
 function mostrarResultadoSolo(data){var div=document.getElementById("resultado");div.style.display="block";var acao=data.acao||"Consulte um agrônomo para mais detalhes.";var textoVoz="Análise de solo. "+acao;var thumbHtml=ultimaFotoBase64?'<img class="card-foto-thumb" src="data:image/jpeg;base64,'+ultimaFotoBase64+'" alt="laudo">':"<div class='card-foto-thumb-placeholder'>🧪</div>";var html='<div class="card-resultado"><div class="card-topo">'+thumbHtml+'<div class="card-titulo"><h2>Análise de Solo</h2><div class="categoria">Recomendação para Café</div></div></div>';html+='<div class="badges"><span class="badge badge-solo">🌱 Laudo Interpretado</span>';if(dadosGPS.regiao)html+='<span class="badge badge-regiao">📍 '+dadosGPS.regiao+'</span>';html+='</div>';if(data.valores){html+='<div class="solo-grid">';for(var k in data.valores){var v=data.valores[k],sc=v.status==="ok"?"solo-ok":v.status==="baixo"?"solo-baixo":"solo-alto",st=v.status==="ok"?"✓ Adequado":v.status==="baixo"?"↓ Baixo":"↑ Alto";html+='<div class="solo-item"><div class="solo-label">'+k+'</div><div class="solo-valor">'+v.valor+'</div><div class="solo-status '+sc+'">'+st+'</div></div>';}html+='</div>';}html+='<div class="divisor"></div><div class="acao-box"><h3>Recomendação</h3><p>'+acao+'</p></div>';html+='<div class="btns-resultado"><button class="btn-voz" onclick="falar(\''+textoVoz.replace(/'/g,"\\'")+'\')">🔊 Ouvir</button><button class="btn-nova" onclick="resetar()">📷 Nova análise</button></div></div>';div.innerHTML=html;falar(textoVoz);div.scrollIntoView({behavior:"smooth",block:"start"});}
 
-function mostrarResultadoDaninha(data){var div=document.getElementById("resultado");div.style.display="block";var nome=data.nome||"Planta não identificada",indicador=data.indicador||"",acao=data.acao||"";var alertaClass="daninha-alerta-compactado";if(indicador.indexOf("cido")>-1||indicador.indexOf("ACIDO")>-1)alertaClass="daninha-alerta-acido";else if(indicador.indexOf("rtil")>-1||indicador.indexOf("fertil")>-1)alertaClass="daninha-alerta-fertil";else if(indicador.indexOf("umidade")>-1||indicador.indexOf("encharcado")>-1)alertaClass="daninha-alerta-umidade";else if(indicador.indexOf("degradado")>-1||indicador.indexOf("calcio")>-1)alertaClass="daninha-alerta-degradado";else if(indicador.indexOf("magnesio")>-1||indicador.indexOf("Mg")>-1)alertaClass="daninha-alerta-mag";var textoVoz="Planta identificada: "+nome+". "+indicador+". "+acao;var thumbHtml=ultimaFotoBase64?'<img class="card-foto-thumb" src="data:image/jpeg;base64,'+ultimaFotoBase64+'" alt="planta">':"<div class='card-foto-thumb-placeholder'>🌾</div>";var html='<div class="card-resultado"><div class="card-topo">'+thumbHtml+'<div class="card-titulo"><h2>'+nome+'</h2><div class="categoria">Planta Daninha Indicadora</div></div></div>';html+='<div class="badges"><span class="badge badge-daninha">🌾 Leitura do Solo</span>';if(dadosGPS.regiao)html+='<span class="badge badge-regiao">📍 '+dadosGPS.regiao+'</span>';html+='</div>';if(data.nome_cientifico)html+='<div class="diag-visto" style="margin:0 20px 10px;"><em>'+data.nome_cientifico+'</em></div>';html+='<div class="daninha-alerta '+alertaClass+'"><div class="daninha-alerta-titulo">🔍 '+indicador+'</div><div class="daninha-alerta-desc">'+acao+'</div></div>';if(data.produtos&&data.produtos.length>0){html+='<div class="calc-box" style="margin:0 20px 14px;"><div class="calc-titulo">🌿 Controle Recomendado</div>';data.produtos.forEach(function(p){html+='<div class="calc-produto"><div class="calc-produto-nome">'+p.nome+'</div><div style="font-size:12px;color:#555;margin-top:4px">'+p.dose+' · '+p.como_usar+'</div></div>';});html+='</div>';}html+='<div class="btns-resultado"><button class="btn-voz" onclick="falar(\''+textoVoz.replace(/'/g,"\\'")+'\')">🔊 Ouvir</button><button class="btn-nova" onclick="resetar()">📷 Nova análise</button></div></div>';div.innerHTML=html;falar(textoVoz);div.scrollIntoView({behavior:"smooth",block:"start"});}
+function mostrarResultadoDaninha(data){
+  var div=document.getElementById("resultado");div.style.display="block";
+  // Suporte ao novo formato com array de plantas
+  var plantas=data.plantas||(data.nome?[data]:[]);
+  if(plantas.length===0){mostrarErro();return;}
+  var thumbHtml=ultimaFotoBase64?'<img class="card-foto-thumb" src="data:image/jpeg;base64,'+ultimaFotoBase64+'" alt="planta">':"<div class='card-foto-thumb-placeholder'>🌾</div>";
+  var qtd=plantas.length>1?plantas.length+" plantas identificadas":"1 planta identificada";
+  var html='<div class="card-resultado"><div class="card-topo">'+thumbHtml+'<div class="card-titulo"><h2>'+qtd+'</h2><div class="categoria">Plantas Daninhas Indicadoras</div></div></div>';
+  html+='<div class="badges"><span class="badge badge-daninha">🌾 Leitura do Solo</span>';
+  if(dadosGPS.regiao)html+='<span class="badge badge-regiao">📍 '+dadosGPS.regiao+'</span>';
+  html+='</div>';
+  // Indicador geral se houver múltiplas plantas
+  if(plantas.length>1&&data.indicador_geral){
+    html+='<div class="daninha-alerta daninha-alerta-compactado" style="background:#fff8e1;border-left:4px solid #f57f17"><div class="daninha-alerta-titulo">🔍 O que esse conjunto indica</div><div class="daninha-alerta-desc">'+data.indicador_geral+'</div></div>';
+  }
+  // Cada planta
+  plantas.forEach(function(p,idx){
+    var indicador=p.indicador||"";
+    var acao=p.acao||"";
+    var alertaClass="daninha-alerta-compactado";
+    if(indicador.indexOf("cido")>-1||indicador.indexOf("ACIDO")>-1)alertaClass="daninha-alerta-acido";
+    else if(indicador.indexOf("rtil")>-1||indicador.indexOf("fertil")>-1)alertaClass="daninha-alerta-fertil";
+    else if(indicador.indexOf("umidade")>-1||indicador.indexOf("encharcado")>-1)alertaClass="daninha-alerta-umidade";
+    else if(indicador.indexOf("degradado")>-1)alertaClass="daninha-alerta-degradado";
+    else if(indicador.indexOf("glifosato")>-1||indicador.indexOf("resistente")>-1)alertaClass="daninha-alerta-compactado";
+    var urgBadge=p.urgencia==="alta"?'<span style="background:#fce4ec;color:#c62828;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:6px">⚠️ URGENTE</span>':p.urgencia==="media"?'<span style="background:#fff3e0;color:#e65100;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:6px">Atenção</span>':"";
+    if(plantas.length>1)html+='<div style="padding:8px 20px 0;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#888">'+(idx+1)+'ª planta encontrada</div>';
+    html+='<div class="card-topo" style="padding:10px 20px 6px"><div style="flex:1"><h2 style="font-family:Playfair Display,serif;font-size:18px;color:#3d2b1a">'+p.nome+urgBadge+'</h2><div style="font-size:11px;color:#888;font-style:italic">'+( p.nome_cientifico||"")+'</div></div></div>';
+    html+='<div class="daninha-alerta '+alertaClass+'" style="margin:0 20px 10px"><div class="daninha-alerta-titulo">🔍 '+indicador+'</div><div class="daninha-alerta-desc">'+acao+'</div></div>';
+    if(p.alerta)html+='<div style="margin:0 20px 10px;background:#fff3e0;border-radius:10px;padding:8px 12px;font-size:12px;color:#e65100;font-weight:600">⚠️ '+p.alerta+'</div>';
+    if(p.produtos&&p.produtos.length>0){
+      html+='<div class="calc-box" style="margin:0 20px 14px"><div class="calc-titulo">🌿 Controle Recomendado</div>';
+      p.produtos.forEach(function(prod){
+        html+='<div class="calc-produto"><div class="calc-produto-nome">'+prod.nome+'</div><div style="font-size:12px;color:#555;margin-top:4px">'+prod.dose+(prod.como_usar?' · '+prod.como_usar:'')+'</div></div>';
+      });
+      html+='</div>';
+    }
+  });
+  // Manejo integrado se múltiplas plantas
+  if(plantas.length>1&&data.manejo_integrado){
+    html+='<div style="margin:0 20px 14px;background:#e8f5e9;border-radius:12px;padding:12px 14px;border-left:4px solid #2d8a3e"><div style="font-size:13px;font-weight:700;color:#1a5c2a;margin-bottom:4px">🎯 Estratégia para controlar tudo junto</div><div style="font-size:12px;color:#333;line-height:1.5">'+data.manejo_integrado+'</div></div>';
+  }
+  var textoVoz=plantas.map(function(p){return p.nome+". "+p.indicador+". "+p.acao;}).join(" Além disso, ");
+  _textoParaFalar=textoVoz;
+  html+='<div class="btns-resultado"><button class="btn-voz" onclick="falarTextoAtual()">🔊 Ouvir</button><button class="btn-nova" onclick="resetar()">📷 Nova análise</button></div></div>';
+  div.innerHTML=html;
+  falar(textoVoz);
+  div.scrollIntoView({behavior:"smooth",block:"start"});
+}
 
 function mostrarErro(){var div=document.getElementById("resultado");div.style.display="block";div.innerHTML='<div class="card-resultado"><div class="acao-box"><p>⚠️ Erro ao analisar. Verifique sua conexão e tente novamente.</p></div><div class="btns-resultado"><button class="btn-nova" onclick="resetar()">📷 Tentar novamente</button></div></div>';}
 
