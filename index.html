@@ -1006,14 +1006,36 @@ function processar(file, isVideo) {
           if(res2.done){
             // Processar buffer restante
             if(sseBuf.trim()) processarEventos(sseBuf);
-            // Fallback: se tipo:fim nunca chegou mas temos diagnósticos, finalizar
-            if(!fimProcessado && diagsSSE.length>0){
-              console.warn("tipo:fim não recebido — fallback com diagsSSE");
-              finalizarAnalise(diagsSSE);
-            } else if(!fimProcessado){
-              // Nenhum diagnóstico e nenhum fim — erro
-              document.getElementById("spinner").style.display="none";
-              mostrarErro();
+            // Se tipo:fim não chegou — buscar resultado completo via JSON
+            if(!fimProcessado){
+              if(diagsSSE.length>0){
+                // Temos parciais — buscar completo no servidor
+                fetch("https://doutor-cafe-production.up.railway.app/diagnostico-json",{
+                  method:"POST", headers:{"Content-Type":"application/json"},
+                  body:JSON.stringify(body)
+                })
+                .then(function(r3){return r3.json();})
+                .then(function(data){
+                  var dF=data.diagnosticos||[];
+                  if(dF.length>0){
+                    // Mesclar com os parciais que já temos na tela
+                    var diags=dF.map(function(df,idx){
+                      var sse=diagsSSE[idx];
+                      return Object.assign({},sse||{},df,{parcial:false});
+                    });
+                    finalizarAnalise(diags);
+                  } else {
+                    finalizarAnalise(diagsSSE);
+                  }
+                })
+                .catch(function(){
+                  // Se o JSON também falhar, usar parciais mesmo
+                  finalizarAnalise(diagsSSE);
+                });
+              } else {
+                document.getElementById("spinner").style.display="none";
+                mostrarErro();
+              }
             }
             return;
           }
