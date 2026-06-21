@@ -1,8 +1,13 @@
 {
-  "rewrites": [
+  "cleanUrls": false,
+  "trailingSlash": false,
+  "headers": [
     {
-      "source": "/.well-known/assetlinks.json",
-      "destination": "/assetlinks.json"
+      "source": "/assetlinks.json",
+      "headers": [
+        { "key": "Content-Type", "value": "application/json" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" }
+      ]
     }
   ]
 }
