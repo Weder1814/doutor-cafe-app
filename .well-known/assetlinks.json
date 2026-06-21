@@ -1,8 +1,0 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "app.doutorcafe.diagnostico",
-    "sha256_cert_fingerprints": ["C6:AD:C4:86:32:D6:11:50:D7:95:28:13:80:D0:D2:E2:25:54:80:68:6B:66:98:A4:C1:8C:CC:E1:E5:F0:91:99"]
-  }
-}]
