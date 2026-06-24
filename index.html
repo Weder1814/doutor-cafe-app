@@ -636,6 +636,7 @@ canvas { display: none; }
   <button class="btn-foto" id="btnCam"><span class="btn-icon">&#128247;</span><span class="btn-text">Fotografar a Folha<small>An&#225;lise por foto &#250;nica</small></span></button>
   <button class="btn-video" id="btnVid"><span class="btn-icon">&#127909;</span><span class="btn-text">Gravar V&#237;deo da Folha<small>Mais preciso &#8212; v&#225;rios &#226;ngulos</small></span></button>
   <button class="btn-galeria" id="btnGal"><span class="btn-icon">&#128444;&#65039;</span><span class="btn-text">Escolher da Galeria<small>Use uma foto j&#225; tirada</small></span></button>
+  <button id="btnTrocarTalhao" onclick="localStorage.removeItem('dc_analise_talhao_id');talhaoAtual=null;selecionarTalhao(function(){});" style="background:none;border:1px dashed #c8ddc8;border-radius:12px;padding:10px;font-size:12px;color:var(--cinza);cursor:pointer;width:100%;font-family:'DM Sans',sans-serif;">&#128260; Trocar talhão selecionado</button>
 
   <div id="spinner">
     <span class="spinner-folha">&#128300;</span>
@@ -750,7 +751,7 @@ function verificarRetornoPagamento(){var params=new URLSearchParams(window.locat
 
 var ultimaFotoBase64 = null;
 var HIST_KEY = "doutorcafe_hist";
-var FILA_MAX = 50;
+var FILA_MAX = 9999;
 var TIMEOUT_MS = 60000;
 
 function fetchComTimeout(url, opcoes, ms) {
@@ -1218,9 +1219,9 @@ function bindSoloGal(){var inp=criarInput("soloGal","image/*",null);inp.addEvent
 function bindDaninha(){var inp=criarInput("daninha","image/*","environment");inp.addEventListener("change",function(e){if(e.target.files[0])processarDaninha(e.target.files[0]);bindDaninha();});}
 function bindDaninhaGal(){var inp=criarInput("daninaGal","image/*",null);inp.addEventListener("change",function(e){if(e.target.files[0])processarDaninha(e.target.files[0]);bindDaninhaGal();});}
 
-document.getElementById("btnCam").addEventListener("click",function(){selecionarTalhao(function(){document.getElementById("cam").click();});});
-document.getElementById("btnGal").addEventListener("click",function(){selecionarTalhao(function(){document.getElementById("gal").click();});});
-document.getElementById("btnVid").addEventListener("click",function(){selecionarTalhao(function(){document.getElementById("vid").click();});});
+document.getElementById("btnCam").addEventListener("click",function(){var t=localStorage.getItem("dc_analise_talhao_id");if(t){document.getElementById("cam").click();}else{selecionarTalhao(function(){document.getElementById("cam").click();});}});
+document.getElementById("btnGal").addEventListener("click",function(){var t=localStorage.getItem("dc_analise_talhao_id");if(t){document.getElementById("gal").click();}else{selecionarTalhao(function(){document.getElementById("gal").click();});}});
+document.getElementById("btnVid").addEventListener("click",function(){var t=localStorage.getItem("dc_analise_talhao_id");if(t){document.getElementById("vid").click();}else{selecionarTalhao(function(){document.getElementById("vid").click();});}});
 document.getElementById("btnSolo").addEventListener("click",function(){document.getElementById("solo").click();});
 document.getElementById("btnSoloGal").addEventListener("click",function(){document.getElementById("soloGal").click();});
 document.getElementById("btnDaninha").addEventListener("click",function(){document.getElementById("daninha").click();});
