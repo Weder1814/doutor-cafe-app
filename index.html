@@ -528,12 +528,9 @@ canvas { display: none; }
 <!-- MODAL LOGIN CPF -->
 <div class="modal-talhao-overlay" id="modalLoginCpf">
   <div class="modal-talhao-box">
-    <div class="modal-talhao-titulo">🔐 Entrar com CPF</div>
-    <div class="modal-talhao-sub">Digite seu celular e PIN para recuperar sua conta</div>
-    <div class="cad-field" style="margin-top:16px">
-      <label style="font-size:12px;font-weight:700;color:#555;text-transform:uppercase">Celular *</label>
-      <input type="tel" id="loginCelularInput" placeholder="(00) 00000-0000" maxlength="15" oninput="mascararCelular(this)" style="width:100%;padding:14px;border:1.5px solid #ddd;border-radius:12px;font-size:16px;box-sizing:border-box;margin-top:6px">
-    </div>
+    <div class="modal-talhao-titulo">🔐 Entrar com Pin</div>
+    <div class="modal-talhao-sub">Digite seu Pin de 4 dígitos para acessar sua conta</div>
+    
     <div class="cad-field" style="margin-top:12px">
       <label style="font-size:12px;font-weight:700;color:#555;text-transform:uppercase">PIN de 4 dígitos *</label>
       <input type="tel" id="loginPinInput" placeholder="••••" maxlength="4" oninput="this.value=this.value.replace(/[^0-9]/g,'').substr(0,4)" onkeydown="if(event.key==='Enter')confirmarLoginPin()" style="width:100%;padding:14px;border:1.5px solid #ddd;border-radius:12px;font-size:28px;font-weight:700;text-align:center;letter-spacing:10px;box-sizing:border-box;margin-top:6px">
