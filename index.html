@@ -528,12 +528,11 @@ canvas { display: none; }
 <!-- MODAL LOGIN CPF -->
 <div class="modal-talhao-overlay" id="modalLoginCpf">
   <div class="modal-talhao-box">
-    <div class="modal-talhao-titulo">🔐 Entrar com Pin</div>
-    <div class="modal-talhao-sub">Digite seu Pin de 4 dígitos para acessar sua conta</div>
-    
-    <div class="cad-field" style="margin-top:12px">
+    <div class="modal-talhao-titulo">🔐 Entrar com PIN</div>
+    <div class="modal-talhao-sub">Digite seu PIN de 4 dígitos para acessar sua conta</div>
+    <div class="cad-field" style="margin-top:16px">
       <label style="font-size:12px;font-weight:700;color:#555;text-transform:uppercase">PIN de 4 dígitos *</label>
-      <input type="tel" id="loginPinInput" placeholder="••••" maxlength="4" oninput="this.value=this.value.replace(/[^0-9]/g,'').substr(0,4)" onkeydown="if(event.key==='Enter')confirmarLoginPin()" style="width:100%;padding:14px;border:1.5px solid #ddd;border-radius:12px;font-size:28px;font-weight:700;text-align:center;letter-spacing:10px;box-sizing:border-box;margin-top:6px">
+      <input type="tel" id="loginPinInput" placeholder="••••" maxlength="4" oninput="this.value=this.value.replace(/[^0-9]/g,'').substr(0,4)" onkeydown="if(event.key==='Enter')confirmarLoginPin()" style="width:100%;padding:20px 14px;border:1.5px solid #ddd;border-radius:12px;font-size:36px;font-weight:700;text-align:center;letter-spacing:16px;box-sizing:border-box;margin-top:6px">
     </div>
     <div id="loginCpfErro" style="color:#e53935;font-size:13px;text-align:center;min-height:20px;margin-bottom:8px"></div>
     <button onclick="confirmarLoginPin()" style="width:100%;padding:14px;background:linear-gradient(135deg,#2d8a3e,#1a5c2a);color:white;border:none;border-radius:16px;font-size:15px;font-weight:700;cursor:pointer">✅ Entrar na minha conta</button>
@@ -1312,13 +1311,11 @@ function toggleStatusAnalise(talhaoId,analiseIdx){var talhoes=getTalhoes();var t
 function abrirLoginCpf(){if(document.getElementById("loginCelularInput"))document.getElementById("loginCelularInput").value="";if(document.getElementById("loginPinInput"))document.getElementById("loginPinInput").value="";document.getElementById("loginCpfErro").textContent="";document.getElementById("modalLoginCpf").classList.add("ativo");}
 function fecharLoginCpf(){document.getElementById("modalLoginCpf").classList.remove("ativo");}
 function confirmarLoginPin(){
-  var celular=(document.getElementById("loginCelularInput").value||"").replace(/[^0-9]/g,"");
   var pin=(document.getElementById("loginPinInput").value||"").replace(/[^0-9]/g,"");
   var erroEl=document.getElementById("loginCpfErro");
-  if(celular.length<10){erroEl.textContent="Informe seu celular.";return;}
   if(pin.length!==4){erroEl.textContent="PIN deve ter 4 dígitos.";return;}
   erroEl.textContent="🔄 Verificando...";
-  fetch("https://doutor-cafe-production.up.railway.app/entrar",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({celular:celular,pin:pin})})
+  fetch("https://doutor-cafe-production.up.railway.app/entrar-pin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({pin:pin})})
   .then(function(r){return r.json();})
   .then(function(d){if(!d.ok){erroEl.textContent=d.erro||"Conta não encontrada.";return;}var cadastro={userId:d.userId,nome:d.nome,celular:d.celular,email:d.email,regiao:d.regiao};localStorage.setItem(CADASTRO_INICIAL_KEY,JSON.stringify(cadastro));if(d.plano&&d.plano!=="gratuito"){salvarPlano({tipo:d.plano,planoId:d.planoId});}document.getElementById("modalLoginCpf").classList.remove("ativo");
     // Recuperar talhões do servidor ao logar em novo dispositivo
