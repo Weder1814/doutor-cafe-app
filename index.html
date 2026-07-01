@@ -1,12 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<script>
-window.onerror = function(msg, url, line, col, error) {
-  alert("ERRO JS:\n" + msg + "\nLinha: " + line + "\nArquivo: " + url);
-  return false;
-};
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Doutor Café</title>
@@ -1447,12 +1441,13 @@ function submeterCadastroInicial(){
   entrarNoApp(nome);
 }
 
-function entrarNoApp(nome){mostrarTela('tela-principal');atualizarContador();renderAreaHistorico();renderCalendario();obterGPS();checarLembretesPendentes();if(nome){var primeiroNome=nome.split(' ')[0];setTimeout(function(){var tag=document.getElementById('regiaoTag');if(tag)tag.innerHTML='Olá, '+primeiroNome+'! Vamos diagnosticar';setTimeout(function(){obterGPS();},3000);},600);}}
+function entrarNoApp(nome){usuarioAtual=verificarCadastroInicial();mostrarTela('tela-principal');atualizarContador();renderAreaHistorico();renderCalendario();obterGPS();checarLembretesPendentes();if(nome){var primeiroNome=nome.split(' ')[0];setTimeout(function(){var tag=document.getElementById('regiaoTag');if(tag)tag.innerHTML='Olá, '+primeiroNome+'! Vamos diagnosticar';setTimeout(function(){obterGPS();},3000);},600);}}
 function verificarCadastroInicial(){try{return JSON.parse(localStorage.getItem(CADASTRO_INICIAL_KEY));}catch(e){return null;}}
 
 // ── TALHÕES ──
 var TALHOES_KEY = "dc_talhoes_v1";
 var talhaoAtual = null;
+var usuarioAtual = null;
 var acaoAposTalhao = null;
 
 function getTalhoes(){try{return JSON.parse(localStorage.getItem(TALHOES_KEY)||"[]");}catch(e){return[];}}
