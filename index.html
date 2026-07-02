@@ -884,8 +884,8 @@ function confirmarCadastro(){
   var btn=document.querySelector('.btn-cadastrar');btn.textContent='Cadastrando...';btn.disabled=true;
   var dados={nome:nome,celular:celular,regiao:regiao,email:email,dataCadastro:new Date().toISOString()};
   fetch('https://doutor-cafe-production.up.railway.app/cadastrar-usuario',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:obterUserId(),nome:nome,celular:celular,regiao:regiao,email:email})})
-  .then(function(r){return r.json();}).then(function(d){salvarCadastroLocal(dados);document.getElementById('modalCadastro').classList.remove('ativo');atualizarContador();alert('✅ Cadastro realizado! Você ganhou mais 10 análises gratuitas.');btn.textContent='✅ Cadastrar e Continuar';btn.disabled=false;})
-  .catch(function(){salvarCadastroLocal(dados);document.getElementById('modalCadastro').classList.remove('ativo');atualizarContador();alert('✅ Cadastro realizado! Você ganhou mais 10 análises gratuitas.');btn.textContent='✅ Cadastrar e Continuar';btn.disabled=false;});
+  .then(function(r){return r.json();}).then(function(d){salvarCadastroLocal(dados);document.getElementById('modalCadastro').classList.remove('ativo');atualizarContador();alert('✅ Cadastro atualizado com sucesso!');btn.textContent='✅ Cadastrar e Continuar';btn.disabled=false;})
+  .catch(function(){salvarCadastroLocal(dados);document.getElementById('modalCadastro').classList.remove('ativo');atualizarContador();alert('✅ Cadastro atualizado com sucesso!');btn.textContent='✅ Cadastrar e Continuar';btn.disabled=false;});
 }
 
 // ── IndexedDB / Fila Offline ──
