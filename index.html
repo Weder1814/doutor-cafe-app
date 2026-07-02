@@ -703,6 +703,23 @@ canvas { display: none; }
 
   <div id="areaHistorico"></div>
 
+  <div class="secao-titulo" style="margin-top:4px">&#10067; O Que Significam os Termos</div>
+  <details class="dica" style="display:block">
+    <summary style="cursor:pointer;font-size:13px;font-weight:600;color:var(--marrom)">Toque para ver explica&#231;&#245;es simples dos termos t&#233;cnicos</summary>
+    <div style="margin-top:10px;font-size:12px;color:var(--cinza);line-height:1.8">
+      <p><strong>Calda</strong> — a mistura de &#225;gua com o produto, pronta pra pulverizar.</p>
+      <p><strong>Protetor</strong> — fica na superf&#237;cie da folha, lava com a chuva, precisa reaplicar mais vezes.</p>
+      <p><strong>Sist&#234;mico</strong> — entra na planta, dura mais, mas n&#227;o pode ser usado sozinho por muito tempo (a doen&#231;a pode criar resist&#234;ncia).</p>
+      <p><strong>P&#243;s-emerg&#234;ncia</strong> — aplicado depois que a planta/erva daninha j&#225; nasceu.</p>
+      <p><strong>Pr&#233;-emerg&#234;ncia</strong> — aplicado antes da planta/erva daninha nascer, no solo.</p>
+      <p><strong>K2O, P2O5, MgO</strong> — jeito que o adubo mede a quantidade de nutriente (pot&#225;ssio, f&#243;sforo, magn&#233;sio). Confira essa % no r&#243;tulo do saco que voc&#234; comprar.</p>
+      <p><strong>Fertirriga&#231;&#227;o</strong> — aplicar adubo dissolvido junto com a &#225;gua de irriga&#231;&#227;o.</p>
+      <p><strong>Banco de sementes</strong> — sementes de erva daninha acumuladas no solo, que continuam nascendo por anos se n&#227;o controladas antes de florescer.</p>
+      <p><strong>Est&#225;gio (1 a 5)</strong> — o qu&#227;o avan&#231;ado est&#225; o problema. 1 &#233; inicial, 5 &#233; grave.</p>
+      <p><strong>Car&#234;ncia</strong> — dias que precisa esperar ap&#243;s aplicar o produto antes de colher.</p>
+    </div>
+  </details>
+
   <div class="secao-titulo" style="margin-top:4px">&#128172; Fale Conosco</div>
   <div class="dica" style="flex-direction:column;gap:10px">
     <p style="font-size:13px;color:var(--marrom);font-weight:600">Tem d&#250;vidas, sugest&#245;es ou encontrou algum problema?</p>
@@ -983,7 +1000,26 @@ function calcularRiscoGeada(minimaPrevista48h){
   return null;
 }
 
-function obterClima(lat,lon){fetch("https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lon+"&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&daily=temperature_2m_min,temperature_2m_max,precipitation_probability_max&forecast_days=3&timezone=America/Sao_Paulo").then(function(r){return r.json();}).then(function(d){var c=d.current,temp=Math.round(c.temperature_2m),umidade=Math.round(c.relative_humidity_2m),chuva=c.precipitation||0,wcode=c.weather_code;var climaIcon=wcode<=1?"\u2600\uFE0F":wcode<=3?"\u26C5":wcode<=49?"\uD83C\uDF2B\uFE0F":wcode<=67?"\uD83C\uDF27\uFE0F":wcode<=77?"\u2744\uFE0F":wcode<=82?"\uD83C\uDF26\uFE0F":"\u26C8\uFE0F";var risco=calcularRiscoFerrugem(temp,umidade,chuva);
+function faseDaLua(data){
+  var lp=29.53058867; // duração do ciclo lunar em dias
+  var novaLuaRef=Date.UTC(2000,0,6,18,14,0)/1000; // nova lua de referência conhecida
+  var diffDias=(data.getTime()/1000-novaLuaRef)/86400;
+  var idade=diffDias%lp; if(idade<0)idade+=lp;
+  var pos=idade/lp;
+  var emojis=["\uD83C\uDF11","\uD83C\uDF12","\uD83C\uDF13","\uD83C\uDF14","\uD83C\uDF15","\uD83C\uDF16","\uD83C\uDF17","\uD83C\uDF18"];
+  var idx=Math.round(pos*8)%8;
+  return emojis[idx];
+}
+function obterIconeClima(wcode,ehDia){
+  if(wcode<=1)return ehDia?"\u2600\uFE0F":faseDaLua(new Date());
+  if(wcode<=3)return ehDia?"\u26C5":"\u2601\uFE0F";
+  if(wcode<=49)return "\uD83C\uDF2B\uFE0F";
+  if(wcode<=67)return "\uD83C\uDF27\uFE0F";
+  if(wcode<=77)return "\u2744\uFE0F";
+  if(wcode<=82)return "\uD83C\uDF26\uFE0F";
+  return "\u26C8\uFE0F";
+}
+function obterClima(lat,lon){fetch("https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lon+"&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,is_day&daily=temperature_2m_min,temperature_2m_max,precipitation_probability_max&forecast_days=3&timezone=America/Sao_Paulo").then(function(r){return r.json();}).then(function(d){var c=d.current,temp=Math.round(c.temperature_2m),umidade=Math.round(c.relative_humidity_2m),chuva=c.precipitation||0,wcode=c.weather_code,ehDia=c.is_day===1;var climaIcon=obterIconeClima(wcode,ehDia);var risco=calcularRiscoFerrugem(temp,umidade,chuva);
   var minima48h=null;
   if(d.daily&&d.daily.temperature_2m_min&&d.daily.temperature_2m_min.length>1){minima48h=Math.round(Math.min(d.daily.temperature_2m_min[0],d.daily.temperature_2m_min[1]));}
   var riscoGeada=calcularRiscoGeada(minima48h);
@@ -1075,7 +1111,20 @@ function identificarRegiao(lat,lon){if(lat>=-20.5&&lat<=-15.0&&lon>=-50.0&&lon<=
 function obterGPS(){if(!navigator.geolocation){document.getElementById("regiaoTag").textContent="\uD83D\uDCCD GPS não disponível";return;}navigator.geolocation.getCurrentPosition(function(pos){dadosGPS.lat=pos.coords.latitude;dadosGPS.lon=pos.coords.longitude;dadosGPS.altitude=pos.coords.altitude?Math.round(pos.coords.altitude):null;dadosGPS.regiao=identificarRegiao(dadosGPS.lat,dadosGPS.lon);var tag="\uD83D\uDCCD "+dadosGPS.regiao;if(dadosGPS.altitude)tag+=" \u00b7 "+dadosGPS.altitude+"m";document.getElementById("regiaoTag").textContent=tag;obterClima(dadosGPS.lat,dadosGPS.lon);},function(){document.getElementById("regiaoTag").textContent="\uD83D\uDCCD Localização não obtida";document.getElementById("cardClima").innerHTML='<div class="clima-topo"><span style="font-size:13px;color:var(--cinza)">Ative o GPS para ver o clima</span></div>';},{timeout:8000,enableHighAccuracy:false});}
 
 // ── CALCULADORA FUNGICIDA ──
-function buildCalcFungicida(fungicidas,diagIdx){if(!fungicidas||fungicidas.length===0)return "";var html='<div class="calc-box"><div class="calc-titulo">\uD83E\uDDEA Calcular Dosagem</div>';fungicidas.forEach(function(f,fi){var badgeClass="calc-tipo-"+(f.tipo||"protetor");var badgeTxt=f.tipo==="sistemico"?"Sistêmico":f.tipo==="biologico"?"Biológico":f.tipo==="acaricida"?"Acaricida":f.tipo==="inseticida"?"Inseticida":"Protetor";var inputId="calc_"+diagIdx+"_"+fi;var resTanque=(f.proporcao_por_litro*20).toFixed(1);html+='<div class="calc-produto"><div class="calc-produto-nome">\uD83E\uDDF4 '+f.nome+' <span class="calc-tipo-badge '+badgeClass+'">'+badgeTxt+'</span></div>';html+='<div class="calc-inputs"><div class="calc-input-group"><label>Área (hectares)</label><input type="number" id="'+inputId+'_ha" value="1" min="0.1" step="0.1" oninput="calcular(\''+inputId+'\','+f.dose_min+','+f.dose_max+','+f.proporcao_por_litro+',\''+f.unidade+'\',\''+(f.unidade_proporcao||'g')+'\')"></div>';html+='<div class="calc-input-group"><label>Tanque (litros)</label><input type="number" id="'+inputId+'_tanque" value="20" min="1" step="1" oninput="calcular(\''+inputId+'\','+f.dose_min+','+f.dose_max+','+f.proporcao_por_litro+',\''+f.unidade+'\',\''+(f.unidade_proporcao||'g')+'\')"></div></div>';html+='<div class="calc-resultado" id="'+inputId+'_res"><div class="calc-resultado-linha"><span class="calc-resultado-label">Dose total no hectare</span><span class="calc-resultado-valor">'+f.dose_min+'\u2013'+f.dose_max+' '+f.unidade+'</span></div><div class="calc-resultado-linha"><span class="calc-resultado-label">Por tanque de 20L</span><span class="calc-resultado-valor">'+resTanque+' '+(f.unidade_proporcao||'g')+'</span></div><div class="calc-aviso">\u26A0\uFE0F Confirme sempre no rótulo do produto comprado</div></div></div>';});html+='<div class="ordem-mistura"><strong>📋 Ordem de mistura no tanque:</strong><br>1º Encher com 1/3 de água<br>2º Pós molháveis (WP/WG)<br>3º Suspensões concentradas (SC)<br>4º Concentrados emulsionáveis (EC)<br>5º Completar com água e agitar bem</div>';html+='</div>';return html;}
+function formulacaoDoNome(nome){
+  if(/\bWG\b/i.test(nome))return{passo:2,label:"Pós molhável (WG)"};
+  if(/\bWP\b/i.test(nome))return{passo:2,label:"Pós molhável (WP)"};
+  if(/\bSC\b/i.test(nome))return{passo:3,label:"Suspensão concentrada (SC)"};
+  if(/\bEC\b/i.test(nome))return{passo:4,label:"Concentrado emulsionável (EC)"};
+  return null;
+}
+function buildCalcFungicida(fungicidas,diagIdx){if(!fungicidas||fungicidas.length===0)return "";var html='<div class="calc-box"><div class="calc-titulo">\uD83E\uDDEA Calcular Dosagem</div>';var passosUsados={};var temProtetor=false,temSistemico=false;fungicidas.forEach(function(f,fi){var badgeClass="calc-tipo-"+(f.tipo||"protetor");var badgeTxt=f.tipo==="sistemico"?"Sistêmico":f.tipo==="biologico"?"Biológico":f.tipo==="acaricida"?"Acaricida":f.tipo==="inseticida"?"Inseticida":"Protetor";if(f.tipo==="sistemico")temSistemico=true;else if(!f.tipo||f.tipo==="protetor")temProtetor=true;var inputId="calc_"+diagIdx+"_"+fi;var resTanque=(f.proporcao_por_litro*20).toFixed(1);var fmt=formulacaoDoNome(f.nome);var passoTxt="";if(fmt){passosUsados[fmt.passo]=f.nome;passoTxt='<div style="font-size:11px;color:#1a5c2a;margin-top:4px">\uD83D\uDCCB Este produto entra no <strong>passo '+fmt.passo+'</strong> da mistura (veja a ordem completa abaixo)</div>';}html+='<div class="calc-produto"><div class="calc-produto-nome">\uD83E\uDDF4 '+f.nome+' <span class="calc-tipo-badge '+badgeClass+'">'+badgeTxt+'</span></div>';html+='<div class="calc-inputs"><div class="calc-input-group"><label>Área (hectares)</label><input type="number" id="'+inputId+'_ha" value="1" min="0.1" step="0.1" oninput="calcular(\''+inputId+'\','+f.dose_min+','+f.dose_max+','+f.proporcao_por_litro+',\''+f.unidade+'\',\''+(f.unidade_proporcao||'g')+'\')"></div>';html+='<div class="calc-input-group"><label>Tanque (litros)</label><input type="number" id="'+inputId+'_tanque" value="20" min="1" step="1" oninput="calcular(\''+inputId+'\','+f.dose_min+','+f.dose_max+','+f.proporcao_por_litro+',\''+f.unidade+'\',\''+(f.unidade_proporcao||'g')+'\')"></div></div>';html+='<div class="calc-resultado" id="'+inputId+'_res"><div class="calc-resultado-linha"><span class="calc-resultado-label">Dose total no hectare</span><span class="calc-resultado-valor">'+f.dose_min+'\u2013'+f.dose_max+' '+f.unidade+'</span></div><div class="calc-resultado-linha"><span class="calc-resultado-label">Por tanque de 20L</span><span class="calc-resultado-valor">'+resTanque+' '+(f.unidade_proporcao||'g')+'</span></div><div class="calc-aviso">\u26A0\uFE0F Confirme sempre no rótulo do produto comprado</div></div>'+passoTxt+'</div>';});
+  var passos=[{n:1,txt:"Encher com 1/3 de água"},{n:2,txt:"Pós molháveis (WP/WG)"},{n:3,txt:"Suspensões concentradas (SC)"},{n:4,txt:"Concentrados emulsionáveis (EC)"},{n:5,txt:"Completar com água e agitar bem"}];
+  var mistHtml='<div class="ordem-mistura"><strong>📋 Ordem de mistura no tanque:</strong><br>';
+  passos.forEach(function(p){var extra=passosUsados[p.n]?' <strong>\u2190 '+passosUsados[p.n]+'</strong>':'';mistHtml+=p.n+'\u00ba '+p.txt+extra+'<br>';});
+  mistHtml+='</div>';
+  if(temProtetor&&temSistemico){mistHtml+='<div style="margin-top:8px;font-size:11px;color:#5a6b5c;line-height:1.5">\uD83D\uDCA1 <strong>Por que dois produtos?</strong> O <em>protetor</em> fica na superfície da folha e lava com a chuva (por isso precisa reaplicar mais vezes). O <em>sistêmico</em> entra na planta e dura mais, mas sozinho pode fazer a doença criar resistência. Por isso os dois juntos funcionam melhor.</div>';}
+  html+=mistHtml+'</div>';return html;}
 function calcular(inputId,doseMin,doseMax,propPorLitro,unidade,unidadeProp){var haEl=document.getElementById(inputId+"_ha"),tanqueEl=document.getElementById(inputId+"_tanque"),resEl=document.getElementById(inputId+"_res");if(!haEl||!tanqueEl||!resEl)return;var ha=parseFloat(haEl.value)||1,tanque=parseFloat(tanqueEl.value)||20;resEl.innerHTML='<div class="calc-resultado-linha"><span class="calc-resultado-label">Dose total ('+ha+' ha)</span><span class="calc-resultado-valor">'+(doseMin*ha).toFixed(2)+'\u2013'+(doseMax*ha).toFixed(2)+' '+unidade+'</span></div><div class="calc-resultado-linha"><span class="calc-resultado-label">Por tanque de '+tanque+'L</span><span class="calc-resultado-valor">'+(propPorLitro*tanque).toFixed(1)+' '+unidadeProp+'</span></div><div class="calc-aviso">\u26A0\uFE0F Confirme sempre no rótulo do produto comprado</div>';}
 
 // ── REDIMENSIONAR IMAGEM ANTES DO UPLOAD ──
