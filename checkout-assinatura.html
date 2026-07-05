@@ -117,8 +117,11 @@
   const MP_PUBLIC_KEY = "APP_USR-c2d2da6a-84f6-46ad-b44a-ab1491945443";
   const PLANO = "basico_mensal"; // basico_mensal | pro_mensal | premium_mensal (tem que bater com o objeto PLANOS do server.js)
   const VALOR = 29.90;
-  const USER_ID = window.DOUTOR_CAFE_USER_ID || "user_1782161206715_7jinp118q"; // injete o id do usuário logado aqui
-  const USER_EMAIL = window.DOUTOR_CAFE_USER_EMAIL || "weder.teste@doutorcafe.app"; // injete o e-mail do usuário logado aqui
+  // Le o usuario real vindo do app principal (?userId=...&email=...).
+  // So usa o valor de teste fixo se essa pagina for aberta direto (sem vir do app).
+  var _params = new URLSearchParams(window.location.search);
+  const USER_ID = _params.get("userId") || window.DOUTOR_CAFE_USER_ID || "user_1782161206715_7jinp118q";
+  const USER_EMAIL = _params.get("email") || window.DOUTOR_CAFE_USER_EMAIL || "weder.teste@doutorcafe.app";
   // -----------------------
 
   const mp = new MercadoPago(MP_PUBLIC_KEY, { locale: "pt-BR" });
