@@ -100,7 +100,7 @@
 
   <div class="aviso-recorrencia">
     <b>Assinatura recorrente:</b> ao confirmar, você autoriza a cobrança de
-    <b id="aviso-valor">R$ 49,90</b> hoje e, automaticamente, a cada 30 dias,
+    <b id="aviso-valor">R$ 49,90</b> hoje e, automaticamente, <span id="aviso-periodo">a cada 30 dias</span>,
     no mesmo cartão, até que você cancele. Você pode cancelar quando quiser,
     sem multa, direto no app.
   </div>
@@ -115,14 +115,25 @@
 <script>
   // ---- CONFIGURAÇÃO ----
   const MP_PUBLIC_KEY = "APP_USR-c2d2da6a-84f6-46ad-b44a-ab1491945443";
-  const PLANO = "premium_mensal"; // basico_mensal | pro_mensal | premium_mensal (tem que bater com o objeto PLANOS do server.js)
-  const VALOR = 49.90;
-  // Le o usuario real vindo do app principal (?userId=...&email=...).
-  // So usa o valor de teste fixo se essa pagina for aberta direto (sem vir do app).
   var _params = new URLSearchParams(window.location.search);
+  const CICLO = (_params.get("ciclo")==="anual") ? "anual" : "mensal";
+  const PRECOS = { mensal: 49.90, anual: 499.90 };
+  const PLANO = "premium_" + CICLO; // premium_mensal | premium_anual (tem que bater com o objeto PLANOS do server.js)
+  const VALOR = PRECOS[CICLO];
   const USER_ID = _params.get("userId") || window.DOUTOR_CAFE_USER_ID || "user_1782161206715_7jinp118q";
   const USER_EMAIL = _params.get("email") || window.DOUTOR_CAFE_USER_EMAIL || "weder.teste@doutorcafe.app";
   // -----------------------
+
+  (function ajustarTelaPorCiclo(){
+    var sufixoNome = CICLO === "anual" ? "Anual" : "Mensal";
+    var sufixoPreco = CICLO === "anual" ? "/ano" : "/mês";
+    var periodo = CICLO === "anual" ? "a cada 12 meses" : "a cada 30 dias";
+    var valorFmt = "R$ " + VALOR.toFixed(2).replace(".",",");
+    document.getElementById("plano-nome").textContent = "Doutor Café Premium " + sufixoNome;
+    document.querySelector(".preco").innerHTML = valorFmt + '<span style="font-size:14px;font-weight:400;">' + sufixoPreco + '</span>';
+    document.getElementById("aviso-valor").textContent = valorFmt;
+    document.getElementById("aviso-periodo").textContent = periodo;
+  })();
 
   const mp = new MercadoPago(MP_PUBLIC_KEY, { locale: "pt-BR" });
 
