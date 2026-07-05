@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assinar Doutor Café Premium</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, system-ui, sans-serif;
+    background: #f5f5f5;
+    margin: 0;
+    padding: 0;
+  }
+  .topbar {
+    background: #6f4e37;
+    color: white;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .topbar a {
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+  }
+  .topbar span {
+    font-size: 17px;
+    font-weight: 600;
+  }
+  .container {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  .plano-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .plano-card h2 {
+    margin: 0 0 4px 0;
+    font-size: 18px;
+  }
+  .plano-card .preco {
+    font-size: 28px;
+    font-weight: 700;
+    color: #6f4e37;
+  }
+  #brick-container {
+    background: white;
+    border-radius: 12px;
+    padding: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .aviso-recorrencia {
+    background: #fff8e1;
+    border: 1px solid #f0d878;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: #6b5700;
+  }
+  .aviso-recorrencia b { color: #4a3c00; }
+  #status-msg {
+    text-align: center;
+    padding: 16px;
+    font-size: 15px;
+  }
+  #status-msg.erro { color: #c0392b; }
+  #status-msg.sucesso { color: #27ae60; }
+  .voltar-fixo {
+    display: block;
+    text-align: center;
+    padding: 14px;
+    margin-top: 16px;
+    color: #6f4e37;
+    text-decoration: none;
+    font-size: 15px;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="/" id="btn-voltar" aria-label="Voltar para o app">←</a>
+  <span>Assinar Doutor Café</span>
+</div>
+
+<div class="container">
+  <div class="plano-card">
+    <h2 id="plano-nome">Doutor Café Premium</h2>
+    <div class="preco">R$ 49,90<span style="font-size:14px;font-weight:400;">/mês</span></div>
+  </div>
+
+  <div class="aviso-recorrencia">
+    <b>Assinatura recorrente:</b> ao confirmar, você autoriza a cobrança de
+    <b id="aviso-valor">R$ 49,90</b> hoje e, automaticamente, a cada 30 dias,
+    no mesmo cartão, até que você cancele. Você pode cancelar quando quiser,
+    sem multa, direto no app.
+  </div>
+
+  <div id="brick-container"></div>
+  <div id="status-msg"></div>
+
+  <a href="/" class="voltar-fixo">← Voltar para o app sem assinar</a>
+</div>
+
+<script src="https://sdk.mercadopago.com/js/v2"></script>
+<script>
+  // ---- CONFIGURAÇÃO ----
+  const MP_PUBLIC_KEY = "APP_USR-c2d2da6a-84f6-46ad-b44a-ab1491945443";
+  const PLANO = "premium_mensal"; // basico_mensal | pro_mensal | premium_mensal (tem que bater com o objeto PLANOS do server.js)
+  const VALOR = 49.90;
+  const USER_ID = window.DOUTOR_CAFE_USER_ID || "user_1782161206715_7jinp118q"; // injete o id do usuário logado aqui
+  const USER_EMAIL = window.DOUTOR_CAFE_USER_EMAIL || "weder.teste@doutorcafe.app"; // injete o e-mail do usuário logado aqui
+  // -----------------------
+
+  const mp = new MercadoPago(MP_PUBLIC_KEY, { locale: "pt-BR" });
+
+  function mostrarStatus(texto, tipo) {
+    const el = document.getElementById("status-msg");
+    el.textContent = texto;
+    el.className = tipo || "";
+  }
+
+  async function iniciarBrick() {
+    if (!USER_ID || !USER_EMAIL) {
+      mostrarStatus("Não foi possível identificar o usuário logado.", "erro");
+      return;
+    }
+
+    const bricksBuilder = mp.bricks();
+
+    await bricksBuilder.create("cardPayment", "brick-container", {
+      initialization: {
+        amount: VALOR,
+      },
+      customization: {
+        visual: {
+          style: { theme: "default" },
+        },
+        // restringe a cartão (evita redirect pra "Conta Mercado Pago")
+        paymentMethods: {
+          minInstallments: 1,
+          maxInstallments: 1,
+        },
+      },
+      callbacks: {
+        onReady: () => {
+          // brick carregado
+        },
+        onSubmit: (cardFormData) => {
+          mostrarStatus("Processando pagamento...", "");
+          return fetch("/criar-assinatura", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              card_token_id: cardFormData.token,
+              payer_email: USER_EMAIL,
+              plano: PLANO,
+              userId: USER_ID,
+            }),
+          })
+            .then((r) => r.json())
+            .then((data) => {
+              if (data.sucesso && data.status === "authorized") {
+                mostrarStatus("Assinatura ativada! Redirecionando...", "sucesso");
+                setTimeout(() => {
+                  window.location.href = "/pagamento?status=sucesso";
+                }, 1200);
+              } else {
+                mostrarStatus(data.erro || "Pagamento não aprovado. Tente outro cartão.", "erro");
+              }
+            })
+            .catch(() => {
+              mostrarStatus("Erro ao processar. Tente novamente.", "erro");
+            });
+        },
+        onError: (error) => {
+          console.error("Erro no Brick:", error);
+          mostrarStatus("Erro ao carregar o formulário de pagamento.", "erro");
+        },
+      },
+    });
+  }
+
+  iniciarBrick();
+
+  // Se sair da tela, destrua a instância do Brick (recomendado pela doc do MP)
+  window.addEventListener("beforeunload", () => {
+    if (window.paymentBrickController) {
+      window.paymentBrickController.unmount();
+    }
+  });
+</script>
+
+</body>
+</html>
