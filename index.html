@@ -830,21 +830,14 @@ function abrirModal(esgotado){document.getElementById("modalPlanos").classList.a
 function fecharModal(){document.getElementById("modalPlanos").classList.remove("ativo");}
 function setCiclo(c){cicloAtual=c;document.getElementById("btnMensal").className="toggle-btn"+(c==="mensal"?" ativo":"");document.getElementById("btnAnual").className="toggle-btn"+(c==="anual"?" ativo":"");document.getElementById("precoBasico").textContent=c==="mensal"?"R$29,90":"R$24,92";document.getElementById("precoPro").textContent=c==="mensal"?"R$39,90":"R$33,25";var pp=document.getElementById("precoPremium");if(pp)pp.textContent=c==="mensal"?"R$49,90":"R$41,58";document.getElementById("descBasico").style.display=c==="anual"?"block":"none";document.getElementById("descPro").style.display=c==="anual"?"block":"none";var dp=document.getElementById("descPremium");if(dp)dp.style.display=c==="anual"?"block":"none";}
 function assinar(tipo){
-  if(cicloAtual==="mensal"){
-    // Planos mensais: checkout embutido no proprio app (Card Payment Brick),
-    // sem redirecionar pro dominio do Mercado Pago.
-    var paginas={basico:"checkout-assinatura.html",pro:"checkout-pro.html",premium:"checkout-premium.html"};
-    var pagina=paginas[tipo];
-    if(!pagina){ alert("Plano não encontrado."); return; }
-    var uid=obterUserId();
-    var email=(usuarioAtual&&usuarioAtual.email)||(uid+"@doutorcafe.app");
-    window.location.href=pagina+"?userId="+encodeURIComponent(uid)+"&email="+encodeURIComponent(email);
-    return;
-  }
-  // Planos anuais: ainda nao migrados pro checkout embutido, usa o link direto do Mercado Pago.
-  var links={basico_anual:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=bd08a04de79f4213886611769b6c9486",pro_anual:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=661a046d15c9415a9508970d2f45c819",premium_anual:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=346f4589aca84ba3b4e76351563fdbe1"};
-  var url=links[tipo+"_"+cicloAtual];
-  if(url)window.open(url,"_blank");else alert("Plano não encontrado.");
+  // Checkout embutido no proprio app (Card Payment Brick), sem redirecionar
+  // pro dominio do Mercado Pago — vale pra mensal e anual.
+  var paginas={basico:"checkout-assinatura.html",pro:"checkout-pro.html",premium:"checkout-premium.html"};
+  var pagina=paginas[tipo];
+  if(!pagina){ alert("Plano não encontrado."); return; }
+  var uid=obterUserId();
+  var email=(usuarioAtual&&usuarioAtual.email)||(uid+"@doutorcafe.app");
+  window.location.href=pagina+"?userId="+encodeURIComponent(uid)+"&email="+encodeURIComponent(email)+"&ciclo="+encodeURIComponent(cicloAtual);
 }
 function contatoEmpresarial(){window.open("https://wa.me/5535998823395?text="+encodeURIComponent("Olá! Tenho interesse no Plano Empresarial do Doutor Café."),"_blank");fecharModal();}
 function verificarRetornoPagamento(){var params=new URLSearchParams(window.location.search),pagamento=params.get("pagamento"),planoId=params.get("plano");if(pagamento==="sucesso"&&planoId){var tipo=planoId.indexOf("pro")>-1?"pro":"basico";salvarPlano({tipo:tipo,planoId:planoId,dataAssinatura:new Date().toISOString()});localStorage.setItem(ANALISES_KEY,"0");atualizarContador();alert("Bem-vindo ao Plano "+(tipo==="pro"?"Pro":"Básico")+"! Suas análises estão liberadas.");window.history.replaceState({},"",window.location.pathname);}}
