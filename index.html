@@ -340,7 +340,7 @@ input[type="file"] { display: none; }
 .hist-analise-doenca-acao { font-size: 12px; color: #555; line-height: 1.4; margin-top: 2px; }
 canvas { display: none; }
 .aviso-servidor { margin: 0 20px 12px; background: #fff3e0; border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; font-size: 12px; color: #bf360c; font-weight: 500; }
-.disclaimer-legal { margin: 0 20px 14px; background: #fff8e1; border-radius: 12px; padding: 10px 14px; border-left: 4px solid #f57f17; font-size: 11px; color: #666; line-height: 1.6; }
+.disclaimer-legal { margin: 0 20px 14px; background: #f0f4f7; border-radius: 12px; padding: 10px 14px; border-left: 4px solid #6b8ca3; font-size: 11px; color: #666; line-height: 1.6; }
 .ordem-mistura { margin: 10px 0 0; background: #e8f5e9; border-radius: 10px; padding: 10px 12px; font-size: 12px; color: #1a5c2a; line-height: 1.7; }
 .modal-cad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 1000; align-items: flex-end; justify-content: center; }
 .modal-cad-overlay.ativo { display: flex; }
@@ -829,16 +829,7 @@ function atualizarBadgeVideo(){
 function abrirModal(esgotado){document.getElementById("modalPlanos").classList.add("ativo");document.getElementById("modalEsgotado").style.display=esgotado?"block":"none";document.getElementById("modalSubtitulo").textContent=esgotado?"Continue diagnosticando sua lavoura sem limites":"Escolha o plano ideal para sua lavoura";}
 function fecharModal(){document.getElementById("modalPlanos").classList.remove("ativo");}
 function setCiclo(c){cicloAtual=c;document.getElementById("btnMensal").className="toggle-btn"+(c==="mensal"?" ativo":"");document.getElementById("btnAnual").className="toggle-btn"+(c==="anual"?" ativo":"");document.getElementById("precoBasico").textContent=c==="mensal"?"R$29,90":"R$24,92";document.getElementById("precoPro").textContent=c==="mensal"?"R$39,90":"R$33,25";var pp=document.getElementById("precoPremium");if(pp)pp.textContent=c==="mensal"?"R$49,90":"R$41,58";document.getElementById("descBasico").style.display=c==="anual"?"block":"none";document.getElementById("descPro").style.display=c==="anual"?"block":"none";var dp=document.getElementById("descPremium");if(dp)dp.style.display=c==="anual"?"block":"none";}
-function assinar(tipo){
-  // Checkout embutido no proprio app (Card Payment Brick), sem redirecionar
-  // pro dominio do Mercado Pago — vale pra mensal e anual.
-  var paginas={basico:"checkout-assinatura.html",pro:"checkout-pro.html",premium:"checkout-premium.html"};
-  var pagina=paginas[tipo];
-  if(!pagina){ alert("Plano não encontrado."); return; }
-  var uid=obterUserId();
-  var email=(usuarioAtual&&usuarioAtual.email)||(uid+"@doutorcafe.app");
-  window.location.href=pagina+"?userId="+encodeURIComponent(uid)+"&email="+encodeURIComponent(email)+"&ciclo="+encodeURIComponent(cicloAtual);
-}
+function assinar(tipo){var links={basico_mensal:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=3bdcbffc028a4d259f32fe37a96ae224",basico_anual:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=bd08a04de79f4213886611769b6c9486",pro_mensal:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=106181c5ed584a65af06403bd1af0608",pro_anual:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=661a046d15c9415a9508970d2f45c819",premium_mensal:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=5bcfb2b27c6241b8a433b3ec0fb2a5c7",premium_anual:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=346f4589aca84ba3b4e76351563fdbe1"};var url=links[tipo+"_"+cicloAtual];if(url)window.open(url,"_blank");else alert("Plano não encontrado.");}
 function contatoEmpresarial(){window.open("https://wa.me/5535998823395?text="+encodeURIComponent("Olá! Tenho interesse no Plano Empresarial do Doutor Café."),"_blank");fecharModal();}
 function verificarRetornoPagamento(){var params=new URLSearchParams(window.location.search),pagamento=params.get("pagamento"),planoId=params.get("plano");if(pagamento==="sucesso"&&planoId){var tipo=planoId.indexOf("pro")>-1?"pro":"basico";salvarPlano({tipo:tipo,planoId:planoId,dataAssinatura:new Date().toISOString()});localStorage.setItem(ANALISES_KEY,"0");atualizarContador();alert("Bem-vindo ao Plano "+(tipo==="pro"?"Pro":"Básico")+"! Suas análises estão liberadas.");window.history.replaceState({},"",window.location.pathname);}}
 
@@ -866,9 +857,9 @@ function fetchComRetry(url, opcoes, ms) {
   });
 }
 
-var EMOJIS = {ferrugem:"\uD83D\uDFE0",bicho_mineiro:"\uD83E\uDEB2",cercosporiose:"\uD83D\uDD35",aureolada:"\uD83D\uDFE3",phoma:"\u26AB",antracnose:"\uD83E\uDED9",ascochyta:"\uD83D\uDFE4",manteigosa:"\uD83E\uDED7",roseliniose:"\uD83D\uDC80",helmintosporiose:"\uD83D\uDD34",broca:"\uD83D\uDD73\uFE0F",acaro:"\uD83D\uDFEB",acaro_ferrugem:"\uD83D\uDFE5",cigarra:"\uD83E\uDD97",cochonilha:"\uD83E\uDD0D",lagarta:"\uD83D\uDC1B",nematoide:"\uD83E\uDEB1",nitrogenio:"\uD83C\uDF3F",magnesio:"\uD83D\uDFE1",potassio:"\uD83D\uDD25",fosforo:"\uD83D\uDC9C",calcio:"\uD83E\uDDB4",enxofre:"\uD83C\uDF15",boro:"\uD83D\uDFE6",zinco:"\uD83E\uDED7",ferro:"\uD83E\uDEA8",manganes:"\uD83D\uDFE4",cobre:"\uD83E\uDDE1",estresse_hidrico:"\uD83D\uDCA7",fitotoxicidade:"\u2697\uFE0F",escaldadura:"\u2600\uFE0F",fruto_verde:"\uD83D\uDFE2",fruto_maduro:"\uD83D\uDD34",fruto_passado:"\u26AB",antracnose_fruto:"\u26AB",fusariose_fruto:"\uD83D\uDFE4",cercosporiose_fruto:"\u26AA",phoma_fruto:"\u26AB",acaro_fruto:"\uD83D\uDFE4",mancha_manteigosa:"\uD83D\uDFE1",corynespora:"\uD83D\uDFE0",koleroga:"\uD83D\uDEA8",rizoctoniose:"\uD83D\uDFEB",cochonilha_raiz:"\uD83D\uDFE4",saudavel:"\u2705"};
-var NOMES_VOZ = {ferrugem:"Ferrugem do café",bicho_mineiro:"Bicho mineiro",cercosporiose:"Cercosporiose",aureolada:"Mancha aureolada",phoma:"Phoma",antracnose:"Antracnose",ascochyta:"Mancha Ascochyta",manteigosa:"Mancha manteigosa",roseliniose:"Roseliniose",helmintosporiose:"Helmintosporiose",broca:"Broca do café",acaro:"Ácaro vermelho",acaro_ferrugem:"Ácaro ferrugem falsa",cigarra:"Cigarra do cafeeiro",cochonilha:"Cochonilha",lagarta:"Lagarta das rosetas",nematoide:"Nematoide das galhas",nitrogenio:"Deficiência de nitrogênio",magnesio:"Deficiência de magnésio",potassio:"Deficiência de potássio",fosforo:"Deficiência de fósforo",calcio:"Deficiência de cálcio",enxofre:"Deficiência de enxofre",boro:"Deficiência de boro",zinco:"Deficiência de zinco",ferro:"Deficiência de ferro",manganes:"Deficiência de manganês",cobre:"Deficiência de cobre",estresse_hidrico:"Estresse hídrico",fitotoxicidade:"Fitotoxicidade",escaldadura:"Escaldadura solar",fruto_verde:"Fruto verde saudável",fruto_maduro:"Fruto maduro para colheita",fruto_passado:"Fruto passado do ponto",antracnose_fruto:"Antracnose nos frutos",fusariose_fruto:"Fusariose nos frutos",cercosporiose_fruto:"Cercosporiose nos frutos",phoma_fruto:"Phoma nos frutos",acaro_fruto:"Ácaro nos frutos",mancha_manteigosa:"Mancha manteigosa",corynespora:"Mancha de Corynespora",koleroga:"Koleroga queima do fio",rizoctoniose:"Rizoctoniose tardia",cochonilha_raiz:"Cochonilha das raízes",lagarta:"Lagarta desfolhadora",nematoide:"Nematoide",saudavel:"Planta saudável"};
-var CATEGORIAS = {ferrugem:"Doença Fúngica",bicho_mineiro:"Praga",cercosporiose:"Doença Fúngica",aureolada:"Doença Bacteriana",phoma:"Doença Fúngica",antracnose:"Doença Fúngica",ascochyta:"Doença Fúngica",manteigosa:"Doença Fúngica",roseliniose:"Doença Fúngica",helmintosporiose:"Doença Fúngica",broca:"Praga",acaro:"Praga",acaro_ferrugem:"Praga",cigarra:"Praga",cochonilha:"Praga",lagarta:"Praga",nematoide:"Praga",nitrogenio:"Deficiência Nutricional",magnesio:"Deficiência Nutricional",potassio:"Deficiência Nutricional",fosforo:"Deficiência Nutricional",calcio:"Deficiência Nutricional",enxofre:"Deficiência Nutricional",boro:"Deficiência Nutricional",zinco:"Deficiência Nutricional",ferro:"Deficiência Nutricional",manganes:"Deficiência Nutricional",cobre:"Deficiência Nutricional",estresse_hidrico:"Estresse Ambiental",fitotoxicidade:"Estresse Ambiental",escaldadura:"Estresse Ambiental",fruto_verde:"Fruto",fruto_maduro:"Fruto",fruto_passado:"Fruto Danificado",antracnose_fruto:"Doença Fúngica — Fruto",fusariose_fruto:"Doença Fúngica — Fruto",cercosporiose_fruto:"Doença Fúngica — Fruto",phoma_fruto:"Doença Fúngica — Fruto",acaro_fruto:"Praga — Fruto",mancha_manteigosa:"Doença Viral/Fúngica",corynespora:"Doença Fúngica",koleroga:"Doença Fúngica",rizoctoniose:"Doença Fúngica — Caule",cochonilha_raiz:"Praga — Raiz",saudavel:"Planta Saudável"};
+var EMOJIS = {ferrugem:"\uD83D\uDFE0",bicho:"\uD83E\uDEB2",cercosporiose:"\uD83D\uDD35",aureolada:"\uD83D\uDFE3",phoma:"\u26AB",antracnose:"\uD83E\uDED9",ascochyta:"\uD83D\uDFE4",manteigosa:"\uD83E\uDED7",roseliniose:"\uD83D\uDC80",helmintosporiose:"\uD83D\uDD34",broca:"\uD83D\uDD73\uFE0F",acaro:"\uD83D\uDFEB",acaro_ferrugem:"\uD83D\uDFE5",cigarra:"\uD83E\uDD97",cochonilha:"\uD83E\uDD0D",lagarta:"\uD83D\uDC1B",nematoide:"\uD83E\uDEB1",nitrogenio:"\uD83C\uDF3F",magnesio:"\uD83D\uDFE1",potassio:"\uD83D\uDD25",fosforo:"\uD83D\uDC9C",calcio:"\uD83E\uDDB4",enxofre:"\uD83C\uDF15",boro:"\uD83D\uDFE6",zinco:"\uD83E\uDED7",ferro:"\uD83E\uDEA8",manganes:"\uD83D\uDFE4",cobre:"\uD83E\uDDE1",estresse_hidrico:"\uD83D\uDCA7",fitotoxicidade:"\u2697\uFE0F",escaldadura:"\u2600\uFE0F",fruto_verde:"\uD83D\uDFE2",fruto_maduro:"\uD83D\uDD34",fruto_passado:"\u26AB",antracnose_fruto:"\u26AB",fusariose_fruto:"\uD83D\uDFE4",cercosporiose_fruto:"\u26AA",phoma_fruto:"\u26AB",acaro_fruto:"\uD83D\uDFE4",mancha_manteigosa:"\uD83D\uDFE1",corynespora:"\uD83D\uDFE0",koleroga:"\uD83D\uDEA8",rizoctoniose:"\uD83D\uDFEB",cochonilha_raiz:"\uD83D\uDFE4",saudavel:"\u2705"};
+var NOMES_VOZ = {ferrugem:"Ferrugem do café",bicho:"Bicho mineiro",cercosporiose:"Cercosporiose",aureolada:"Mancha aureolada",phoma:"Phoma",antracnose:"Antracnose",ascochyta:"Mancha Ascochyta",manteigosa:"Mancha manteigosa",roseliniose:"Roseliniose",helmintosporiose:"Helmintosporiose",broca:"Broca do café",acaro:"Ácaro vermelho",acaro_ferrugem:"Ácaro ferrugem falsa",cigarra:"Cigarra do cafeeiro",cochonilha:"Cochonilha",lagarta:"Lagarta das rosetas",nematoide:"Nematoide das galhas",nitrogenio:"Deficiência de nitrogênio",magnesio:"Deficiência de magnésio",potassio:"Deficiência de potássio",fosforo:"Deficiência de fósforo",calcio:"Deficiência de cálcio",enxofre:"Deficiência de enxofre",boro:"Deficiência de boro",zinco:"Deficiência de zinco",ferro:"Deficiência de ferro",manganes:"Deficiência de manganês",cobre:"Deficiência de cobre",estresse_hidrico:"Estresse hídrico",fitotoxicidade:"Fitotoxicidade",escaldadura:"Escaldadura solar",fruto_verde:"Fruto verde saudável",fruto_maduro:"Fruto maduro para colheita",fruto_passado:"Fruto passado do ponto",antracnose_fruto:"Antracnose nos frutos",fusariose_fruto:"Fusariose nos frutos",cercosporiose_fruto:"Cercosporiose nos frutos",phoma_fruto:"Phoma nos frutos",acaro_fruto:"Ácaro nos frutos",mancha_manteigosa:"Mancha manteigosa",corynespora:"Mancha de Corynespora",koleroga:"Koleroga queima do fio",rizoctoniose:"Rizoctoniose tardia",cochonilha_raiz:"Cochonilha das raízes",lagarta:"Lagarta desfolhadora",nematoide:"Nematoide",saudavel:"Planta saudável"};
+var CATEGORIAS = {ferrugem:"Doença Fúngica",bicho:"Praga",cercosporiose:"Doença Fúngica",aureolada:"Doença Bacteriana",phoma:"Doença Fúngica",antracnose:"Doença Fúngica",ascochyta:"Doença Fúngica",manteigosa:"Doença Fúngica",roseliniose:"Doença Fúngica",helmintosporiose:"Doença Fúngica",broca:"Praga",acaro:"Praga",acaro_ferrugem:"Praga",cigarra:"Praga",cochonilha:"Praga",lagarta:"Praga",nematoide:"Praga",nitrogenio:"Deficiência Nutricional",magnesio:"Deficiência Nutricional",potassio:"Deficiência Nutricional",fosforo:"Deficiência Nutricional",calcio:"Deficiência Nutricional",enxofre:"Deficiência Nutricional",boro:"Deficiência Nutricional",zinco:"Deficiência Nutricional",ferro:"Deficiência Nutricional",manganes:"Deficiência Nutricional",cobre:"Deficiência Nutricional",estresse_hidrico:"Estresse Ambiental",fitotoxicidade:"Estresse Ambiental",escaldadura:"Estresse Ambiental",fruto_verde:"Fruto",fruto_maduro:"Fruto",fruto_passado:"Fruto Danificado",antracnose_fruto:"Doença Fúngica — Fruto",fusariose_fruto:"Doença Fúngica — Fruto",cercosporiose_fruto:"Doença Fúngica — Fruto",phoma_fruto:"Doença Fúngica — Fruto",acaro_fruto:"Praga — Fruto",mancha_manteigosa:"Doença Viral/Fúngica",corynespora:"Doença Fúngica",koleroga:"Doença Fúngica",rizoctoniose:"Doença Fúngica — Caule",cochonilha_raiz:"Praga — Raiz",saudavel:"Planta Saudável"};
 var CORES_ESTAGIO = ["#4caf50","#8bc34a","#ffc107","#ff9800","#f44336"];
 var MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 
@@ -960,7 +951,7 @@ function analisarDaFila(id) {
           if (dadosGPS.regiao) bodyV.regiao = dadosGPS.regiao;
           if (dadosGPS.altitude) bodyV.altitude = dadosGPS.altitude;
           fetchComTimeout("https://doutor-cafe-production.up.railway.app/diagnostico-video",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bodyV)},TIMEOUT_MS)
-          .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";if(data.erro){alert("Erro: "+data.erro);return;}mostrarResultado(data,true);incrementarAnalise();})
+          .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultado(data,true);incrementarAnalise();})
           .catch(function(){document.getElementById("spinner").style.display="none";adicionarNaFila(item.foto,item.frames,"video",function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert("Ainda sem conexão estável. Foto salva de volta na fila!");}});});
         } else if (item.tipo === "daninha") {
           document.getElementById("spinnerTexto").textContent = "Identificando planta daninha...";
@@ -968,7 +959,7 @@ function analisarDaFila(id) {
           var bodyD = { imagem: item.foto, tipo: "image/jpeg" };
           if (dadosGPS.regiao) bodyD.regiao = dadosGPS.regiao;
           fetchComRetry("https://doutor-cafe-production.up.railway.app/identifica-daninha",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bodyD)},TIMEOUT_MS)
-          .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";if(data.erro){alert("Erro: "+data.erro);return;}mostrarResultadoDaninha(data);incrementarAnalise();})
+          .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultadoDaninha(data);incrementarAnalise();})
           .catch(function(){document.getElementById("spinner").style.display="none";adicionarNaFila(item.foto,null,"daninha",function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert("Ainda sem conexão estável. Foto salva de volta na fila!");}});});
         } else if (item.tipo === "solo") {
           document.getElementById("spinnerTexto").textContent = "Lendo laudo de solo...";
@@ -976,7 +967,7 @@ function analisarDaFila(id) {
           var bodyS = { imagem: item.foto, tipo: "image/jpeg" };
           if (dadosGPS.regiao) bodyS.regiao = dadosGPS.regiao;
           fetchComRetry("https://doutor-cafe-production.up.railway.app/analise-solo",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bodyS)},TIMEOUT_MS)
-          .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";if(data.erro){alert("Erro: "+data.erro);return;}mostrarResultadoSolo(data);incrementarAnalise();})
+          .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultadoSolo(data);incrementarAnalise();})
           .catch(function(){document.getElementById("spinner").style.display="none";adicionarNaFila(item.foto,null,"solo",function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert("Ainda sem conexão estável. Foto salva de volta na fila!");}});});
         } else {
           document.getElementById("spinnerTexto").textContent = "Analisando...";
@@ -985,7 +976,7 @@ function analisarDaFila(id) {
           if (dadosGPS.regiao) bodyF.regiao = dadosGPS.regiao;
           if (dadosGPS.altitude) bodyF.altitude = dadosGPS.altitude;
           fetchComTimeout("https://doutor-cafe-production.up.railway.app/diagnostico",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bodyF)},TIMEOUT_MS)
-          .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";if(data.erro){alert("Erro: "+data.erro);return;}mostrarResultado(data,false);incrementarAnalise();})
+          .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultado(data,false);incrementarAnalise();})
           .catch(function(){document.getElementById("spinner").style.display="none";adicionarNaFila(item.foto,null,"folha",function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert("Ainda sem conexão estável. Foto salva de volta na fila!");}});});
         }
       };
@@ -1268,14 +1259,6 @@ function processar(file, isVideo) {
               } else if(ev.tipo==="diag_completo"){
                 if(ev.index<diagsSSE.length) diagsSSE[ev.index]=ev.diag; else diagsSSE.push(ev.diag);
                 mostrarResultadoStreaming(diagsSSE,b64,isVideo);
-              } else if(ev.tipo==="erro"){
-                if(diagsSSE.length===0 && !fimProcessado){
-                  fimProcessado = true;
-                  document.getElementById("spinner").style.display="none";
-                  mostrarErro();
-                }
-                // Se ja tinhamos parciais na tela, deixa o fluxo normal (fim do
-                // stream) decidir — mostrarErro() aqui apagaria progresso real.
               } else if(ev.tipo==="fim"){
                 var dF=(ev.resultado&&ev.resultado.diagnosticos)||[];
                 var fb=dF.length===1&&dF[0].diagnostico==="saudavel"&&dF[0].confianca==="baixa";
@@ -1318,11 +1301,6 @@ function processar(file, isVideo) {
                 })
                 .then(function(r3){return r3.json();})
                 .then(function(data){
-                  if(data.erro && diagsSSE.length===0){
-                    document.getElementById("spinner").style.display="none";
-                    mostrarErro();
-                    return;
-                  }
                   var dF=data.diagnosticos||[];
                   if(dF.length>0){
                     // Mesclar com os parciais que já temos na tela
@@ -1331,17 +1309,13 @@ function processar(file, isVideo) {
                       return Object.assign({},sse||{},df,{parcial:false});
                     });
                     finalizarAnalise(diags);
-                  } else if(diagsSSE.length>0){
-                    finalizarAnalise(diagsSSE);
                   } else {
-                    document.getElementById("spinner").style.display="none";
-                    mostrarErro();
+                    finalizarAnalise(diagsSSE);
                   }
                 })
                 .catch(function(){
-                  // Se o JSON também falhar, usar parciais mesmo (ou erro se não há nada)
-                  if(diagsSSE.length>0){ finalizarAnalise(diagsSSE); }
-                  else { document.getElementById("spinner").style.display="none"; mostrarErro(); }
+                  // Se o JSON também falhar, usar parciais mesmo
+                  finalizarAnalise(diagsSSE);
                 });
               } else {
                 document.getElementById("spinner").style.display="none";
@@ -1370,8 +1344,8 @@ function processar(file, isVideo) {
   });
 }
 
-function processarSolo(file){if(!servidorAcordado)acordarServidor(null);document.getElementById("spinner").style.display="block";document.getElementById("resultado").style.display="none";document.getElementById("spinnerTexto").textContent="Lendo laudo de solo...";document.getElementById("spinnerSub").textContent="Interpretando valores e calculando recomendações";redimensionarImagem(file,1600,0.85,function(b64){ultimaFotoBase64=b64;var body={imagem:b64,tipo:"image/jpeg"};if(dadosGPS.regiao)body.regiao=dadosGPS.regiao;fetchComRetry("https://doutor-cafe-production.up.railway.app/analise-solo",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)},TIMEOUT_MS).then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";if(data.erro){alert("Erro ao ler o laudo: "+data.erro+"\nTente novamente.");return;}mostrarResultadoSolo(data);incrementarAnalise();}).catch(function(){document.getElementById("spinner").style.display="none";adicionarNaFila(b64,null,"solo",function(ok){if(ok){renderAreaHistorico();alert("Sem conexão estável. Laudo salvo na fila offline!");}else{mostrarErro();}});});});}
-function processarDaninha(file){if(!servidorAcordado)acordarServidor(null);document.getElementById("spinner").style.display="block";document.getElementById("resultado").style.display="none";document.getElementById("spinnerTexto").textContent="Identificando planta daninha...";document.getElementById("spinnerSub").textContent="Lendo o que ela revela sobre o seu solo";redimensionarImagem(file,1024,0.85,function(b64){ultimaFotoBase64=b64;var body={imagem:b64,tipo:"image/jpeg"};if(dadosGPS.regiao)body.regiao=dadosGPS.regiao;fetchComRetry("https://doutor-cafe-production.up.railway.app/identifica-daninha",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)},TIMEOUT_MS).then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";if(data.erro){alert("Erro ao identificar a planta: "+data.erro+"\nTente novamente.");return;}mostrarResultadoDaninha(data);incrementarAnalise();}).catch(function(){document.getElementById("spinner").style.display="none";adicionarNaFila(b64,null,"daninha",function(ok){if(ok){renderAreaHistorico();alert("Sem conexão estável. Foto salva na fila offline!");}else{mostrarErro();}});});});}
+function processarSolo(file){if(!servidorAcordado)acordarServidor(null);document.getElementById("spinner").style.display="block";document.getElementById("resultado").style.display="none";document.getElementById("spinnerTexto").textContent="Lendo laudo de solo...";document.getElementById("spinnerSub").textContent="Interpretando valores e calculando recomendações";redimensionarImagem(file,1600,0.85,function(b64){ultimaFotoBase64=b64;var body={imagem:b64,tipo:"image/jpeg"};if(dadosGPS.regiao)body.regiao=dadosGPS.regiao;fetchComRetry("https://doutor-cafe-production.up.railway.app/analise-solo",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)},TIMEOUT_MS).then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultadoSolo(data);incrementarAnalise();}).catch(function(){document.getElementById("spinner").style.display="none";adicionarNaFila(b64,null,"solo",function(ok){if(ok){renderAreaHistorico();alert("Sem conexão estável. Laudo salvo na fila offline!");}else{mostrarErro();}});});});}
+function processarDaninha(file){if(!servidorAcordado)acordarServidor(null);document.getElementById("spinner").style.display="block";document.getElementById("resultado").style.display="none";document.getElementById("spinnerTexto").textContent="Identificando planta daninha...";document.getElementById("spinnerSub").textContent="Lendo o que ela revela sobre o seu solo";redimensionarImagem(file,1024,0.85,function(b64){ultimaFotoBase64=b64;var body={imagem:b64,tipo:"image/jpeg"};if(dadosGPS.regiao)body.regiao=dadosGPS.regiao;fetchComRetry("https://doutor-cafe-production.up.railway.app/identifica-daninha",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)},TIMEOUT_MS).then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultadoDaninha(data);incrementarAnalise();}).catch(function(){document.getElementById("spinner").style.display="none";adicionarNaFila(b64,null,"daninha",function(ok){if(ok){renderAreaHistorico();alert("Sem conexão estável. Foto salva na fila offline!");}else{mostrarErro();}});});});}
 function processarVideo(file){document.getElementById("spinner").style.display="block";document.getElementById("resultado").style.display="none";document.getElementById("spinnerTexto").textContent="Extraindo frames do vídeo...";document.getElementById("spinnerSub").textContent="Analisando múltiplos ângulos";var video=document.createElement("video"),canvas=document.getElementById("canvas"),ctx=canvas.getContext("2d"),url=URL.createObjectURL(file);video.src=url;video.muted=true;video.addEventListener("loadedmetadata",function(){var duration=video.duration,frames=[],tempos=[duration*0.15,duration*0.35,duration*0.60,duration*0.85],idx=0;function capturarFrame(){if(idx>=tempos.length){URL.revokeObjectURL(url);enviarFrames(frames);return;}video.currentTime=tempos[idx];}video.addEventListener("seeked",function(){canvas.width=640;canvas.height=480;ctx.drawImage(video,0,0,640,480);var frameB64=canvas.toDataURL("image/jpeg",0.7).split(",")[1];if(idx===0)ultimaFotoBase64=frameB64;frames.push(frameB64);idx++;capturarFrame();});capturarFrame();});video.load();}
 function enviarFrames(frames){if(!servidorAcordado)acordarServidor(null);document.getElementById("spinnerTexto").textContent="Analisando "+frames.length+" ângulos...";var body={frames:frames,tipo:"image/jpeg"};if(dadosGPS.regiao)body.regiao=dadosGPS.regiao;if(dadosGPS.altitude)body.altitude=dadosGPS.altitude;if(usuarioAtual&&usuarioAtual.userId)body.userId=usuarioAtual.userId;fetchComRetry("https://doutor-cafe-production.up.railway.app/diagnostico-video",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)},TIMEOUT_MS).then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";if(data.semVideos){alert("Você atingiu o limite de vídeos do seu plano este mês.\nDica: use a câmera de foto para continuar diagnosticando.");atualizarBadgeVideo();return;}if(data.semAnalises){alert("Limite de análises do plano atingido. Faça upgrade para continuar.");abrirModal(true);return;}if(data.erro){alert("Erro: "+data.erro);return;}mostrarResultado(data,true);incrementarAnalise();if(usuarioAtual&&usuarioAtual.userId){fetch("https://doutor-cafe-production.up.railway.app/incrementar-video",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({userId:usuarioAtual.userId})}).then(function(){var v=parseInt(localStorage.getItem("doutorcafe_videos_usados")||"0");localStorage.setItem("doutorcafe_videos_usados",(v+1).toString());atualizarBadgeVideo();}).catch(function(){});}}).catch(function(){document.getElementById("spinner").style.display="none";adicionarNaFila(frames[0],frames,"video",function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert("Sem conexão. Vídeo salvo na fila!");}});});}
 
@@ -1421,7 +1395,7 @@ function mostrarResultadoStreaming(diags,fotoBase64,isVideo){
   var textoVoz=naoSaudavel.length>0?"Sua planta tem: "+nomesVoz+". ":"Planta saudável. ";
   textoVoz+=naoSaudavel.map(function(d){return d.acao;}).filter(Boolean).join(". ");
   _textoParaFalar=textoVoz;
-  html+='<div class="disclaimer-legal">⚖️ <strong>Aviso Legal:</strong> As recomendações não substituem o Receituário Agronômico obrigatório emitido por Engenheiro Agrônomo habilitado (MAPA/CREA). Consulte sempre um profissional antes de aplicar defensivos.</div>';
+  html+='<div class="disclaimer-legal">💡 <strong>Use para agir rápido:</strong> identifique o problema agora e chegue mais preparado numa visita do Engenheiro Agrônomo — a aplicação de defensivos exige Receituário Agronômico (MAPA/CREA) por lei.</div>';
   html+='<div class="btns-resultado"><button class="btn-voz" onclick="falarTextoAtual()">🔊 Ouvir</button>';
   html+='<button class="btn-share" onclick="compartilharAtual()">📤 WhatsApp</button>';
   html+='<button class="btn-nova" onclick="resetar()">📷 Nova</button></div>';
@@ -1434,7 +1408,7 @@ function mostrarResultadoStreaming(diags,fotoBase64,isVideo){
 
 function mostrarResultado(data,isVideo){var div=document.getElementById("resultado");div.style.display="block";var diags=data.diagnosticos||[{diagnostico:data.diagnostico||"saudavel",estagio:data.estagio||1,confianca:data.confianca||"media",visto:data.visto||"",acao:data.acao||"Tente novamente.",fungicidas:[]}];var regiao=dadosGPS.regiao||"";salvarHistorico(diags,ultimaFotoBase64,regiao);mostrarResultadoStreaming(diags,ultimaFotoBase64,isVideo);}
 
-function mostrarResultadoSolo(data){var div=document.getElementById("resultado");div.style.display="block";var acao=data.acao||"Consulte um agrônomo para mais detalhes.";var textoVoz="Análise de solo. "+acao;var thumbHtml=ultimaFotoBase64?'<img class="card-foto-thumb" src="data:image/jpeg;base64,'+ultimaFotoBase64+'" alt="laudo">':"<div class='card-foto-thumb-placeholder'>🧪</div>";var html='<div class="card-resultado"><div class="card-topo">'+thumbHtml+'<div class="card-titulo"><h2>Análise de Solo</h2><div class="categoria">Recomendação para Café</div></div></div>';html+='<div class="badges"><span class="badge badge-solo">🌱 Laudo Interpretado</span>';if(dadosGPS.regiao)html+='<span class="badge badge-regiao">📍 '+dadosGPS.regiao+'</span>';html+='</div>';if(data.valores){html+='<div class="solo-grid">';for(var k in data.valores){var v=data.valores[k],sc=v.status==="ok"?"solo-ok":v.status==="baixo"?"solo-baixo":"solo-alto",st=v.status==="ok"?"✓ Adequado":v.status==="baixo"?"↓ Baixo":"↑ Alto";html+='<div class="solo-item"><div class="solo-label">'+k+'</div><div class="solo-valor">'+v.valor+'</div><div class="solo-status '+sc+'">'+st+'</div></div>';}html+='</div>';}html+='<div class="divisor"></div><div class="acao-box"><h3>Recomendação</h3><p>'+acao+'</p></div>';html+='<div class="btns-resultado"><button class="btn-voz" onclick="falar(\''+textoVoz.replace(/'/g,"\\'")+'\')">🔊 Ouvir</button><button class="btn-nova" onclick="resetar()">📷 Nova análise</button></div></div>';div.innerHTML=html;falar(textoVoz);div.scrollIntoView({behavior:"smooth",block:"start"});}
+function mostrarResultadoSolo(data){var div=document.getElementById("resultado");div.style.display="block";var acao=data.acao||"Consulte um agrônomo para mais detalhes.";var textoVoz="Análise de solo. "+acao;var thumbHtml=ultimaFotoBase64?'<img class="card-foto-thumb" src="data:image/jpeg;base64,'+ultimaFotoBase64+'" alt="laudo">':"<div class='card-foto-thumb-placeholder'>🧪</div>";var html='<div class="card-resultado"><div class="card-topo">'+thumbHtml+'<div class="card-titulo"><h2>Análise de Solo</h2><div class="categoria">Recomendação para Café</div></div></div>';html+='<div class="badges"><span class="badge badge-solo">🌱 Laudo Interpretado</span>';if(dadosGPS.regiao)html+='<span class="badge badge-regiao">📍 '+dadosGPS.regiao+'</span>';html+='</div>';if(data.valores){html+='<div class="solo-grid">';for(var k in data.valores){var v=data.valores[k],sc=v.status==="ok"?"solo-ok":v.status==="baixo"?"solo-baixo":"solo-alto",st=v.status==="ok"?"✓ Adequado":v.status==="baixo"?"↓ Baixo":"↑ Alto";html+='<div class="solo-item"><div class="solo-label">'+k+'</div><div class="solo-valor">'+v.valor+'</div><div class="solo-status '+sc+'">'+st+'</div></div>';}html+='</div>';}html+='<div class="divisor"></div><div class="acao-box"><h3>Recomendação</h3><p>'+acao+'</p></div>';html+='<div class="disclaimer-legal">💡 <strong>Use para agir cedo:</strong> identifique a necessidade agora e chegue mais preparado numa visita do Engenheiro Agrônomo — pra ajustes de maior escala, uma análise de solo laboratorial completa dá mais precisão na dose exata.</div>';html+='<div class="btns-resultado"><button class="btn-voz" onclick="falar(\''+textoVoz.replace(/'/g,"\\'")+'\')">🔊 Ouvir</button><button class="btn-nova" onclick="resetar()">📷 Nova análise</button></div></div>';div.innerHTML=html;falar(textoVoz);div.scrollIntoView({behavior:"smooth",block:"start"});}
 
 function mostrarResultadoDaninha(data){
   var div=document.getElementById("resultado");div.style.display="block";
@@ -1480,6 +1454,7 @@ function mostrarResultadoDaninha(data){
   }
   var textoVoz=plantas.map(function(p){return p.nome+". "+p.indicador+". "+p.acao;}).join(" Além disso, ");
   _textoParaFalar=textoVoz;
+  html+='<div class="disclaimer-legal">💡 <strong>Use para agir rápido:</strong> identifique a planta agora e chegue mais preparado numa visita do Engenheiro Agrônomo — a aplicação de herbicidas exige Receituário Agronômico (MAPA/CREA) por lei.</div>';
   html+='<div class="btns-resultado"><button class="btn-voz" onclick="falarTextoAtual()">🔊 Ouvir</button><button class="btn-nova" onclick="resetar()">📷 Nova análise</button></div></div>';
   div.innerHTML=html;
   falar(textoVoz);
@@ -1553,7 +1528,25 @@ function submeterCadastroInicial(){
   entrarNoApp(nome);
 }
 
-function entrarNoApp(nome){usuarioAtual=verificarCadastroInicial();mostrarTela('tela-principal');atualizarContador();renderAreaHistorico();renderCalendario();obterGPS();obterPrecoCafe();checarLembretesPendentes();if(nome){var primeiroNome=nome.split(' ')[0];setTimeout(function(){var tag=document.getElementById('regiaoTag');if(tag)tag.innerHTML='Olá, '+primeiroNome+'! Vamos diagnosticar';setTimeout(function(){obterGPS();},3000);},600);}}
+function sincronizarIdentidade(callback){
+  var cad = verificarCadastroInicial();
+  if (!cad || (!cad.celular && !cad.cpf)) { if(callback) callback(); return; }
+  fetch('https://doutor-cafe-production.up.railway.app/cadastrar-usuario',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:obterUserId(),nome:cad.nome||'',cpf:cad.cpf||'',celular:cad.celular||'',email:cad.email||'',pin:cad.pin||''})})
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if (d && d.userId && d.userId !== obterUserId()) {
+      // O servidor achou uma conta ja existente com esse celular/CPF, diferente
+      // do id local deste navegador/PWA — reconecta para nao fragmentar o limite.
+      localStorage.setItem('doutorcafe_uid', d.userId);
+      cad.userId = d.userId;
+      localStorage.setItem(CADASTRO_INICIAL_KEY, JSON.stringify(cad));
+      usuarioAtual = cad;
+    }
+    if (callback) callback();
+  })
+  .catch(function(){ if (callback) callback(); });
+}
+function entrarNoApp(nome){usuarioAtual=verificarCadastroInicial();mostrarTela('tela-principal');sincronizarIdentidade(function(){atualizarContador();});renderAreaHistorico();renderCalendario();obterGPS();obterPrecoCafe();checarLembretesPendentes();if(nome){var primeiroNome=nome.split(' ')[0];setTimeout(function(){var tag=document.getElementById('regiaoTag');if(tag)tag.innerHTML='Olá, '+primeiroNome+'! Vamos diagnosticar';setTimeout(function(){obterGPS();},3000);},600);}}
 function verificarCadastroInicial(){try{return JSON.parse(localStorage.getItem(CADASTRO_INICIAL_KEY));}catch(e){return null;}}
 
 // ── TALHÕES ──
