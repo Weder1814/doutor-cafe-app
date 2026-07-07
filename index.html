@@ -243,7 +243,7 @@ input[type="file"] { display: none; }
 .offline-banner-txt { font-size: 12px; color: #bf360c; line-height: 1.4; font-weight: 500; }
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 1000; align-items: flex-end; justify-content: center; }
 .modal-overlay.ativo { display: flex; }
-.modal-planos { background: var(--creme); border-radius: 28px 28px 0 0; padding: 24px 20px 48px; width: 100%; max-width: 480px; max-height: 92vh; overflow-y: auto; }
+.modal-planos { background: var(--creme); border-radius: 28px 28px 0 0; padding: 62px 20px 48px; width: 100%; max-width: 480px; max-height: 92vh; overflow-y: auto; position: relative; }
 .modal-titulo { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--marrom); font-weight: 900; margin-bottom: 4px; }
 .modal-sub { font-size: 13px; color: var(--cinza); margin-bottom: 14px; line-height: 1.4; }
 .modal-esgotado { background: #fce4ec; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; font-size: 13px; color: #c62828; font-weight: 600; line-height: 1.4; }
@@ -563,6 +563,7 @@ canvas { display: none; }
 <!-- MODAL PLANOS -->
 <div class="modal-overlay" id="modalPlanos">
   <div class="modal-planos">
+    <button onclick="fecharModal()" style="position:absolute;top:14px;left:14px;background:#f0ece4;border:none;width:38px;height:38px;border-radius:50%;font-size:20px;color:var(--marrom);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:5;line-height:1;">&#8592;</button>
     <div class="modal-titulo">&#127807; Doutor Caf&#233; Premium</div>
     <div class="modal-sub" id="modalSubtitulo">Escolha o plano ideal para sua lavoura</div>
     <div class="modal-esgotado" id="modalEsgotado" style="display:none"><p>&#128274; Suas análises gratuitas foram usadas. Assine para continuar!</p></div>
@@ -631,14 +632,11 @@ canvas { display: none; }
     <div class="sub">O agr&#244;nomo no seu bolso</div>
     <div class="regiao-tag" id="regiaoTag">&#128205; Localizando...</div>
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:2px">
-      <div class="contador-bar" id="contadorBar" onclick="abrirModal(false)">
-        <span class="contador-txt" id="contadorTxt">15 análises grátis</span>
-        <div class="contador-progresso"><div class="contador-fill" id="contadorFill" style="width:100%"></div></div>
-      </div>
       <div class="plano-chip" id="planoChip" onclick="abrirModal(false)">
         <span class="plano-chip-dot" id="planoChipDot"></span>
-        <span id="planoChipTxt">Gratuito</span>
-        <span style="opacity:0.7">· Ver planos ›</span>
+        <span id="planoChipTxt">Plano Gratuito</span>
+        <span style="opacity:0.7">·</span>
+        <span id="planoChipAnalises">15 análises restantes</span>
       </div>
     </div>
   </div>
@@ -837,20 +835,22 @@ function sincronizarContadorServidor(){
 }
 
 function atualizarContador(){
-  var p=getPlano(),usado=getAnalisesUsadas(),txt=document.getElementById("contadorTxt"),fill=document.getElementById("contadorFill");
-  if(!txt||!fill)return;
+  var p=getPlano(),usado=getAnalisesUsadas();
   var cad=getCadastro();
-  if(p.tipo==="premium"){var r=LIMITE_PREMIUM-(usado%LIMITE_PREMIUM);txt.textContent=r+" análises restantes (Premium)";fill.style.width=(r/LIMITE_PREMIUM*100)+"%";fill.className="contador-fill";}
-  else if(p.tipo==="pro"){var r=LIMITE_PRO-(usado%LIMITE_PRO);txt.textContent=r+" análises restantes (Pro)";fill.style.width=(r/LIMITE_PRO*100)+"%";fill.className="contador-fill";}
-  else if(p.tipo==="basico"){var r=LIMITE_BASICO-(usado%LIMITE_BASICO);txt.textContent=r+" análises restantes (Básico)";fill.style.width=(r/LIMITE_BASICO*100)+"%";fill.className="contador-fill";}
-  else{var r=Math.max(0,TOTAL_GRATIS_COM_CAD-usado);txt.textContent=r+" análises grátis restantes";var pct=(r/TOTAL_GRATIS_COM_CAD)*100;fill.style.width=pct+"%";fill.className="contador-fill"+(pct<=25?" vermelho":pct<=50?" amarelo":"");}
+  var r; // análises restantes
+  if(p.tipo==="premium"){r=LIMITE_PREMIUM-(usado%LIMITE_PREMIUM);}
+  else if(p.tipo==="pro"){r=LIMITE_PRO-(usado%LIMITE_PRO);}
+  else if(p.tipo==="basico"){r=LIMITE_BASICO-(usado%LIMITE_BASICO);}
+  else{r=Math.max(0,TOTAL_GRATIS_COM_CAD-usado);}
 
-  // ── CHIP DE PLANO ──────────────────────────────────────────
-  var chipTxt=document.getElementById("planoChipTxt"),chipDot=document.getElementById("planoChipDot");
+  // ── CHIP UNIFICADO (plano + análises restantes) ────────────
+  var chipTxt=document.getElementById("planoChipTxt"),chipDot=document.getElementById("planoChipDot"),chipAnalises=document.getElementById("planoChipAnalises");
   if(chipTxt&&chipDot){
-    var nomePlano={gratuito:"Gratuito",basico:"Básico",pro:"Pro",premium:"Premium"}[p.tipo||"gratuito"]||"Gratuito";
-    var pctRestante=p.tipo==="premium"?(LIMITE_PREMIUM-(usado%LIMITE_PREMIUM))/LIMITE_PREMIUM:p.tipo==="pro"?(LIMITE_PRO-(usado%LIMITE_PRO))/LIMITE_PRO:p.tipo==="basico"?(LIMITE_BASICO-(usado%LIMITE_BASICO))/LIMITE_BASICO:r/TOTAL_GRATIS_COM_CAD;
-    chipTxt.textContent="Plano "+nomePlano;
+    var nomePlano={gratuito:"Plano Gratuito",basico:"Plano Básico",pro:"Plano Pro",premium:"Plano Premium"}[p.tipo||"gratuito"]||"Plano Gratuito";
+    var limitePlano=p.tipo==="premium"?LIMITE_PREMIUM:p.tipo==="pro"?LIMITE_PRO:p.tipo==="basico"?LIMITE_BASICO:TOTAL_GRATIS_COM_CAD;
+    var pctRestante=r/limitePlano;
+    chipTxt.textContent=nomePlano;
+    if(chipAnalises)chipAnalises.textContent=r+(r===1?" análise restante":" análises restantes");
     chipDot.className="plano-chip-dot"+(pctRestante<=0.15?" vermelho":pctRestante<=0.30?" amarelo":"");
   }
 
