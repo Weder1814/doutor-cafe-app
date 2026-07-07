@@ -303,9 +303,9 @@ input[type="file"] { display: none; }
 .talhao-status.pendente { background: #fff3e0; color: #e65100; }
 .talhao-status.ok { background: #e8f5e9; color: #2e7d32; }
 .btn-novo-talhao { width: 100%; margin-top: 10px; padding: 12px; background: transparent; border: 2px dashed #2d8a3e; border-radius: 16px; color: #2d8a3e; font-size: 14px; font-weight: 700; cursor: pointer; }
-.modal-talhao-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 500; align-items: flex-end; }
+.modal-talhao-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 1000; align-items: flex-end; }
 .modal-talhao-overlay.ativo { display: flex; }
-.modal-talhao-box { background: white; border-radius: 24px 24px 0 0; padding: 20px 16px 32px; width: 100%; max-height: 80vh; overflow-y: auto; }
+.modal-talhao-box { background: white; border-radius: 24px 24px 0 0; padding: 20px 16px 90px; width: 100%; max-height: 80vh; overflow-y: auto; }
 .modal-talhao-titulo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--verde-escuro); margin-bottom: 4px; }
 .modal-talhao-sub { font-size: 13px; color: #888; margin-bottom: 16px; }
 .talhao-opcao { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 14px; border: 1.5px solid #e0ede0; margin-bottom: 8px; cursor: pointer; transition: all 0.15s; }
@@ -314,7 +314,7 @@ input[type="file"] { display: none; }
 .talhao-opcao-detalhe { font-size: 12px; color: #888; }
 .talhao-opcao-icone { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg,#2d8a3e,#1a5c2a); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
 .btn-criar-talhao-modal { width: 100%; padding: 14px; background: linear-gradient(135deg,#2d8a3e,#1a5c2a); color: white; border: none; border-radius: 16px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 8px; }
-.modal-criar-talhao { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 600; align-items: flex-end; }
+.modal-criar-talhao { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 1000; align-items: flex-end; }
 .modal-criar-talhao.ativo { display: flex; }
 .criar-talhao-box { background: white; border-radius: 24px 24px 0 0; padding: 24px 16px 32px; width: 100%; }
 .criar-talhao-titulo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--verde-escuro); margin-bottom: 16px; }
@@ -324,7 +324,7 @@ input[type="file"] { display: none; }
 .criar-talhao-select { width: 100%; padding: 12px 14px; border: 1.5px solid #ddd; border-radius: 12px; font-size: 14px; background: white; box-sizing: border-box; }
 .btn-salvar-talhao { width: 100%; padding: 14px; background: linear-gradient(135deg,#2d8a3e,#1a5c2a); color: white; border: none; border-radius: 16px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 16px; }
 .btn-cancelar-talhao { width: 100%; padding: 12px; background: transparent; border: none; color: #888; font-size: 14px; cursor: pointer; margin-top: 8px; }
-.modal-hist-talhao { display: none; position: fixed; inset: 0; background: white; z-index: 700; overflow-y: auto; }
+.modal-hist-talhao { display: none; position: fixed; inset: 0; background: white; z-index: 1000; overflow-y: auto; }
 .modal-hist-talhao.ativo { display: block; }
 .hist-talhao-header { background: linear-gradient(135deg,#1a5c2a,#2d8a3e); padding: 48px 20px 20px; }
 .hist-talhao-back { font-size: 22px; cursor: pointer; color: white; margin-bottom: 8px; display: inline-block; }
