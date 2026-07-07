@@ -171,6 +171,12 @@ input[type="file"] { display: none; }
 .badge-confianca-media { background: #fff8e1; color: #f57f17; }
 .badge-confianca-baixa { background: #fce4ec; color: #c62828; }
 .aviso-confirmar { margin: 8px 0 4px; background: #fff8e1; border-radius: 10px; padding: 9px 12px; border-left: 3px solid #f5b800; font-size: 12px; color: #7a5c00; line-height: 1.5; }
+.nav-inferior { position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto; background: #fff; border-top: 1px solid #ececec; display: flex; justify-content: space-around; align-items: center; padding: 6px 0 max(6px, env(safe-area-inset-bottom)); box-shadow: 0 -2px 12px rgba(0,0,0,0.06); z-index: 900; }
+.nav-btn { flex: 1; background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 0; cursor: pointer; font-family: 'DM Sans', sans-serif; position: relative; }
+.nav-btn-icon { font-size: 21px; line-height: 1; }
+.nav-btn-label { font-size: 10px; font-weight: 600; color: #9a9a9a; }
+.nav-btn.ativo .nav-btn-label { color: var(--verde); }
+.nav-badge { position: absolute; top: 0; right: 22%; background: #e53935; color: #fff; font-size: 9px; font-weight: 700; min-width: 15px; height: 15px; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 0 4px; line-height: 1; }
 .badge-regiao { background: #e3f2fd; color: #1565c0; }
 .badge-video { background: #e8eaf6; color: #283593; }
 .badge-solo { background: #efebe9; color: #4e342e; }
@@ -733,15 +739,36 @@ canvas { display: none; }
     &#127807; Doutor Caf&#233; &#169; 2026 &#183; Todos os direitos reservados<br>
     <span style="font-size:10px">CNPJ 67.223.948/0001-87</span>
   </div>
+  <div style="height:72px"></div>
 </div>
+
+<nav class="nav-inferior" id="navInferior" style="display:none">
+  <button class="nav-btn ativo" id="navInicio" onclick="navegarInicio()">
+    <span class="nav-btn-icon">&#127807;</span>
+    <span class="nav-btn-label">In&#237;cio</span>
+  </button>
+  <button class="nav-btn" id="navHistorico" onclick="navegarHistorico()">
+    <span class="nav-btn-icon">&#128203;</span>
+    <span class="nav-btn-label">Hist&#243;rico</span>
+  </button>
+  <button class="nav-btn" id="navPlanos" onclick="navegarPlanos()">
+    <span class="nav-btn-icon">&#128142;</span>
+    <span class="nav-btn-label">Planos</span>
+    <span class="nav-badge" id="navPlanosBadge" style="display:none"></span>
+  </button>
+  <button class="nav-btn" id="navMais" onclick="navegarMais()">
+    <span class="nav-btn-icon">&#9776;</span>
+    <span class="nav-btn-label">Mais</span>
+  </button>
+</nav>
 
 <!-- MODAL CADASTRO -->
 <div class="modal-cadastro" id="modalCadastro">
   <div class="modal-cadastro-box">
     <span class="modal-cadastro-icon">🌿</span>
     <div class="modal-cadastro-titulo">Continue usando gratuitamente!</div>
-    <div class="modal-cadastro-sub">Você usou 5 análises. Cadastre-se e ganhe mais 10 análises grátis.</div>
-    <div class="modal-cadastro-bonus">🎁 Cadastro gratuito · Mais 10 análises liberadas</div>
+    <div class="modal-cadastro-sub">Cadastre-se para continuar usando o Doutor Café e salvar seu histórico de análises.</div>
+    <div class="modal-cadastro-bonus">🌿 Cadastro rápido e gratuito</div>
     <label class="cad-label">Nome completo *</label>
     <input class="cad-input" id="cadNome" type="text" placeholder="Ex: João da Silva">
     <label class="cad-label">WhatsApp / Celular *</label>
@@ -829,6 +856,22 @@ function atualizarContador(){
 
   // ── BADGE DE VÍDEO ─────────────────────────────────────────
   atualizarBadgeVideo();
+
+  // ── BADGE DA NAV (Planos) ──────────────────────────────────
+  atualizarBadgeNav(p, r);
+}
+
+function atualizarBadgeNav(plano, restantes){
+  var badge=document.getElementById("navPlanosBadge");
+  if(!badge)return;
+  // Só mostra badge de urgência para plano gratuito quando está acabando
+  if((plano.tipo||"gratuito")==="gratuito" && restantes<=5){
+    badge.textContent=restantes;
+    badge.style.display="flex";
+    badge.style.background=restantes<=2?"#e53935":"#f5a623";
+  }else{
+    badge.style.display="none";
+  }
 }
 
 function atualizarBadgeVideo(){
@@ -1606,7 +1649,25 @@ function sincronizarIdentidade(callback){
   })
   .catch(function(){ if (callback) callback(); });
 }
-function entrarNoApp(nome){usuarioAtual=verificarCadastroInicial();mostrarTela('tela-principal');sincronizarIdentidade(function(){atualizarContador();sincronizarContadorServidor();});renderAreaHistorico();renderCalendario();obterGPS();obterPrecoCafe();checarLembretesPendentes();if(nome){var primeiroNome=nome.split(' ')[0];setTimeout(function(){var tag=document.getElementById('regiaoTag');if(tag)tag.innerHTML='Olá, '+primeiroNome+'! Vamos diagnosticar';setTimeout(function(){obterGPS();},3000);},600);}}
+function _navSetAtivo(id){
+  ["navInicio","navHistorico","navPlanos","navMais"].forEach(function(n){
+    var el=document.getElementById(n); if(el)el.classList.remove("ativo");
+  });
+  var a=document.getElementById(id); if(a)a.classList.add("ativo");
+}
+function navegarInicio(){_navSetAtivo("navInicio");window.scrollTo({top:0,behavior:"smooth"});}
+function navegarHistorico(){
+  _navSetAtivo("navHistorico");
+  var el=document.getElementById("tituloSecaoHistorico")||document.getElementById("areaHistorico");
+  if(el)el.scrollIntoView({behavior:"smooth",block:"start"});
+}
+function navegarPlanos(){_navSetAtivo("navPlanos");abrirModal(false);setTimeout(function(){_navSetAtivo("navInicio");},400);}
+function navegarMais(){
+  _navSetAtivo("navMais");
+  var el=document.getElementById("cardClima");
+  if(el)el.scrollIntoView({behavior:"smooth",block:"start"});
+}
+function entrarNoApp(nome){usuarioAtual=verificarCadastroInicial();mostrarTela('tela-principal');var nav=document.getElementById('navInferior');if(nav)nav.style.display='flex';sincronizarIdentidade(function(){atualizarContador();sincronizarContadorServidor();});renderAreaHistorico();renderCalendario();obterGPS();obterPrecoCafe();checarLembretesPendentes();if(nome){var primeiroNome=nome.split(' ')[0];setTimeout(function(){var tag=document.getElementById('regiaoTag');if(tag)tag.innerHTML='Olá, '+primeiroNome+'! Vamos diagnosticar';setTimeout(function(){obterGPS();},3000);},600);}}
 function verificarCadastroInicial(){try{return JSON.parse(localStorage.getItem(CADASTRO_INICIAL_KEY));}catch(e){return null;}}
 
 // ── TALHÕES ──
