@@ -45,8 +45,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--creme); min-height:
 .secao-titulo { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--cinza); padding: 4px 4px 0; }
 
 /* ── CARDS DE SEÇÃO (identidade visual por tema) ────────────── */
-.secao-card { border-radius: 20px; padding: 14px 14px 16px; margin-bottom: 4px; background: white; box-shadow: 0 2px 14px rgba(0,0,0,0.06); border-left: 7px solid var(--tema); position: relative; overflow: hidden; }
-.secao-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 100%; background: var(--tema-bg); z-index: 0; pointer-events: none; }
+.secao-card { border-radius: 20px; padding: 14px 14px 16px; margin-bottom: 4px; background: var(--tema-fundo); box-shadow: 0 2px 14px rgba(0,0,0,0.06); border: 2px solid var(--tema-borda); position: relative; overflow: hidden; }
 .secao-card > * { position: relative; z-index: 1; }
 .secao-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
 .secao-badge { width: 52px; height: 52px; border-radius: 15px; background: var(--tema-grad); display: flex; align-items: center; justify-content: center; font-size: 27px; flex-shrink: 0; box-shadow: 0 3px 10px var(--tema-sombra); }
@@ -55,11 +54,11 @@ body { font-family: 'DM Sans', sans-serif; background: var(--creme); min-height:
 .secao-card-tit p { font-size: 11.5px; color: var(--cinza); margin-top: 3px; line-height: 1.35; }
 
 /* Folha do Café — Verde */
-.tema-folha { --tema: #2d8a3e; --tema-escuro: #1a5c2a; --tema-grad: linear-gradient(135deg,#2d8a3e,#1a5c2a); --tema-sombra: rgba(26,92,42,0.3); --tema-bg: linear-gradient(180deg, rgba(45,138,62,0.05), rgba(45,138,62,0)); }
+.tema-folha { --tema: #2d8a3e; --tema-escuro: #1a5c2a; --tema-grad: linear-gradient(135deg,#2d8a3e,#1a5c2a); --tema-sombra: rgba(26,92,42,0.3); --tema-bg: linear-gradient(180deg, rgba(45,138,62,0.05), rgba(45,138,62,0)); --tema-fundo: #f2f8f3; --tema-borda: #bfe0c6; }
 /* Laudo de Solo — Marrom-terra */
-.tema-solo { --tema: #795548; --tema-escuro: #4e342e; --tema-grad: linear-gradient(135deg,#8d6e63,#4e342e); --tema-sombra: rgba(78,52,46,0.3); --tema-bg: linear-gradient(180deg, rgba(121,85,72,0.05), rgba(121,85,72,0)); }
+.tema-solo { --tema: #795548; --tema-escuro: #4e342e; --tema-grad: linear-gradient(135deg,#8d6e63,#4e342e); --tema-sombra: rgba(78,52,46,0.3); --tema-bg: linear-gradient(180deg, rgba(121,85,72,0.05), rgba(121,85,72,0)); --tema-fundo: #f7f3f1; --tema-borda: #ddc9bf; }
 /* Erva Daninha / Mato — Dourado-oliva (distinto dos dois verdes) */
-.tema-mato { --tema: #c08a1e; --tema-escuro: #7a5a10; --tema-grad: linear-gradient(135deg,#d9a531,#a5730f); --tema-sombra: rgba(160,115,15,0.3); --tema-bg: linear-gradient(180deg, rgba(192,138,30,0.06), rgba(192,138,30,0)); }
+.tema-mato { --tema: #c08a1e; --tema-escuro: #7a5a10; --tema-grad: linear-gradient(135deg,#d9a531,#a5730f); --tema-sombra: rgba(160,115,15,0.3); --tema-bg: linear-gradient(180deg, rgba(192,138,30,0.06), rgba(192,138,30,0)); --tema-fundo: #faf5e9; --tema-borda: #e6d29a; }
 /* Botões da seção Mato passam a seguir o tema dourado-oliva (antes eram verdes, confundiam com folha) */
 .tema-mato .btn-daninha { background: linear-gradient(135deg,#c99a2e,#a5730f); box-shadow: 0 4px 16px rgba(160,115,15,0.28); }
 .tema-mato .btn-daninha-gal { color: #7a5a10; border-color: #e6d29a; }
