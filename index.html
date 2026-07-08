@@ -1582,16 +1582,24 @@ function mostrarResultadoDaninha(data){
     else if(indicador.indexOf("degradado")>-1)alertaClass="daninha-alerta-degradado";
     else if(indicador.indexOf("glifosato")>-1||indicador.indexOf("resistente")>-1)alertaClass="daninha-alerta-compactado";
     var urgBadge=p.urgencia==="alta"?'<span style="background:#fce4ec;color:#c62828;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:6px">⚠️ URGENTE</span>':p.urgencia==="media"?'<span style="background:#fff3e0;color:#e65100;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:6px">Atenção</span>':"";
+    var conf=(p.confianca||"media").toLowerCase();
+    var incerto = conf==="baixa" || /não identificad|nao identificad/i.test(p.nome||"");
+    var confBadge = conf==="alta"?'<span style="background:#e8f5e9;color:#2e7d32;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:6px">✓ Alta confiança</span>':conf==="media"?'<span style="background:#fff8e1;color:#f57f17;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:6px">~ Confiança média</span>':'<span style="background:#fce4ec;color:#c62828;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:6px">! Baixa confiança</span>';
     if(plantas.length>1)html+='<div style="padding:8px 20px 0;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#888">'+(idx+1)+'ª planta encontrada</div>';
-    html+='<div class="card-topo" style="padding:10px 20px 6px"><div style="flex:1"><h2 style="font-family:Playfair Display,serif;font-size:18px;color:#3d2b1a">'+p.nome+urgBadge+'</h2><div style="font-size:11px;color:#888;font-style:italic">'+( p.nome_cientifico||"")+'</div></div></div>';
-    html+='<div class="daninha-alerta '+alertaClass+'" style="margin:0 20px 10px"><div class="daninha-alerta-titulo">🔍 '+indicador+'</div><div class="daninha-alerta-desc">'+acao+'</div></div>';
-    if(p.alerta)html+='<div style="margin:0 20px 10px;background:#fff3e0;border-radius:10px;padding:8px 12px;font-size:12px;color:#e65100;font-weight:600">⚠️ '+p.alerta+'</div>';
-    if(p.produtos&&p.produtos.length>0){
-      html+='<div class="calc-box" style="margin:0 20px 14px"><div class="calc-titulo">🌿 Controle Recomendado</div>';
-      p.produtos.forEach(function(prod){
-        html+='<div class="calc-produto"><div class="calc-produto-nome">'+prod.nome+'</div><div style="font-size:12px;color:#555;margin-top:4px">'+prod.dose+(prod.como_usar?' · '+prod.como_usar:'')+'</div></div>';
-      });
-      html+='</div>';
+    html+='<div class="card-topo" style="padding:10px 20px 6px"><div style="flex:1"><h2 style="font-family:Playfair Display,serif;font-size:18px;color:#3d2b1a">'+p.nome+urgBadge+'</h2><div style="font-size:11px;color:#888;font-style:italic">'+( p.nome_cientifico||"")+'</div><div style="margin-top:5px">'+confBadge+'</div></div></div>';
+    if(p.visto)html+='<div style="margin:0 20px 8px;font-size:12px;color:#666;font-style:italic;line-height:1.4">👁️ '+p.visto+'</div>';
+    if(incerto){
+      html+='<div style="margin:0 20px 12px;background:#fff8e1;border-radius:12px;padding:12px 14px;border-left:4px solid #f5b800"><div style="font-size:13px;font-weight:700;color:#7a5c00;margin-bottom:3px">🔎 Não tenho certeza desta planta</div><div style="font-size:12px;color:#7a5c00;line-height:1.5">'+(acao||'Tire uma foto mais próxima e nítida da planta inteira (folha, caule e base) e tente de novo.')+' Antes de aplicar qualquer produto, confirme a espécie com um técnico — herbicida errado desperdiça dinheiro e pode não controlar o mato.</div></div>';
+    } else {
+      html+='<div class="daninha-alerta '+alertaClass+'" style="margin:0 20px 10px"><div class="daninha-alerta-titulo">🔍 '+indicador+'</div><div class="daninha-alerta-desc">'+acao+'</div></div>';
+      if(p.alerta)html+='<div style="margin:0 20px 10px;background:#fff3e0;border-radius:10px;padding:8px 12px;font-size:12px;color:#e65100;font-weight:600">⚠️ '+p.alerta+'</div>';
+      if(p.produtos&&p.produtos.length>0){
+        html+='<div class="calc-box" style="margin:0 20px 14px"><div class="calc-titulo">🌿 Controle Recomendado</div>';
+        p.produtos.forEach(function(prod){
+          html+='<div class="calc-produto"><div class="calc-produto-nome">'+prod.nome+'</div><div style="font-size:12px;color:#555;margin-top:4px">'+prod.dose+(prod.como_usar?' · '+prod.como_usar:'')+'</div></div>';
+        });
+        html+='</div>';
+      }
     }
   });
   // Manejo integrado se múltiplas plantas
