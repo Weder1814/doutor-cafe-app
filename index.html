@@ -145,7 +145,7 @@ input[type="file"] { display: none; }
 .spinner-folha { font-size: 40px; animation: spin-pulse 1.2s ease-in-out infinite; display: block; margin-bottom: 12px; }
 @keyframes spin-pulse { 0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; } 50% { transform: scale(1.15) rotate(10deg); opacity: 0.7; } }
 #spinner p { color: var(--verde); font-weight: 700; font-size: 16px; }
-#spinner small { color: var(--cinza); font-size: 12px; margin-top: 4px; display: block; }
+#spinner small { color: var(--cinza); font-size: 12px; margin-top: 4px; display: block; transition: opacity 0.2s ease; min-height: 32px; }
 #resultado { display: none; }
 .card-resultado { background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.1); animation: slideUp 0.4s ease; }
 .multi-header { padding: 16px 20px 8px; display: flex; align-items: center; gap: 12px; }
@@ -1295,7 +1295,7 @@ function processar(file, isVideo) {
   document.getElementById("spinner").style.display="block";
   document.getElementById("resultado").style.display="none";
   document.getElementById("spinnerTexto").textContent="Analisando...";
-  document.getElementById("spinnerSub").textContent="Identificando sintomas — resultado em ~15 segundos";
+  iniciarDicasSpinner(DICAS_FOLHA);
   document.getElementById("spinner").scrollIntoView({behavior:"smooth",block:"center"});
   redimensionarImagem(file, 1280, 0.95, function(b64) {
     ultimaFotoBase64=b64;
@@ -1311,6 +1311,7 @@ function processar(file, isVideo) {
     function finalizarAnalise(diags) {
       if(fimProcessado) return;
       fimProcessado = true;
+      pararDicasSpinner();
       destravarAnalise();
       diags = diags.map(function(d){ return Object.assign({},d,{parcial:false}); });
       // Salvar no talhão usando o ID capturado no início da análise
@@ -1483,10 +1484,10 @@ function processar(file, isVideo) {
   });
 }
 
-function processarSolo(file){if(!travarAnalise())return;if(!servidorAcordado)acordarServidor(null);document.getElementById("spinner").style.display="block";document.getElementById("resultado").style.display="none";document.getElementById("spinnerTexto").textContent="Lendo laudo de solo...";document.getElementById("spinnerSub").textContent="Interpretando valores e calculando recomendações";document.getElementById("spinner").scrollIntoView({behavior:"smooth",block:"center"});redimensionarImagem(file,1600,0.85,function(b64){ultimaFotoBase64=b64;var body={imagem:b64,tipo:"image/jpeg"};if(dadosGPS.regiao)body.regiao=dadosGPS.regiao;if(usuarioAtual&&usuarioAtual.userId)body.userId=usuarioAtual.userId;fetchComRetry("https://doutor-cafe-production.up.railway.app/analise-solo",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)},TIMEOUT_MS).then(function(r){return r.json();}).then(function(data){if(data&&data.semAnalises){mostrarSemCreditos();return;}destravarAnalise();document.getElementById("spinner").style.display="none";mostrarResultadoSolo(data);incrementarAnalise();}).catch(function(){destravarAnalise();document.getElementById("spinner").style.display="none";adicionarNaFila(b64,null,"solo",function(ok){if(ok){renderAreaHistorico();alert("Sem conexão estável. Laudo salvo na fila offline!");}else{mostrarErro();}});});});}
-function processarDaninha(file){if(!travarAnalise())return;if(!servidorAcordado)acordarServidor(null);document.getElementById("spinner").style.display="block";document.getElementById("resultado").style.display="none";document.getElementById("spinnerTexto").textContent="Identificando planta daninha...";document.getElementById("spinnerSub").textContent="Lendo o que ela revela sobre o seu solo";document.getElementById("spinner").scrollIntoView({behavior:"smooth",block:"center"});redimensionarImagem(file,1280,0.92,function(b64){ultimaFotoBase64=b64;var body={imagem:b64,tipo:"image/jpeg"};if(dadosGPS.regiao)body.regiao=dadosGPS.regiao;if(usuarioAtual&&usuarioAtual.userId)body.userId=usuarioAtual.userId;fetchComRetry("https://doutor-cafe-production.up.railway.app/identifica-daninha",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)},TIMEOUT_MS).then(function(r){return r.json();}).then(function(data){if(data&&data.semAnalises){mostrarSemCreditos();return;}destravarAnalise();document.getElementById("spinner").style.display="none";mostrarResultadoDaninha(data);incrementarAnalise();}).catch(function(){destravarAnalise();document.getElementById("spinner").style.display="none";adicionarNaFila(b64,null,"daninha",function(ok){if(ok){renderAreaHistorico();alert("Sem conexão estável. Foto salva na fila offline!");}else{mostrarErro();}});});});}
-function processarVideo(file){if(!travarAnalise())return;document.getElementById("spinner").style.display="block";document.getElementById("resultado").style.display="none";document.getElementById("spinnerTexto").textContent="Extraindo frames do vídeo...";document.getElementById("spinnerSub").textContent="Analisando múltiplos ângulos";document.getElementById("spinner").scrollIntoView({behavior:"smooth",block:"center"});var video=document.createElement("video"),canvas=document.getElementById("canvas"),ctx=canvas.getContext("2d"),url=URL.createObjectURL(file);video.src=url;video.muted=true;video.addEventListener("loadedmetadata",function(){var duration=video.duration,frames=[],tempos=[duration*0.15,duration*0.35,duration*0.60,duration*0.85],idx=0;function capturarFrame(){if(idx>=tempos.length){URL.revokeObjectURL(url);enviarFrames(frames);return;}video.currentTime=tempos[idx];}video.addEventListener("seeked",function(){canvas.width=640;canvas.height=480;ctx.drawImage(video,0,0,640,480);var frameB64=canvas.toDataURL("image/jpeg",0.7).split(",")[1];if(idx===0)ultimaFotoBase64=frameB64;frames.push(frameB64);idx++;capturarFrame();});capturarFrame();});video.load();video.addEventListener("error",function(){destravarAnalise();document.getElementById("spinner").style.display="none";alert("Não foi possível ler o vídeo. Tente gravar novamente.");});}
-function enviarFrames(frames){if(!servidorAcordado)acordarServidor(null);document.getElementById("spinnerTexto").textContent="Analisando "+frames.length+" ângulos...";var body={frames:frames,tipo:"image/jpeg"};if(dadosGPS.regiao)body.regiao=dadosGPS.regiao;if(dadosGPS.altitude)body.altitude=dadosGPS.altitude;if(usuarioAtual&&usuarioAtual.userId)body.userId=usuarioAtual.userId;fetchComRetry("https://doutor-cafe-production.up.railway.app/diagnostico-video",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)},TIMEOUT_MS).then(function(r){return r.json();}).then(function(data){destravarAnalise();document.getElementById("spinner").style.display="none";if(data.semVideos){alert("Você atingiu o limite de vídeos do seu plano este mês.\nDica: use a câmera de foto para continuar diagnosticando.");atualizarBadgeVideo();return;}if(data.semAnalises){mostrarSemCreditos();return;}if(data.erro){alert("Erro: "+data.erro);return;}mostrarResultado(data,true);incrementarAnalise();if(usuarioAtual&&usuarioAtual.userId){fetch("https://doutor-cafe-production.up.railway.app/incrementar-video",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({userId:usuarioAtual.userId})}).then(function(){var v=parseInt(localStorage.getItem("doutorcafe_videos_usados")||"0");localStorage.setItem("doutorcafe_videos_usados",(v+1).toString());atualizarBadgeVideo();}).catch(function(){});}}).catch(function(){destravarAnalise();document.getElementById("spinner").style.display="none";adicionarNaFila(frames[0],frames,"video",function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert("Sem conexão. Vídeo salvo na fila!");}});});}
+function processarSolo(file){if(!travarAnalise())return;if(!servidorAcordado)acordarServidor(null);document.getElementById("spinner").style.display="block";document.getElementById("resultado").style.display="none";document.getElementById("spinnerTexto").textContent="Lendo laudo de solo...";iniciarDicasSpinner(DICAS_SOLO);document.getElementById("spinner").scrollIntoView({behavior:"smooth",block:"center"});redimensionarImagem(file,1600,0.85,function(b64){ultimaFotoBase64=b64;var body={imagem:b64,tipo:"image/jpeg"};if(dadosGPS.regiao)body.regiao=dadosGPS.regiao;if(usuarioAtual&&usuarioAtual.userId)body.userId=usuarioAtual.userId;fetchComRetry("https://doutor-cafe-production.up.railway.app/analise-solo",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)},TIMEOUT_MS).then(function(r){return r.json();}).then(function(data){if(data&&data.semAnalises){mostrarSemCreditos();return;}pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";mostrarResultadoSolo(data);incrementarAnalise();}).catch(function(){pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";adicionarNaFila(b64,null,"solo",function(ok){if(ok){renderAreaHistorico();alert("Sem conexão estável. Laudo salvo na fila offline!");}else{mostrarErro();}});});});}
+function processarDaninha(file){if(!travarAnalise())return;if(!servidorAcordado)acordarServidor(null);document.getElementById("spinner").style.display="block";document.getElementById("resultado").style.display="none";document.getElementById("spinnerTexto").textContent="Identificando planta daninha...";iniciarDicasSpinner(DICAS_DANINHA);document.getElementById("spinner").scrollIntoView({behavior:"smooth",block:"center"});redimensionarImagem(file,1280,0.92,function(b64){ultimaFotoBase64=b64;var body={imagem:b64,tipo:"image/jpeg"};if(dadosGPS.regiao)body.regiao=dadosGPS.regiao;if(usuarioAtual&&usuarioAtual.userId)body.userId=usuarioAtual.userId;fetchComRetry("https://doutor-cafe-production.up.railway.app/identifica-daninha",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)},TIMEOUT_MS).then(function(r){return r.json();}).then(function(data){if(data&&data.semAnalises){mostrarSemCreditos();return;}pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";mostrarResultadoDaninha(data);incrementarAnalise();}).catch(function(){pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";adicionarNaFila(b64,null,"daninha",function(ok){if(ok){renderAreaHistorico();alert("Sem conexão estável. Foto salva na fila offline!");}else{mostrarErro();}});});});}
+function processarVideo(file){if(!travarAnalise())return;document.getElementById("spinner").style.display="block";document.getElementById("resultado").style.display="none";document.getElementById("spinnerTexto").textContent="Extraindo frames do vídeo...";iniciarDicasSpinner(DICAS_FOLHA);document.getElementById("spinner").scrollIntoView({behavior:"smooth",block:"center"});var video=document.createElement("video"),canvas=document.getElementById("canvas"),ctx=canvas.getContext("2d"),url=URL.createObjectURL(file);video.src=url;video.muted=true;video.addEventListener("loadedmetadata",function(){var duration=video.duration,frames=[],tempos=[duration*0.15,duration*0.35,duration*0.60,duration*0.85],idx=0;function capturarFrame(){if(idx>=tempos.length){URL.revokeObjectURL(url);enviarFrames(frames);return;}video.currentTime=tempos[idx];}video.addEventListener("seeked",function(){canvas.width=640;canvas.height=480;ctx.drawImage(video,0,0,640,480);var frameB64=canvas.toDataURL("image/jpeg",0.7).split(",")[1];if(idx===0)ultimaFotoBase64=frameB64;frames.push(frameB64);idx++;capturarFrame();});capturarFrame();});video.load();video.addEventListener("error",function(){pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";alert("Não foi possível ler o vídeo. Tente gravar novamente.");});}
+function enviarFrames(frames){if(!servidorAcordado)acordarServidor(null);document.getElementById("spinnerTexto").textContent="Analisando "+frames.length+" ângulos...";var body={frames:frames,tipo:"image/jpeg"};if(dadosGPS.regiao)body.regiao=dadosGPS.regiao;if(dadosGPS.altitude)body.altitude=dadosGPS.altitude;if(usuarioAtual&&usuarioAtual.userId)body.userId=usuarioAtual.userId;fetchComRetry("https://doutor-cafe-production.up.railway.app/diagnostico-video",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)},TIMEOUT_MS).then(function(r){return r.json();}).then(function(data){pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";if(data.semVideos){alert("Você atingiu o limite de vídeos do seu plano este mês.\nDica: use a câmera de foto para continuar diagnosticando.");atualizarBadgeVideo();return;}if(data.semAnalises){mostrarSemCreditos();return;}if(data.erro){alert("Erro: "+data.erro);return;}mostrarResultado(data,true);incrementarAnalise();if(usuarioAtual&&usuarioAtual.userId){fetch("https://doutor-cafe-production.up.railway.app/incrementar-video",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({userId:usuarioAtual.userId})}).then(function(){var v=parseInt(localStorage.getItem("doutorcafe_videos_usados")||"0");localStorage.setItem("doutorcafe_videos_usados",(v+1).toString());atualizarBadgeVideo();}).catch(function(){});}}).catch(function(){pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";adicionarNaFila(frames[0],frames,"video",function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert("Sem conexão. Vídeo salvo na fila!");}});});}
 
 // ── COMPARTILHAR ──
 function compartilharAtual(){var texto="🌿 *Doutor Café — Diagnóstico*\n";if(dadosGPS.regiao)texto+="📍 "+dadosGPS.regiao+"\n";texto+="\n";var doencas=(_ultimosDiags||[]).filter(function(d){return d.diagnostico!=="saudavel";});if(doencas.length>0){texto+="🔬 *"+doencas.length+" problema(s) detectado(s):*\n";doencas.forEach(function(d){var emoji=EMOJIS[d.diagnostico]||"🌿";var nome=NOMES_VOZ[d.diagnostico]||d.diagnostico.replace(/_/g," ");texto+=emoji+" "+nome+" — Estágio "+(d.estagio||1)+"/5\n";});texto+="\n";}if(_ultimoPlano){texto+="📋 *Plano de Ação:*\n";if(_ultimoPlano.urgente)texto+="🔴 *Esta semana:* "+_ultimoPlano.urgente+"\n";if(_ultimoPlano.em_21_dias)texto+="🟡 *Em 21 dias:* "+_ultimoPlano.em_21_dias+"\n";if(_ultimoPlano.nutricao)texto+="🟢 *Nutrição:* "+_ultimoPlano.nutricao+"\n";texto+="\n";}texto+="_Diagnóstico realizado pelo app Doutor Café_";window.open("https://wa.me/?text="+encodeURIComponent(texto),"_blank");}
@@ -1622,11 +1623,55 @@ function mostrarResultadoDaninha(data){
   div.scrollIntoView({behavior:"smooth",block:"start"});
 }
 
-function mostrarErro(){var div=document.getElementById("resultado");div.style.display="block";div.innerHTML='<div class="card-resultado"><div class="acao-box"><p>⚠️ Não conseguimos concluir a análise após duas tentativas. Isso pode acontecer quando o servidor está iniciando — geralmente funciona ao tentar de novo em alguns segundos.</p></div><div class="btns-resultado"><button class="btn-nova" onclick="resetar()">📷 Tentar novamente</button></div></div>';}
+// ── DICAS ROTATIVAS NO SPINNER (mantem o produtor engajado durante a espera) ──
+var _spinnerDicaTimer = null;
+var DICAS_DANINHA = [
+  "🌱 Plantas daninhas competem com o café por água, luz e nutrientes.",
+  "🐛 A tiririca se espalha por tubérculos no solo — arranquio manual ajuda muito.",
+  "💨 A buva dispersa sementes pelo vento após florescer. Controle antes da flor!",
+  "🧪 Erva daninha também indica o tipo de solo — ácido, compactado ou fértil.",
+  "🚫 Nunca aplique herbicida sem o Receituário Agronômico — é exigido por lei.",
+  "🔄 Alternar o mecanismo de ação do herbicida evita resistência das plantas.",
+  "📸 Fotos de lado, mostrando a planta inteira, ajudam a identificar melhor."
+];
+var DICAS_FOLHA = [
+  "☕ A ferrugem do café aparece como pó alaranjado na parte de baixo da folha.",
+  "🍃 Folhas novas contam histórias diferentes das folhas velhas — sintomas mudam com a idade.",
+  "💧 Alta umidade favorece o bicho-mineiro e a ferrugem no cafezal.",
+  "🧫 O cobre é o fungicida protetor mais usado no café — mas lava com a chuva.",
+  "🌡️ Clima ameno (15-25°C) favorece a Ascochyta, mais rara em dias quentes.",
+  "🔬 Fotografe a face de baixo da folha também — muitos sintomas aparecem lá.",
+  "🌾 Deficiência de potássio queima as bordas das folhas mais velhas primeiro."
+];
+var DICAS_SOLO = [
+  "🧪 O pH ideal do solo para o café fica entre 5,5 e 6,5.",
+  "🌱 Calagem corrige a acidez do solo e melhora a absorção de nutrientes.",
+  "📊 A análise de solo deve ser feita a cada safra para ajustar a adubação.",
+  "💊 Boro e Zinco em falta afetam o crescimento dos ponteiros do cafeeiro.",
+  "🌧️ Solo com boa matéria orgânica retém mais água e nutrientes."
+];
+function iniciarDicasSpinner(lista) {
+  pararDicasSpinner();
+  var idx = 0;
+  var el = document.getElementById("spinnerSub");
+  if (!el || !lista || lista.length === 0) return;
+  el.textContent = lista[0];
+  _spinnerDicaTimer = setInterval(function() {
+    idx = (idx + 1) % lista.length;
+    var elAtual = document.getElementById("spinnerSub");
+    if (elAtual) { elAtual.style.opacity = "0"; setTimeout(function(){ elAtual.textContent = lista[idx]; elAtual.style.opacity = "1"; }, 200); }
+  }, 3500);
+}
+function pararDicasSpinner() {
+  if (_spinnerDicaTimer) { clearInterval(_spinnerDicaTimer); _spinnerDicaTimer = null; }
+}
+
+function mostrarErro(){pararDicasSpinner();var div=document.getElementById("resultado");div.style.display="block";div.innerHTML='<div class="card-resultado"><div class="acao-box"><p>⚠️ Não conseguimos concluir a análise após duas tentativas. Isso pode acontecer quando o servidor está iniciando — geralmente funciona ao tentar de novo em alguns segundos.</p></div><div class="btns-resultado"><button class="btn-nova" onclick="resetar()">📷 Tentar novamente</button></div></div>';}
 
 // Aviso claro de que o saldo de análises acabou (não é erro técnico).
 // Usado pelos 3 fluxos (folha, laudo, daninha) quando o servidor responde 403 semAnalises.
 function mostrarSemCreditos(){
+  pararDicasSpinner();
   destravarAnalise();
   document.getElementById("spinner").style.display="none";
   var div=document.getElementById("resultado");div.style.display="block";
