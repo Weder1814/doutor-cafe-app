@@ -141,11 +141,26 @@ input[type="file"] { display: none; }
 .dica { background: white; border-radius: 14px; padding: 12px 14px; display: flex; align-items: flex-start; gap: 10px; border-left: 3px solid var(--verde-neon); }
 .dica p { font-size: 12px; color: var(--cinza); line-height: 1.5; }
 .dica strong { color: var(--marrom); }
-#spinner { display: none; background: white; border-radius: 20px; padding: 32px 20px; text-align: center; box-shadow: 0 2px 16px rgba(0,0,0,0.07); }
-.spinner-folha { font-size: 40px; animation: spin-pulse 1.2s ease-in-out infinite; display: block; margin-bottom: 12px; }
-@keyframes spin-pulse { 0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; } 50% { transform: scale(1.15) rotate(10deg); opacity: 0.7; } }
-#spinner p { color: var(--verde); font-weight: 700; font-size: 16px; }
-#spinner small { color: var(--cinza); font-size: 12px; margin-top: 4px; display: block; transition: opacity 0.2s ease; min-height: 32px; }
+#spinner { display: none; background: linear-gradient(160deg, #f0f8f1, white 60%); border-radius: 24px; padding: 32px 22px 26px; text-align: center; box-shadow: 0 4px 24px rgba(26,92,42,0.12); border: 1px solid #e0ede0; overflow: hidden; }
+.spinner-visual { position: relative; width: 92px; height: 92px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; }
+.spinner-scan-ring { position: absolute; inset: 0; border-radius: 50%; border: 3px solid #d5ead8; border-top-color: var(--verde-claro); animation: spin-ring 1.1s linear infinite; }
+.spinner-scan-ring::after { content: ""; position: absolute; inset: -8px; border-radius: 50%; border: 2px dashed #bfe0c6; animation: spin-ring-rev 4s linear infinite; }
+.spinner-scan-icon { font-size: 38px; z-index: 1; animation: icon-pulse 1.6s ease-in-out infinite; }
+.spinner-scan-linha { position: absolute; left: 6%; right: 6%; height: 3px; background: linear-gradient(90deg, transparent, #5dde74, transparent); border-radius: 3px; animation: scan-sweep 1.8s ease-in-out infinite; box-shadow: 0 0 8px rgba(93,222,116,0.6); }
+@keyframes spin-ring { to { transform: rotate(360deg); } }
+@keyframes spin-ring-rev { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+@keyframes icon-pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.12); opacity: 0.85; } }
+@keyframes scan-sweep { 0% { top: 15%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { top: 85%; opacity: 0; } }
+#spinner p { color: var(--verde); font-weight: 800; font-size: 17px; margin-bottom: 14px; }
+.spinner-etapas { display: flex; flex-direction: column; gap: 9px; max-width: 280px; margin: 0 auto 14px; text-align: left; }
+.spinner-etapa { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #b8c2b9; font-weight: 600; transition: color 0.4s ease; }
+.spinner-etapa .etapa-check { font-size: 9px; color: #d5ead8; transition: color 0.4s ease, transform 0.4s ease; flex-shrink: 0; }
+.spinner-etapa.ativo { color: var(--marrom); }
+.spinner-etapa.ativo .etapa-check { color: var(--verde-claro); transform: scale(1.4); }
+.spinner-etapa.concluido { color: #7a8a7c; }
+.spinner-etapa.concluido .etapa-check { color: var(--verde); }
+.spinner-etapa.concluido .etapa-check::before { content: "\2713"; font-size: 11px; }
+#spinner small { color: var(--cinza); font-size: 12px; margin-top: 4px; display: block; transition: opacity 0.2s ease; min-height: 32px; padding: 0 8px; line-height: 1.4; }
 #resultado { display: none; }
 .card-resultado { background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.1); animation: slideUp 0.4s ease; }
 .multi-header { padding: 16px 20px 8px; display: flex; align-items: center; gap: 12px; }
@@ -697,8 +712,18 @@ canvas { display: none; }
   </div>
 
   <div id="spinner">
-    <span class="spinner-folha">&#128300;</span>
+    <div class="spinner-visual">
+      <div class="spinner-scan-ring"></div>
+      <span class="spinner-scan-icon" id="spinnerIcone">&#128300;</span>
+      <div class="spinner-scan-linha"></div>
+    </div>
     <p id="spinnerTexto">Analisando...</p>
+    <div class="spinner-etapas" id="spinnerEtapas">
+      <div class="spinner-etapa" data-etapa="1"><span class="etapa-check">&#9679;</span><span class="etapa-label">Enviando foto</span></div>
+      <div class="spinner-etapa" data-etapa="2"><span class="etapa-check">&#9679;</span><span class="etapa-label">Identificando padr&#245;es</span></div>
+      <div class="spinner-etapa" data-etapa="3"><span class="etapa-check">&#9679;</span><span class="etapa-label">Comparando base t&#233;cnica</span></div>
+      <div class="spinner-etapa" data-etapa="4"><span class="etapa-check">&#9679;</span><span class="etapa-label">Montando recomenda&#231;&#227;o</span></div>
+    </div>
     <small id="spinnerSub">Identificando sintomas e comparando padr&#245;es</small>
   </div>
   <div id="resultado"></div>
@@ -1623,6 +1648,28 @@ function mostrarResultadoDaninha(data){
   div.scrollIntoView({behavior:"smooth",block:"start"});
 }
 
+// ── ETAPAS PROGRESSIVAS DO SPINNER (visual, acende ao longo de ~15-20s) ──
+var _spinnerEtapaTimers = [];
+function iniciarEtapasSpinner() {
+  pararEtapasSpinner();
+  var etapas = document.querySelectorAll(".spinner-etapa");
+  etapas.forEach(function(el){ el.classList.remove("ativo","concluido"); });
+  var tempos = [0, 4500, 10000, 15500]; // quando cada etapa acende (ms)
+  tempos.forEach(function(t, i){
+    _spinnerEtapaTimers.push(setTimeout(function(){
+      var atuais = document.querySelectorAll(".spinner-etapa");
+      atuais.forEach(function(el, idx){
+        if (idx < i) { el.classList.remove("ativo"); el.classList.add("concluido"); }
+        else if (idx === i) { el.classList.remove("concluido"); el.classList.add("ativo"); }
+      });
+    }, t));
+  });
+}
+function pararEtapasSpinner() {
+  _spinnerEtapaTimers.forEach(function(id){ clearTimeout(id); });
+  _spinnerEtapaTimers = [];
+}
+
 // ── DICAS ROTATIVAS NO SPINNER (mantem o produtor engajado durante a espera) ──
 var _spinnerDicaTimer = null;
 var DICAS_DANINHA = [
@@ -1652,6 +1699,7 @@ var DICAS_SOLO = [
 ];
 function iniciarDicasSpinner(lista) {
   pararDicasSpinner();
+  iniciarEtapasSpinner();
   var idx = 0;
   var el = document.getElementById("spinnerSub");
   if (!el || !lista || lista.length === 0) return;
@@ -1664,6 +1712,7 @@ function iniciarDicasSpinner(lista) {
 }
 function pararDicasSpinner() {
   if (_spinnerDicaTimer) { clearInterval(_spinnerDicaTimer); _spinnerDicaTimer = null; }
+  pararEtapasSpinner();
 }
 
 function mostrarErro(){pararDicasSpinner();var div=document.getElementById("resultado");div.style.display="block";div.innerHTML='<div class="card-resultado"><div class="acao-box"><p>⚠️ Não conseguimos concluir a análise após duas tentativas. Isso pode acontecer quando o servidor está iniciando — geralmente funciona ao tentar de novo em alguns segundos.</p></div><div class="btns-resultado"><button class="btn-nova" onclick="resetar()">📷 Tentar novamente</button></div></div>';}
