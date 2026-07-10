@@ -236,6 +236,10 @@ input[type="file"] { display: none; }
 .visto-box { margin: 0 20px 16px; background: var(--creme); border-radius: 12px; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start; }
 .visto-box .visto-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
 .visto-box p { font-size: 13px; color: #555; line-height: 1.5; font-style: italic; }
+.diag-ref-visual { margin: 0 20px 16px; background: var(--creme); border-radius: 14px; padding: 12px; border: 1px solid #e8e0d5; }
+.diag-ref-label { font-size: 12px; font-weight: 700; color: var(--marrom); margin-bottom: 8px; }
+.diag-ref-visual img { width: 100%; max-height: 200px; object-fit: cover; border-radius: 10px; display: block; }
+.diag-ref-legenda { font-size: 12px; color: #666; margin-top: 8px; line-height: 1.4; }
 .divisor { height: 1px; background: #f0f0f0; margin: 0 20px; }
 .acao-box { padding: 16px 20px; }
 .acao-box h3 { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--cinza); margin-bottom: 8px; }
@@ -1566,6 +1570,9 @@ function mostrarResultadoStreaming(diags,fotoBase64,isVideo){
     html+='<div class="diag-badges"><span class="badge badge-estagio">📊 Estágio '+estagio+'/5</span><span class="badge badge-confianca-'+confianca+'">'+badgeTexto+' confiança</span></div>';
     html+='<div class="diag-bar">'+barras+'</div>';
     if(d.visto)html+='<div class="diag-visto">"'+d.visto+'"</div>';
+    if(d.imagem_referencia){
+      html+='<div class="diag-ref-visual"><div class="diag-ref-label">🔍 Compare com um exemplo real</div><img src="'+d.imagem_referencia+'" alt="Referência visual" loading="lazy" onerror="this.parentElement.style.display=\'none\'">'+(d.imagem_referencia_legenda?'<div class="diag-ref-legenda">'+d.imagem_referencia_legenda+'</div>':'')+'</div>';
+    }
     if(d.parcial){
       html+='<div class="diag-acao" style="color:#aaa;font-style:italic">⏳ Analisando...</div>';
     }else{
