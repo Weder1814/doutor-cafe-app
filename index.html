@@ -1535,7 +1535,68 @@ function processar(file, isVideo) {
 }
 
 function processarSolo(file){if(!travarAnalise())return;if(!servidorAcordado)acordarServidor(null);document.getElementById("spinner").style.display="block";document.getElementById("resultado").style.display="none";document.getElementById("spinnerTexto").textContent="Lendo laudo de solo...";iniciarDicasSpinner(DICAS_SOLO);document.getElementById("spinner").scrollIntoView({behavior:"smooth",block:"center"});redimensionarImagem(file,1600,0.85,function(b64){ultimaFotoBase64=b64;var body={imagem:b64,tipo:"image/jpeg"};if(dadosGPS.regiao)body.regiao=dadosGPS.regiao;if(usuarioAtual&&usuarioAtual.userId)body.userId=usuarioAtual.userId;fetchComRetry("https://doutor-cafe-production.up.railway.app/analise-solo",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)},TIMEOUT_MS).then(function(r){return r.json();}).then(function(data){if(data&&data.semAnalises){mostrarSemCreditos();return;}pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";mostrarResultadoSolo(data);incrementarAnalise();}).catch(function(){pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";adicionarNaFila(b64,null,"solo",function(ok){if(ok){renderAreaHistorico();alert("Sem conexão estável. Laudo salvo na fila offline!");}else{mostrarErro();}});});});}
-function processarDaninha(file){if(!travarAnalise())return;if(!servidorAcordado)acordarServidor(null);document.getElementById("spinner").style.display="block";document.getElementById("resultado").style.display="none";document.getElementById("spinnerTexto").textContent="Identificando planta daninha...";iniciarDicasSpinner(DICAS_DANINHA);document.getElementById("spinner").scrollIntoView({behavior:"smooth",block:"center"});redimensionarImagem(file,1100,0.88,function(b64){ultimaFotoBase64=b64;var body={imagem:b64,tipo:"image/jpeg"};if(dadosGPS.regiao)body.regiao=dadosGPS.regiao;if(usuarioAtual&&usuarioAtual.userId)body.userId=usuarioAtual.userId;fetchComRetry("https://doutor-cafe-production.up.railway.app/identifica-daninha",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)},TIMEOUT_MS).then(function(r){return r.json();}).then(function(data){if(data&&data.semAnalises){mostrarSemCreditos();return;}pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";mostrarResultadoDaninha(data);incrementarAnalise();}).catch(function(){pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";adicionarNaFila(b64,null,"daninha",function(ok){if(ok){renderAreaHistorico();alert("Sem conexão estável. Foto salva na fila offline!");}else{mostrarErro();}});});});}
+function processarDaninha(file){if(!travarAnalise())return;if(!servidorAcordado)acordarServidor(null);document.getElementById("spinner").style.display="block";document.getElementById("resultado").style.display="none";document.getElementById("spinnerTexto").textContent="Identificando planta daninha...";iniciarDicasSpinner(DICAS_DANINHA);document.getElementById("spinner").scrollIntoView({behavior:"smooth",block:"center"});redimensionarImagem(file,1100,0.88,function(b64){
+  ultimaFotoBase64=b64;
+  var body={imagem:b64,tipo:"image/jpeg"};
+  if(dadosGPS.regiao)body.regiao=dadosGPS.regiao;
+  if(usuarioAtual&&usuarioAtual.userId)body.userId=usuarioAtual.userId;
+  var fimProcessadoD=false;
+  function falhaOffline(){
+    pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";
+    adicionarNaFila(b64,null,"daninha",function(ok){if(ok){renderAreaHistorico();alert("Sem conexão estável. Foto salva na fila offline!");}else{mostrarErro();}});
+  }
+  fetchComRetry("https://doutor-cafe-production.up.railway.app/identifica-daninha",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)},TIMEOUT_MS)
+  .then(function(r){
+    if(r.status===403){
+      r.json().then(function(d){ if(d&&d.semAnalises){ mostrarSemCreditos(); } else { destravarAnalise(); mostrarErro(); } }).catch(function(){ destravarAnalise(); mostrarErro(); });
+      return;
+    }
+    var reader2=r.body.getReader(), dec=new TextDecoder(), sseBuf="";
+    function processarEventosD(buf){
+      buf.split("\n\n").forEach(function(bloco){
+        bloco.split("\n").forEach(function(linha){
+          if(linha.startsWith(":")) return;
+          if(!linha.startsWith("data: ")) return;
+          var jsonStr=linha.slice(6).trim();
+          if(!jsonStr) return;
+          try {
+            var ev=JSON.parse(jsonStr);
+            if(ev.tipo==="nome_parcial"){
+              var el=document.getElementById("spinnerSub");
+              if(el) el.textContent="\uD83D\uDD0D Identificado: "+ev.nome+" — finalizando detalhes...";
+            } else if(ev.tipo==="fim"){
+              fimProcessadoD=true;
+              pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";
+              mostrarResultadoDaninha(ev.resultado);incrementarAnalise();
+            } else if(ev.tipo==="erro"){
+              fimProcessadoD=true;
+              falhaOffline();
+            }
+          } catch(e){}
+        });
+      });
+    }
+    function lerD(){
+      reader2.read().then(function(res2){
+        if(res2.done){
+          if(sseBuf.trim()) processarEventosD(sseBuf);
+          if(!fimProcessadoD) falhaOffline();
+          return;
+        }
+        sseBuf+=dec.decode(res2.value,{stream:true});
+        var posUltimoEvento=sseBuf.lastIndexOf("\n\n");
+        if(posUltimoEvento>=0){
+          var blocoCompleto=sseBuf.substring(0,posUltimoEvento+2);
+          sseBuf=sseBuf.substring(posUltimoEvento+2);
+          processarEventosD(blocoCompleto);
+        }
+        lerD();
+      }).catch(function(){ if(!fimProcessadoD) falhaOffline(); });
+    }
+    lerD();
+  })
+  .catch(falhaOffline);
+});}
 function processarVideo(file){if(!travarAnalise())return;document.getElementById("spinner").style.display="block";document.getElementById("resultado").style.display="none";document.getElementById("spinnerTexto").textContent="Extraindo frames do vídeo...";iniciarDicasSpinner(DICAS_FOLHA);document.getElementById("spinner").scrollIntoView({behavior:"smooth",block:"center"});var video=document.createElement("video"),canvas=document.getElementById("canvas"),ctx=canvas.getContext("2d"),url=URL.createObjectURL(file);video.src=url;video.muted=true;video.addEventListener("loadedmetadata",function(){var duration=video.duration,frames=[],tempos=[duration*0.15,duration*0.35,duration*0.60,duration*0.85],idx=0;function capturarFrame(){if(idx>=tempos.length){URL.revokeObjectURL(url);enviarFrames(frames);return;}video.currentTime=tempos[idx];}video.addEventListener("seeked",function(){canvas.width=640;canvas.height=480;ctx.drawImage(video,0,0,640,480);var frameB64=canvas.toDataURL("image/jpeg",0.7).split(",")[1];if(idx===0)ultimaFotoBase64=frameB64;frames.push(frameB64);idx++;capturarFrame();});capturarFrame();});video.load();video.addEventListener("error",function(){pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";alert("Não foi possível ler o vídeo. Tente gravar novamente.");});}
 function enviarFrames(frames){if(!servidorAcordado)acordarServidor(null);document.getElementById("spinnerTexto").textContent="Analisando "+frames.length+" ângulos...";var body={frames:frames,tipo:"image/jpeg"};if(dadosGPS.regiao)body.regiao=dadosGPS.regiao;if(dadosGPS.altitude)body.altitude=dadosGPS.altitude;if(usuarioAtual&&usuarioAtual.userId)body.userId=usuarioAtual.userId;fetchComRetry("https://doutor-cafe-production.up.railway.app/diagnostico-video",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)},TIMEOUT_MS).then(function(r){return r.json();}).then(function(data){pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";if(data.semVideos){alert("Você atingiu o limite de vídeos do seu plano este mês.\nDica: use a câmera de foto para continuar diagnosticando.");atualizarBadgeVideo();return;}if(data.semAnalises){mostrarSemCreditos();return;}if(data.erro){alert("Erro: "+data.erro);return;}mostrarResultado(data,true);incrementarAnalise();if(usuarioAtual&&usuarioAtual.userId){fetch("https://doutor-cafe-production.up.railway.app/incrementar-video",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({userId:usuarioAtual.userId})}).then(function(){var v=parseInt(localStorage.getItem("doutorcafe_videos_usados")||"0");localStorage.setItem("doutorcafe_videos_usados",(v+1).toString());atualizarBadgeVideo();}).catch(function(){});}}).catch(function(){pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";adicionarNaFila(frames[0],frames,"video",function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert("Sem conexão. Vídeo salvo na fila!");}});});}
 
