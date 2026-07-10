@@ -1562,8 +1562,9 @@ function processarDaninha(file){if(!travarAnalise())return;if(!servidorAcordado)
           try {
             var ev=JSON.parse(jsonStr);
             if(ev.tipo==="nome_parcial"){
+              if(typeof _spinnerDicaTimer!=="undefined"&&_spinnerDicaTimer){clearInterval(_spinnerDicaTimer);_spinnerDicaTimer=null;}
               var el=document.getElementById("spinnerSub");
-              if(el) el.textContent="\uD83D\uDD0D Identificado: "+ev.nome+" — finalizando detalhes...";
+              if(el){el.style.opacity="0";setTimeout(function(){el.textContent="\uD83D\uDD0D Identificado: "+ev.nome+" — finalizando detalhes...";el.style.opacity="1";},200);}
             } else if(ev.tipo==="fim"){
               fimProcessadoD=true;
               pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";
