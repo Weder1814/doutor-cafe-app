@@ -1684,14 +1684,15 @@ function mostrarResultadoDaninha(data){
   // Suporte ao novo formato com array de plantas
   var plantas=data.plantas||(data.nome?[data]:[]);
   if(plantas.length===0){mostrarErro();return;}
+  var mesmaPlanta=!!data.hipoteses_mesma_planta&&plantas.length>1;
   var thumbHtml=ultimaFotoBase64?'<img class="card-foto-thumb" src="data:image/jpeg;base64,'+ultimaFotoBase64+'" alt="planta">':"<div class='card-foto-thumb-placeholder'>🌾</div>";
-  var qtd=plantas.length>1?plantas.length+" plantas identificadas":"1 planta identificada";
+  var qtd=mesmaPlanta?"1 planta identificada (2 hipóteses)":(plantas.length>1?plantas.length+" plantas identificadas":"1 planta identificada");
   var html='<div class="card-resultado"><div class="card-topo">'+thumbHtml+'<div class="card-titulo"><h2>'+qtd+'</h2><div class="categoria">Plantas Daninhas Indicadoras</div></div></div>';
   html+='<div class="badges"><span class="badge badge-daninha">🌾 Leitura do Solo</span>';
   if(dadosGPS.regiao)html+='<span class="badge badge-regiao">📍 '+dadosGPS.regiao+'</span>';
   html+='</div>';
-  // Indicador geral se houver múltiplas plantas
-  if(plantas.length>1&&data.indicador_geral){
+  // Indicador geral se houver múltiplas plantas DE VERDADE (nao aplica a hipoteses da mesma planta)
+  if(plantas.length>1&&data.indicador_geral&&!mesmaPlanta){
     html+='<div class="daninha-alerta daninha-alerta-compactado" style="background:#fff8e1;border-left:4px solid #f57f17"><div class="daninha-alerta-titulo">🔍 O que esse conjunto indica</div><div class="daninha-alerta-desc">'+data.indicador_geral+'</div></div>';
   }
   // Cada planta
@@ -1708,7 +1709,8 @@ function mostrarResultadoDaninha(data){
     var conf=(p.confianca||"media").toLowerCase();
     var incerto = conf==="baixa" || /não identificad|nao identificad/i.test(p.nome||"");
     var confBadge = conf==="alta"?'<span style="background:#e8f5e9;color:#2e7d32;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:6px">✓ Alta confiança</span>':conf==="media"?'<span style="background:#fff8e1;color:#f57f17;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:6px">~ Confiança média</span>':'<span style="background:#fce4ec;color:#c62828;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:6px">! Baixa confiança</span>';
-    if(plantas.length>1)html+='<div style="padding:8px 20px 0;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#888">'+(idx+1)+'ª planta encontrada</div>';
+    if(mesmaPlanta)html+='<div style="padding:8px 20px 0;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#888">'+(idx===0?"Hipótese mais provável":"Hipótese alternativa")+'</div>';
+    else if(plantas.length>1)html+='<div style="padding:8px 20px 0;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#888">'+(idx+1)+'ª planta encontrada</div>';
     html+='<div class="card-topo" style="padding:10px 20px 6px"><div style="flex:1"><h2 style="font-family:Playfair Display,serif;font-size:18px;color:#3d2b1a">'+p.nome+urgBadge+'</h2><div style="font-size:11px;color:#888;font-style:italic">'+( p.nome_cientifico||"")+'</div><div style="margin-top:5px">'+confBadge+'</div></div></div>';
     if(p.visto)html+='<div style="margin:0 20px 8px;font-size:12px;color:#666;font-style:italic;line-height:1.4">👁️ '+p.visto+'</div>';
     if(incerto){
@@ -1725,11 +1727,11 @@ function mostrarResultadoDaninha(data){
       }
     }
   });
-  // Manejo integrado se múltiplas plantas
-  if(plantas.length>1&&data.manejo_integrado){
+  // Manejo integrado se múltiplas plantas DE VERDADE
+  if(plantas.length>1&&data.manejo_integrado&&!mesmaPlanta){
     html+='<div style="margin:0 20px 14px;background:#e8f5e9;border-radius:12px;padding:12px 14px;border-left:4px solid #2d8a3e"><div style="font-size:13px;font-weight:700;color:#1a5c2a;margin-bottom:4px">🎯 Estratégia para controlar tudo junto</div><div style="font-size:12px;color:#333;line-height:1.5">'+data.manejo_integrado+'</div></div>';
   }
-  var textoVoz=plantas.map(function(p){return p.nome+". "+p.indicador+". "+p.acao;}).join(" Além disso, ");
+  var textoVoz=mesmaPlanta?(plantas[0].nome+". "+plantas[0].indicador+". "+plantas[0].acao):plantas.map(function(p){return p.nome+". "+p.indicador+". "+p.acao;}).join(" Além disso, ");
   _textoParaFalar=textoVoz;
   html+='<div class="disclaimer-legal">💡 <strong>Use para agir rápido:</strong> identifique a planta agora e chegue mais preparado numa visita do Engenheiro Agrônomo — a aplicação de herbicidas exige Receituário Agronômico (MAPA/CREA) por lei.</div>';
   html+='<div class="btns-resultado"><button class="btn-voz" onclick="falarTextoAtual()">🔊 Ouvir</button><button class="btn-nova" onclick="resetar()">📷 Nova análise</button></div></div>';
