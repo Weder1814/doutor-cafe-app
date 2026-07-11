@@ -885,7 +885,7 @@ canvas { display: none; }
 <script>
 // ── PLANOS E PAGAMENTO ──
 var PLANO_KEY="doutorcafe_plano",ANALISES_KEY="doutorcafe_analises",LIMITE_GRATIS=15,cicloAtual="mensal";
-var LIMITE_BASICO=130,LIMITE_PRO=250,LIMITE_PREMIUM=400;
+var LIMITE_BASICO=130,LIMITE_PRO=250,LIMITE_PREMIUM=400,LIMITE_ADMIN=999999;
 
 function getPlano(){try{return JSON.parse(localStorage.getItem(PLANO_KEY))||{tipo:"gratuito"};}catch(e){return{tipo:"gratuito"};}}
 function salvarPlano(p){try{localStorage.setItem(PLANO_KEY,JSON.stringify(p));}catch(e){}}
@@ -909,7 +909,7 @@ function incrementarAnalise(){
   }
   return u;
 }
-function podeanalisar(){var p=getPlano();if(p.tipo==="pro")return getAnalisesUsadas()%(LIMITE_PRO+1)<LIMITE_PRO;if(p.tipo==="premium")return getAnalisesUsadas()%(LIMITE_PREMIUM+1)<LIMITE_PREMIUM;if(p.tipo==="basico")return getAnalisesUsadas()%(LIMITE_BASICO+1)<LIMITE_BASICO;return getAnalisesUsadas()<LIMITE_GRATIS;}
+function podeanalisar(){var p=getPlano();if(p.tipo==="admin")return true;if(p.tipo==="pro")return getAnalisesUsadas()%(LIMITE_PRO+1)<LIMITE_PRO;if(p.tipo==="premium")return getAnalisesUsadas()%(LIMITE_PREMIUM+1)<LIMITE_PREMIUM;if(p.tipo==="basico")return getAnalisesUsadas()%(LIMITE_BASICO+1)<LIMITE_BASICO;return getAnalisesUsadas()<LIMITE_GRATIS;}
 
 function sincronizarContadorServidor(){
   if(!(usuarioAtual&&usuarioAtual.userId))return;
@@ -931,7 +931,8 @@ function atualizarContador(){
   var p=getPlano(),usado=getAnalisesUsadas();
   var cad=getCadastro();
   var r; // análises restantes
-  if(p.tipo==="premium"){r=LIMITE_PREMIUM-(usado%LIMITE_PREMIUM);}
+  if(p.tipo==="admin"){r=LIMITE_ADMIN-usado;}
+  else if(p.tipo==="premium"){r=LIMITE_PREMIUM-(usado%LIMITE_PREMIUM);}
   else if(p.tipo==="pro"){r=LIMITE_PRO-(usado%LIMITE_PRO);}
   else if(p.tipo==="basico"){r=LIMITE_BASICO-(usado%LIMITE_BASICO);}
   else{r=Math.max(0,TOTAL_GRATIS_COM_CAD-usado);}
@@ -939,8 +940,8 @@ function atualizarContador(){
   // ── CHIP UNIFICADO (plano + análises restantes) ────────────
   var chipTxt=document.getElementById("planoChipTxt"),chipDot=document.getElementById("planoChipDot"),chipAnalises=document.getElementById("planoChipAnalises");
   if(chipTxt&&chipDot){
-    var nomePlano={gratuito:"Plano Gratuito",basico:"Plano Básico",pro:"Plano Pro",premium:"Plano Premium"}[p.tipo||"gratuito"]||"Plano Gratuito";
-    var limitePlano=p.tipo==="premium"?LIMITE_PREMIUM:p.tipo==="pro"?LIMITE_PRO:p.tipo==="basico"?LIMITE_BASICO:TOTAL_GRATIS_COM_CAD;
+    var nomePlano={gratuito:"Plano Gratuito",basico:"Plano Básico",pro:"Plano Pro",premium:"Plano Premium",admin:"Plano Admin (ilimitado)"}[p.tipo||"gratuito"]||"Plano Gratuito";
+    var limitePlano=p.tipo==="admin"?LIMITE_ADMIN:p.tipo==="premium"?LIMITE_PREMIUM:p.tipo==="pro"?LIMITE_PRO:p.tipo==="basico"?LIMITE_BASICO:TOTAL_GRATIS_COM_CAD;
     var pctRestante=r/limitePlano;
     chipTxt.textContent=nomePlano;
     if(chipAnalises)chipAnalises.textContent=r+(r===1?" análise restante":" análises restantes");
