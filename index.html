@@ -710,6 +710,8 @@ canvas { display: none; }
   <input id="soloGal" type="file" accept="image/*">
   <input id="daninha" type="file" accept="image/*" capture="environment">
   <input id="daninaGal" type="file" accept="image/*">
+  <input id="graos" type="file" accept="image/*" capture="environment">
+  <input id="graosGal" type="file" accept="image/*">
   <canvas id="canvas"></canvas>
 
   <div class="secao-card tema-folha">
@@ -777,6 +779,18 @@ canvas { display: none; }
     <div style="margin-top:10px;font-size:11.5px;color:#8a6d1e;background:#faf0d8;border-radius:10px;padding:8px 12px;line-height:1.4">&#128248; <strong>Dica:</strong> fotografe a planta INTEIRA, de lado (da base at&#233; o topo) &#8212; n&#227;o s&#243; de cima. Isso evita confundir plantas parecidas.</div>
   </div>
 
+  <div class="secao-card tema-solo" id="secaoGraos">
+    <div class="secao-card-head">
+      <div class="secao-badge">&#9749;</div>
+      <div class="secao-card-tit"><h3>Triagem de Defeitos do Gr&#227;o</h3><p>O caf&#233; j&#225; seco e limpo &#8212; identifica defeitos e a causa prov&#225;vel</p></div>
+    </div>
+    <div class="solo-row">
+      <button class="btn-solo" id="btnGraos"><span class="btn-icon">&#128247;</span><span class="btn-text">Fotografar os Gr&#227;os<small>Amostra na palma da m&#227;o</small></span></button>
+      <button class="btn-solo-gal" id="btnGraosGal"><span class="btn-icon">&#128196;</span><span class="btn-text">Gr&#227;os da Galeria<small>Foto j&#225; tirada</small></span></button>
+    </div>
+    <div style="margin-top:10px;font-size:11.5px;color:#5c4326;background:#f3e9d8;border-radius:10px;padding:8px 12px;line-height:1.4">&#9888;&#65039; <strong>Isso n&#227;o &#233; classifica&#231;&#227;o oficial nem bebida.</strong> Bebida (mole, dura, riada) s&#243; se prova torrando e degustando uma amostra &#8212; nenhum app faz isso por foto. Aqui a gente s&#243; aponta os defeitos vis&#237;veis e a causa mais prov&#225;vel, pra te ajudar a corrigir o manejo.</div>
+  </div>
+
   <div class="dica">
     <span style="font-size:16px;flex-shrink:0;margin-top:1px">&#128161;</span>
     <p><strong>Dica:</strong> Fotografe a face inferior da folha tamb&#233;m. A ferrugem aparece embaixo com p&#243; alaranjado.</p>
@@ -841,6 +855,10 @@ canvas { display: none; }
   <button class="nav-btn" id="navHistorico" onclick="navegarHistorico()">
     <span class="nav-btn-icon">&#128203;</span>
     <span class="nav-btn-label">Hist&#243;rico</span>
+  </button>
+  <button class="nav-btn" id="navGraos" onclick="navegarGraos()">
+    <span class="nav-btn-icon">&#9749;</span>
+    <span class="nav-btn-label">Gr&#227;os</span>
   </button>
   <button class="nav-btn" id="navPlanos" onclick="navegarPlanos()">
     <span class="nav-btn-icon">&#128142;</span>
@@ -1149,6 +1167,14 @@ function analisarDaFilaConfirmado(id) {
           fetchComRetry("https://doutor-cafe-production.up.railway.app/analise-solo",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bodyS)},TIMEOUT_MS)
           .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultadoSolo(data);incrementarAnalise();})
           .catch(function(){document.getElementById("spinner").style.display="none";adicionarNaFila(item.foto,null,"solo",function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert("Ainda sem conexão estável. Foto salva de volta na fila!");}});});
+        } else if (item.tipo === "graos") {
+          document.getElementById("spinnerTexto").textContent = "Analisando os grãos...";
+          document.getElementById("spinnerSub").textContent = "Triagem de defeitos (fila offline)";
+          var bodyGr = { imagem: item.foto, tipo: "image/jpeg" };
+          if (dadosGPS.regiao) bodyGr.regiao = dadosGPS.regiao;
+          fetchComRetry("https://doutor-cafe-production.up.railway.app/identifica-defeito-grao",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bodyGr)},TIMEOUT_MS)
+          .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultadoGraos(data);incrementarAnalise();})
+          .catch(function(){document.getElementById("spinner").style.display="none";adicionarNaFila(item.foto,null,"graos",function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert("Ainda sem conexão estável. Foto salva de volta na fila!");}});});
         } else {
           document.getElementById("spinnerTexto").textContent = "Analisando...";
           document.getElementById("spinnerSub").textContent = "Identificando sintomas e comparando padrões";
@@ -1164,7 +1190,7 @@ function analisarDaFilaConfirmado(id) {
   });
 }
 
-function renderAreaHistorico(){lerFila(function(fila){var tituloEl=document.getElementById("tituloSecaoHistorico");var areaEl=document.getElementById("areaHistorico");if(fila.length>0){tituloEl.textContent="\uD83D\uDCF8 Fotos Aguardando Análise";var online=navigator.onLine&&servidorAcordado;var html='<div class="card-fila"><div class="fila-header"><div class="fila-header-esq"><div class="fila-titulo">\uD83D\uDCF7 Fila Offline</div><div class="fila-sub"><span class="fila-contagem">'+fila.length+'</span> foto'+(fila.length>1?'s':'')+" aguardando sinal</div></div><button class=\"fila-limpar\" onclick=\"limparFila()\">Limpar tudo</button></div>";if(!online){html+='<div class="offline-banner"><span class="offline-banner-icon">\uD83D\uDCF5</span><span class="offline-banner-txt">Sem internet. As fotos ficam salvas aqui. Quando chegar no sinal, toque na foto para analisar.</span></div>';}else{html+='<div class="offline-banner" style="background:#e8f5e9;margin-bottom:0"><span class="offline-banner-icon">\u2705</span><span class="offline-banner-txt" style="color:#1b5e20">Internet disponível! Toque em uma foto para analisar agora.</span></div>';}html+='<div class="fila-divisor" style="margin-top:12px"></div><div class="fila-grid">';fila.forEach(function(item,idx){var talhaoLabel="";if(item.talhaoId){var ts=getTalhoes();var t=ts.find(function(x){return x.id===item.talhaoId;});if(t)talhaoLabel=' <span style="font-size:8px;color:#ffd54f;font-weight:700">'+t.nome+'</span>';}html+='<div class="fila-item" onclick="analisarDaFila('+item.id+')"><img src="data:image/jpeg;base64,'+item.foto+'" alt="foto '+(idx+1)+'">';html+='<div class="fila-item-overlay"><div class="fila-item-hora">\uD83D\uDCC5 '+item.data+' '+item.hora+talhaoLabel+'</div><div class="fila-item-tap">'+(online?'\u25B6 Toque para analisar':'\u23F3 Aguardando sinal')+'</div></div>';html+='<div class="fila-item-num">'+(item.isVideo?'\uD83C\uDFA5':item.tipo==='daninha'?'\uD83D\uDD0D':item.tipo==='solo'?'\uD83E\uDDEA':(idx+1))+'</div>';html+='<button class="fila-item-del" onclick="event.stopPropagation();removerDaFila('+item.id+')" title="Remover">\u2715</button></div>';});html+='</div></div>';areaEl.innerHTML=html;}else{tituloEl.textContent="\uD83D\uDCCB Histórico de Análises";renderHistoricoNaArea(areaEl);}});}
+function renderAreaHistorico(){lerFila(function(fila){var tituloEl=document.getElementById("tituloSecaoHistorico");var areaEl=document.getElementById("areaHistorico");if(fila.length>0){tituloEl.textContent="\uD83D\uDCF8 Fotos Aguardando Análise";var online=navigator.onLine&&servidorAcordado;var html='<div class="card-fila"><div class="fila-header"><div class="fila-header-esq"><div class="fila-titulo">\uD83D\uDCF7 Fila Offline</div><div class="fila-sub"><span class="fila-contagem">'+fila.length+'</span> foto'+(fila.length>1?'s':'')+" aguardando sinal</div></div><button class=\"fila-limpar\" onclick=\"limparFila()\">Limpar tudo</button></div>";if(!online){html+='<div class="offline-banner"><span class="offline-banner-icon">\uD83D\uDCF5</span><span class="offline-banner-txt">Sem internet. As fotos ficam salvas aqui. Quando chegar no sinal, toque na foto para analisar.</span></div>';}else{html+='<div class="offline-banner" style="background:#e8f5e9;margin-bottom:0"><span class="offline-banner-icon">\u2705</span><span class="offline-banner-txt" style="color:#1b5e20">Internet disponível! Toque em uma foto para analisar agora.</span></div>';}html+='<div class="fila-divisor" style="margin-top:12px"></div><div class="fila-grid">';fila.forEach(function(item,idx){var talhaoLabel="";if(item.talhaoId){var ts=getTalhoes();var t=ts.find(function(x){return x.id===item.talhaoId;});if(t)talhaoLabel=' <span style="font-size:8px;color:#ffd54f;font-weight:700">'+t.nome+'</span>';}html+='<div class="fila-item" onclick="analisarDaFila('+item.id+')"><img src="data:image/jpeg;base64,'+item.foto+'" alt="foto '+(idx+1)+'">';html+='<div class="fila-item-overlay"><div class="fila-item-hora">\uD83D\uDCC5 '+item.data+' '+item.hora+talhaoLabel+'</div><div class="fila-item-tap">'+(online?'\u25B6 Toque para analisar':'\u23F3 Aguardando sinal')+'</div></div>';html+='<div class="fila-item-num">'+(item.isVideo?'\uD83C\uDFA5':item.tipo==='daninha'?'\uD83D\uDD0D':item.tipo==='solo'?'\uD83E\uDDEA':item.tipo==='graos'?'\u2615':(idx+1))+'</div>';html+='<button class="fila-item-del" onclick="event.stopPropagation();removerDaFila('+item.id+')" title="Remover">\u2715</button></div>';});html+='</div></div>';areaEl.innerHTML=html;}else{tituloEl.textContent="\uD83D\uDCCB Histórico de Análises";renderHistoricoNaArea(areaEl);}});}
 function renderHistoricoNaArea(areaEl){try{var hist=JSON.parse(localStorage.getItem(HIST_KEY)||"[]");if(hist.length===0){areaEl.innerHTML='<div class="card-historico"><div class="hist-vazio">Nenhuma análise ainda. Fotografe uma folha!</div></div>';return;}var html='<div class="card-historico"><div class="hist-header"><div class="hist-titulo">\uD83D\uDCCB Últimas análises</div><button class="hist-limpar" onclick="limparHistorico()">Limpar</button></div><div class="hist-lista">';hist.forEach(function(h){var thumbHtml=h.foto?'<img class="hist-thumb" src="data:image/jpeg;base64,'+h.foto+'" alt="foto">':"<div class='hist-thumb-placeholder'>"+(h.emoji||"\uD83C\uDF3F")+"</div>";var nomes=h.diags?h.diags.map(function(d){return d.diagnostico.replace(/_/g," ");}).join(", "):h.diag.replace(/_/g," ");html+='<div class="hist-item">'+thumbHtml+'<div class="hist-info"><div class="hist-nome">'+nomes+'</div><div class="hist-data">'+h.data+(h.regiao?" \u00b7 "+h.regiao:"")+'</div></div></div>';});html+='</div></div>';areaEl.innerHTML=html;}catch(e){areaEl.innerHTML='<div class="card-historico"><div class="hist-vazio">Histórico não disponível.</div></div>';}}
 function limparHistorico(){try{localStorage.removeItem(HIST_KEY);}catch(e){}renderAreaHistorico();}
 
@@ -1549,6 +1575,34 @@ function processar(file, isVideo) {
   });
 }
 
+function processarGraos(file){if(!travarAnalise()){alert("Ainda terminando a análise anterior — aguarde alguns segundos e tente de novo.");return;}if(!servidorAcordado)acordarServidor(null);document.getElementById("spinner").style.display="block";document.getElementById("resultado").style.display="none";document.getElementById("spinnerTexto").textContent="Analisando os grãos...";iniciarDicasSpinner(DICAS_GRAOS);document.getElementById("spinner").scrollIntoView({behavior:"smooth",block:"center"});redimensionarImagem(file,1600,0.88,function(b64){if(!navigator.onLine){pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";adicionarNaFila(b64,null,"graos",function(ok){if(ok){renderAreaHistorico();alert("Sem sinal — foto salva na fila. Assim que a internet voltar, toque nela para analisar.");}else{mostrarErro();}});return;}ultimaFotoBase64=b64;var body={imagem:b64,tipo:"image/jpeg"};if(dadosGPS.regiao)body.regiao=dadosGPS.regiao;if(usuarioAtual&&usuarioAtual.userId)body.userId=usuarioAtual.userId;fetchComRetry("https://doutor-cafe-production.up.railway.app/identifica-defeito-grao",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)},TIMEOUT_MS).then(function(r){return r.json();}).then(function(data){if(data&&data.semAnalises){mostrarSemCreditos();return;}pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";mostrarResultadoGraos(data);incrementarAnalise();}).catch(function(){pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";adicionarNaFila(b64,null,"graos",function(ok){if(ok){renderAreaHistorico();alert("Sem conexão estável. Foto salva na fila offline!");}else{mostrarErro();}});});});}
+
+function mostrarResultadoGraos(data){
+  var div=document.getElementById("resultado");div.style.display="block";
+  var defeitos=data.defeitos||[];
+  var thumbHtml=ultimaFotoBase64?'<img class="card-foto-thumb" src="data:image/jpeg;base64,'+ultimaFotoBase64+'" alt="grãos">':"<div class='card-foto-thumb-placeholder'>☕</div>";
+  var qtd=defeitos.length===0?"Nenhum defeito visível":defeitos.length+(defeitos.length>1?" defeitos identificados":" defeito identificado");
+  var html='<div class="card-resultado"><div class="card-topo">'+thumbHtml+'<div class="card-titulo"><h2>'+qtd+'</h2><div class="categoria">Triagem de Defeitos do Grão</div></div></div>';
+  html+='<div class="badges"><span class="badge badge-solo">☕ Café Seco/Limpo</span>';
+  if(dadosGPS.regiao)html+='<span class="badge badge-regiao">📍 '+dadosGPS.regiao+'</span>';
+  html+='</div>';
+  html+='<div class="disclaimer-legal">⚖️ <strong>Isso não é classificação oficial (COB) nem prova de bebida.</strong> É uma leitura informal só dessa amostra fotografada. Umidade, tipo/peneira e bebida exigem equipamento e prova sensorial — não dá pra saber por foto.</div>';
+  if(defeitos.length===0){
+    html+='<div class="acao-box"><h3>Amostra parece limpa</h3><p>Não identifiquei defeitos claros nessa foto. Isso não substitui uma classificação física completa (amostra de 300g) se você for negociar o lote.</p></div>';
+  } else {
+    defeitos.forEach(function(d){
+      var confBadge=(d.confianca==="alta")?'<span style="background:#e8f5e9;color:#2e7d32;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:6px">✓ Alta confiança</span>':(d.confianca==="baixa")?'<span style="background:#fce4ec;color:#c62828;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:6px">! Baixa confiança</span>':'<span style="background:#fff8e1;color:#f57f17;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:6px">~ Confiança média</span>';
+      html+='<div class="daninha-alerta daninha-alerta-compactado" style="margin:0 20px 12px"><div class="daninha-alerta-titulo">☕ '+d.nome+confBadge+'</div>';
+      if(d.visto)html+='<div style="font-size:12px;color:#666;font-style:italic;margin:4px 0">👁️ '+d.visto+'</div>';
+      html+='<div class="daninha-alerta-desc"><strong>Causa provável:</strong> '+(d.causa||"—")+'</div>';
+      if(d.acao)html+='<div class="daninha-alerta-desc" style="margin-top:4px"><strong>O que fazer:</strong> '+d.acao+'</div>';
+      html+='</div>';
+    });
+  }
+  var textoVoz="Triagem de grãos. "+qtd+(defeitos.length>0?(". Defeito principal: "+defeitos[0].nome+". "+(defeitos[0].causa||"")):".");
+  html+='<div class="btns-resultado"><button class="btn-voz" onclick="falar(\''+textoVoz.replace(/'/g,"\\'")+'\')">🔊 Ouvir</button><button class="btn-nova" onclick="resetar()">📷 Nova análise</button></div></div>';
+  div.innerHTML=html;falar(textoVoz);div.scrollIntoView({behavior:"smooth",block:"start"});
+}
 function processarSolo(file){if(!travarAnalise()){alert("Ainda terminando a análise anterior — aguarde alguns segundos e tente de novo.");return;}if(!servidorAcordado)acordarServidor(null);document.getElementById("spinner").style.display="block";document.getElementById("resultado").style.display="none";document.getElementById("spinnerTexto").textContent="Lendo laudo de solo...";iniciarDicasSpinner(DICAS_SOLO);document.getElementById("spinner").scrollIntoView({behavior:"smooth",block:"center"});redimensionarImagem(file,1600,0.85,function(b64){if(!navigator.onLine){pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";adicionarNaFila(b64,null,"solo",function(ok){if(ok){renderAreaHistorico();alert("Sem sinal — laudo salvo na fila. Assim que a internet voltar, toque nele para analisar.");}else{mostrarErro();}});return;}ultimaFotoBase64=b64;var body={imagem:b64,tipo:"image/jpeg"};if(dadosGPS.regiao)body.regiao=dadosGPS.regiao;if(usuarioAtual&&usuarioAtual.userId)body.userId=usuarioAtual.userId;fetchComRetry("https://doutor-cafe-production.up.railway.app/analise-solo",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)},TIMEOUT_MS).then(function(r){return r.json();}).then(function(data){if(data&&data.semAnalises){mostrarSemCreditos();return;}pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";mostrarResultadoSolo(data);incrementarAnalise();}).catch(function(){pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";adicionarNaFila(b64,null,"solo",function(ok){if(ok){renderAreaHistorico();alert("Sem conexão estável. Laudo salvo na fila offline!");}else{mostrarErro();}});});});}
 function processarDaninha(file){if(!travarAnalise()){alert("Ainda terminando a análise anterior — aguarde alguns segundos e tente de novo.");return;}if(!servidorAcordado)acordarServidor(null);document.getElementById("spinner").style.display="block";document.getElementById("resultado").style.display="none";document.getElementById("spinnerTexto").textContent="Identificando planta daninha...";iniciarDicasSpinner(DICAS_DANINHA);document.getElementById("spinner").scrollIntoView({behavior:"smooth",block:"center"});redimensionarImagem(file,1100,0.88,function(b64){
   if(!navigator.onLine){
@@ -1809,6 +1863,13 @@ var DICAS_SOLO = [
   "💊 Boro e Zinco em falta afetam o crescimento dos ponteiros do cafeeiro.",
   "🌧️ Solo com boa matéria orgânica retém mais água e nutrientes."
 ];
+var DICAS_GRAOS = [
+  "☕ Grão preto é o pior defeito — 1 grão preto já conta como 1 defeito inteiro na classificação oficial.",
+  "🌡️ Grão ardido costuma vir de fruto que ficou tempo demais no terreiro sem revolver.",
+  "🌱 Grão chocho (leve, mal formado) pode indicar falta de potássio ou estresse hídrico na lavoura.",
+  "🐛 Grão brocado vem da broca-do-café ainda na lavoura — colher todo fruto ajuda a controlar.",
+  "⚖️ Essa análise não substitui a classificação oficial (COB) nem a prova de bebida."
+];
 function iniciarDicasSpinner(lista) {
   pararDicasSpinner();
   iniciarEtapasSpinner();
@@ -1870,6 +1931,8 @@ function bindSolo(){var inp=criarInput("solo","image/*","environment");inp.addEv
 function bindSoloGal(){var inp=criarInput("soloGal","image/*",null);inp.addEventListener("change",function(e){if(e.target.files[0])processarSolo(e.target.files[0]);bindSoloGal();});}
 function bindDaninha(){var inp=criarInput("daninha","image/*","environment");inp.addEventListener("change",function(e){if(e.target.files[0])processarDaninha(e.target.files[0]);bindDaninha();});}
 function bindDaninhaGal(){var inp=criarInput("daninaGal","image/*",null);inp.addEventListener("change",function(e){if(e.target.files[0])processarDaninha(e.target.files[0]);bindDaninhaGal();});}
+function bindGraos(){var inp=criarInput("graos","image/*","environment");inp.addEventListener("change",function(e){if(e.target.files[0])processarGraos(e.target.files[0]);bindGraos();});}
+function bindGraosGal(){var inp=criarInput("graosGal","image/*",null);inp.addEventListener("change",function(e){if(e.target.files[0])processarGraos(e.target.files[0]);bindGraosGal();});}
 
 document.getElementById("btnCam").addEventListener("click",function(){selecionarTalhao(function(){document.getElementById("cam").click();});});
 document.getElementById("btnGal").addEventListener("click",function(){selecionarTalhao(function(){document.getElementById("gal").click();});});
@@ -1878,8 +1941,10 @@ document.getElementById("btnSolo").addEventListener("click",function(){document.
 document.getElementById("btnSoloGal").addEventListener("click",function(){document.getElementById("soloGal").click();});
 document.getElementById("btnDaninha").addEventListener("click",function(){document.getElementById("daninha").click();});
 document.getElementById("btnDaninhaGal").addEventListener("click",function(){document.getElementById("daninaGal").click();});
+document.getElementById("btnGraos").addEventListener("click",function(){document.getElementById("graos").click();});
+document.getElementById("btnGraosGal").addEventListener("click",function(){document.getElementById("graosGal").click();});
 
-bindCam();bindGal();bindVid();bindSolo();bindSoloGal();bindDaninha();bindDaninhaGal();
+bindCam();bindGal();bindVid();bindSolo();bindSoloGal();bindDaninha();bindDaninhaGal();bindGraos();bindGraosGal();
 window.addEventListener("online",function(){renderAreaHistorico();});
 window.addEventListener("offline",function(){renderAreaHistorico();});
 
@@ -1953,6 +2018,7 @@ function navegarHistorico(){
   if(el)el.scrollIntoView({behavior:"smooth",block:"start"});
 }
 function navegarPlanos(){_navSetAtivo("navPlanos");abrirModal(false);setTimeout(function(){_navSetAtivo("navInicio");},400);}
+function navegarGraos(){_navSetAtivo("navGraos");var el=document.getElementById("secaoGraos");if(el)el.scrollIntoView({behavior:"smooth",block:"start"});}
 function navegarMais(){
   _navSetAtivo("navMais");
   var el=document.getElementById("cardClima");
