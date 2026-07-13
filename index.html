@@ -604,10 +604,48 @@ canvas { display: none; }
   <div id="histTalhaoLista" style="padding-bottom:32px"></div>
 </div>
 
+<!-- MODAL PRODUTIVIDADE ESPERADA (para calculadora de adubação NPK) -->
+<div class="modal-talhao-overlay" id="modalProdutividade">
+  <div class="modal-talhao-box">
+    <div class="modal-talhao-titulo">📊 Produtividade Esperada</div>
+    <div class="modal-talhao-sub">Com isso o app calcula também a dose certa de adubo (N-P-K), além da calagem. Escolha como prefere informar:</div>
+    <div id="prodModoEscolha">
+      <div class="talhao-opcao" onclick="prodEscolherModo('sacas')">
+        <div class="talhao-opcao-icone">🌾</div>
+        <div><div class="talhao-opcao-nome">Sei quantas sacas colho</div><div class="talhao-opcao-detalhe">Informo sacas + área — o app calcula sc/ha pra você</div></div>
+      </div>
+      <div class="talhao-opcao" onclick="prodEscolherModo('direto')">
+        <div class="talhao-opcao-icone">✍️</div>
+        <div><div class="talhao-opcao-nome">Já sei o valor em sacas/hectare</div><div class="talhao-opcao-detalhe">Digito direto</div></div>
+      </div>
+      <div class="talhao-opcao" onclick="prodEscolherModo('pular')">
+        <div class="talhao-opcao-icone">⏭️</div>
+        <div><div class="talhao-opcao-nome">Não sei / é minha primeira safra</div><div class="talhao-opcao-detalhe">Sem problema — o app calcula só a calagem</div></div>
+      </div>
+    </div>
+    <div id="prodModoSacas" style="display:none">
+      <label class="criar-talhao-label">Sacas colhidas (ou esperadas) nesta safra, no talhão/área do laudo</label>
+      <input class="criar-talhao-input" id="prodSacas" type="number" placeholder="Ex: 120" inputmode="decimal">
+      <label class="criar-talhao-label">Área dessa lavoura (hectares)</label>
+      <input class="criar-talhao-input" id="prodArea" type="number" step="0.1" placeholder="Ex: 4.5" inputmode="decimal">
+      <div style="font-size:11px;color:#888;margin-top:6px">💡 Não sabe a área exata? Uma estimativa já ajuda — dá pra ajustar depois.</div>
+      <button class="btn-salvar-talhao" onclick="prodConfirmarSacas()">✅ Calcular e continuar</button>
+      <button class="btn-cancelar-talhao" onclick="prodVoltarEscolha()">← Voltar</button>
+    </div>
+    <div id="prodModoDireto" style="display:none">
+      <label class="criar-talhao-label">Produtividade esperada (sacas por hectare)</label>
+      <input class="criar-talhao-input" id="prodDireto" type="number" placeholder="Ex: 30" inputmode="decimal">
+      <button class="btn-salvar-talhao" onclick="prodConfirmarDireto()">✅ Continuar</button>
+      <button class="btn-cancelar-talhao" onclick="prodVoltarEscolha()">← Voltar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL LOGIN CPF -->
 <div class="modal-talhao-overlay" id="modalLoginCpf">
   <div class="modal-talhao-box">
     <div class="modal-talhao-titulo">🔐 Entrar com PIN</div>
+
     <div class="modal-talhao-sub">Digite seu PIN de 4 dígitos para acessar sua conta</div>
     <div class="cad-field" style="margin-top:16px">
       <label style="font-size:12px;font-weight:700;color:#555;text-transform:uppercase">PIN de 4 dígitos *</label>
@@ -1161,6 +1199,9 @@ function analisarDaFilaConfirmado(id) {
           .then(function(r){return r.json();}).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultadoDaninha(data);incrementarAnalise();})
           .catch(function(){document.getElementById("spinner").style.display="none";adicionarNaFila(item.foto,null,"daninha",function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert("Ainda sem conexão estável. Foto salva de volta na fila!");}});});
         } else if (item.tipo === "solo") {
+          // OBS: fotos reprocessadas da fila offline nao passam pelo modal de
+          // produtividade (o app ja esta em outro fluxo nesse ponto) — o calculo
+          // de NPK fica de fora, mas a calagem/gessagem continua funcionando normalmente.
           document.getElementById("spinnerTexto").textContent = "Lendo laudo de solo...";
           document.getElementById("spinnerSub").textContent = "Interpretando valores e calculando recomendações (fila offline)";
           var bodyS = { imagem: item.foto, tipo: "image/jpeg" };
@@ -1622,10 +1663,52 @@ function mostrarResultadoGraos(data){
   html+='<div class="btns-resultado"><button class="btn-voz" onclick="falar(\''+textoVoz.replace(/'/g,"\\'")+'\')">🔊 Ouvir</button><button class="btn-nova" onclick="resetar()">📷 Nova análise</button></div></div>';
   div.innerHTML=html;falar(textoVoz);div.scrollIntoView({behavior:"smooth",block:"start"});
 }
+var _produtividadeCallback = null;
+function abrirModalProdutividade(callback){
+  _produtividadeCallback = callback;
+  document.getElementById("prodModoEscolha").style.display="block";
+  document.getElementById("prodModoSacas").style.display="none";
+  document.getElementById("prodModoDireto").style.display="none";
+  document.getElementById("prodSacas").value="";
+  document.getElementById("prodDireto").value="";
+  // se houver talhão selecionado com área cadastrada, pré-preenche pra facilitar
+  if(talhaoAtual && talhaoAtual.area){ document.getElementById("prodArea").value = talhaoAtual.area; }
+  else { document.getElementById("prodArea").value=""; }
+  document.getElementById("modalProdutividade").classList.add("ativo");
+}
+function prodVoltarEscolha(){
+  document.getElementById("prodModoEscolha").style.display="block";
+  document.getElementById("prodModoSacas").style.display="none";
+  document.getElementById("prodModoDireto").style.display="none";
+}
+function prodEscolherModo(modo){
+  if(modo==="sacas"){document.getElementById("prodModoEscolha").style.display="none";document.getElementById("prodModoSacas").style.display="block";}
+  else if(modo==="direto"){document.getElementById("prodModoEscolha").style.display="none";document.getElementById("prodModoDireto").style.display="block";}
+  else { fecharModalProdutividade(null); }
+}
+function prodConfirmarSacas(){
+  var sacas=parseFloat((document.getElementById("prodSacas").value||"").replace(",","."));
+  var area=parseFloat((document.getElementById("prodArea").value||"").replace(",","."));
+  if(!sacas||sacas<=0||!area||area<=0){alert("Informe sacas e área válidas (maiores que zero).");return;}
+  var scHa=Math.round((sacas/area)*10)/10;
+  fecharModalProdutividade(scHa);
+}
+function prodConfirmarDireto(){
+  var v=parseFloat((document.getElementById("prodDireto").value||"").replace(",","."));
+  if(!v||v<=0){alert("Informe um valor válido.");return;}
+  fecharModalProdutividade(v);
+}
+function fecharModalProdutividade(valorScHa){
+  document.getElementById("modalProdutividade").classList.remove("ativo");
+  var cb=_produtividadeCallback; _produtividadeCallback=null;
+  if(cb) cb(valorScHa);
+}
 function processarSolo(file){if(!travarAnalise()){alert("Ainda terminando a análise anterior — aguarde alguns segundos e tente de novo.");return;}
-  var produtividadeInput=window.prompt("📊 Produtividade esperada nesta safra (sacas/ha)?\n\nCom esse dado o app calcula também a dose de adubo (N-P-K) recomendada, além da calagem.\n\nDeixe em branco se não souber.","");
-  var produtividadeSc=null;
-  if(produtividadeInput){var pv=parseFloat(produtividadeInput.replace(",","."));if(!isNaN(pv)&&pv>0)produtividadeSc=pv;}
+  abrirModalProdutividade(function(produtividadeSc){
+    _processarSoloComProdutividade(file, produtividadeSc);
+  });
+}
+function _processarSoloComProdutividade(file, produtividadeSc){
   if(!servidorAcordado)acordarServidor(null);document.getElementById("spinner").style.display="block";document.getElementById("resultado").style.display="none";document.getElementById("spinnerTexto").textContent="Lendo laudo de solo...";iniciarDicasSpinner(DICAS_SOLO);document.getElementById("spinner").scrollIntoView({behavior:"smooth",block:"center"});redimensionarImagem(file,1600,0.85,function(b64){if(!navigator.onLine){pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";adicionarNaFila(b64,null,"solo",function(ok){if(ok){renderAreaHistorico();alert("Sem sinal — laudo salvo na fila. Assim que a internet voltar, toque nele para analisar.");}else{mostrarErro();}});return;}ultimaFotoBase64=b64;var body={imagem:b64,tipo:"image/jpeg"};if(dadosGPS.regiao)body.regiao=dadosGPS.regiao;if(usuarioAtual&&usuarioAtual.userId)body.userId=usuarioAtual.userId;if(produtividadeSc)body.produtividadeSc=produtividadeSc;fetchComRetry("https://doutor-cafe-production.up.railway.app/analise-solo",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)},TIMEOUT_MS).then(function(r){return r.json();}).then(function(data){if(data&&data.semAnalises){mostrarSemCreditos();return;}pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";mostrarResultadoSolo(data);incrementarAnalise();}).catch(function(){pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";adicionarNaFila(b64,null,"solo",function(ok){if(ok){renderAreaHistorico();alert("Sem conexão estável. Laudo salvo na fila offline!");}else{mostrarErro();}});});});}
 function processarDaninha(file){if(!travarAnalise()){alert("Ainda terminando a análise anterior — aguarde alguns segundos e tente de novo.");return;}if(!servidorAcordado)acordarServidor(null);document.getElementById("spinner").style.display="block";document.getElementById("resultado").style.display="none";document.getElementById("spinnerTexto").textContent="Identificando planta daninha...";iniciarDicasSpinner(DICAS_DANINHA);document.getElementById("spinner").scrollIntoView({behavior:"smooth",block:"center"});redimensionarImagem(file,1100,0.88,function(b64){
   if(!navigator.onLine){
