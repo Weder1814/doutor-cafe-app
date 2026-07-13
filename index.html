@@ -789,6 +789,7 @@ canvas { display: none; }
       <button class="btn-solo-gal" id="btnGraosGal"><span class="btn-icon">&#128196;</span><span class="btn-text">Gr&#227;os da Galeria<small>Foto j&#225; tirada</small></span></button>
     </div>
     <div style="margin-top:10px;font-size:11.5px;color:#5c4326;background:#f3e9d8;border-radius:10px;padding:8px 12px;line-height:1.4">&#9888;&#65039; <strong>Isso n&#227;o &#233; classifica&#231;&#227;o oficial nem bebida.</strong> Bebida (mole, dura, riada) s&#243; se prova torrando e degustando uma amostra &#8212; nenhum app faz isso por foto. Aqui a gente s&#243; aponta os defeitos vis&#237;veis e a causa mais prov&#225;vel, pra te ajudar a corrigir o manejo.</div>
+    <div style="margin-top:8px;font-size:11.5px;color:#5c4326;background:#f3e9d8;border-radius:10px;padding:8px 12px;line-height:1.4">&#128248; <strong>Dica:</strong> fotografe os gr&#227;os na sombra ou com luz difusa, evitando sol direto ou luz amarela &#8212; isso pode mascarar gr&#227;os ardidos ou dar um tom amarelado falso na amostra inteira.</div>
   </div>
 
   <div class="dica">
@@ -1587,6 +1588,13 @@ function mostrarResultadoGraos(data){
   if(dadosGPS.regiao)html+='<span class="badge badge-regiao">📍 '+dadosGPS.regiao+'</span>';
   html+='</div>';
   html+='<div class="disclaimer-legal">⚖️ <strong>Isso não é classificação oficial (COB) nem prova de bebida.</strong> É uma leitura informal só dessa amostra fotografada. Umidade, tipo/peneira e bebida exigem equipamento e prova sensorial — não dá pra saber por foto.</div>';
+  if(data.resumo_geral||data.recomendacao_processamento){
+    html+='<div class="resumo-diag-card" style="margin:0 20px 16px;border-radius:18px">';
+    html+='<div class="resumo-diag-titulo">🔍 Conclusão do Lote</div>';
+    if(data.resumo_geral)html+='<div class="resumo-diag-texto" style="margin-bottom:10px">'+data.resumo_geral+'</div>';
+    if(data.recomendacao_processamento){html+='<div class="resumo-diag-secao">📋 Como reprocessar/separar</div><div class="resumo-diag-texto">'+data.recomendacao_processamento+'</div>';}
+    html+='</div>';
+  }
   if(defeitos.length===0){
     html+='<div class="acao-box"><h3>Amostra parece limpa</h3><p>Não identifiquei defeitos claros nessa foto. Isso não substitui uma classificação física completa (amostra de 300g) se você for negociar o lote.</p></div>';
   } else {
@@ -1600,6 +1608,7 @@ function mostrarResultadoGraos(data){
     });
   }
   var textoVoz="Triagem de grãos. "+qtd+(defeitos.length>0?(". Defeito principal: "+defeitos[0].nome+". "+(defeitos[0].causa||"")):".");
+  if(data.resumo_geral)textoVoz+=" "+data.resumo_geral;
   html+='<div class="btns-resultado"><button class="btn-voz" onclick="falar(\''+textoVoz.replace(/'/g,"\\'")+'\')">🔊 Ouvir</button><button class="btn-nova" onclick="resetar()">📷 Nova análise</button></div></div>';
   div.innerHTML=html;falar(textoVoz);div.scrollIntoView({behavior:"smooth",block:"start"});
 }
