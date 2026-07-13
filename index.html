@@ -409,19 +409,19 @@ canvas { display: none; }
 .ordem-mistura { margin: 10px 0 0; background: #e8f5e9; border-radius: 10px; padding: 10px 12px; font-size: 12px; color: #1a5c2a; line-height: 1.7; }
 /* ── ANIMAÇÃO DE MISTURA NO TANQUE (CSS puro, ciclo de 10s em loop) ── */
 .mist-anim-box { margin: 12px 0 0; background: #f7fbf6; border: 2px solid #d5ead8; border-radius: 16px; padding: 16px 14px 12px; }
-.mist-anim-titulo { font-size: 12px; font-weight: 700; color: #1a5c2a; text-align: center; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 6px; }
-.mist-anim-legenda { font-size: 10px; color: #7a8a7c; text-align: center; margin-top: 8px; }
-.mist-cena { position: relative; height: 168px; display: flex; align-items: flex-end; justify-content: center; }
-.mist-tanque { position: relative; width: 84px; height: 116px; border: 3px solid #2d8a3e; border-radius: 10px 10px 34px 34px; background: #eef6ef; overflow: hidden; animation: mistShake 10s ease-in-out infinite; box-shadow: 0 3px 10px rgba(26,92,42,0.12); }
+.mist-anim-titulo { font-size: 13px; font-weight: 700; color: #1a5c2a; text-align: center; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.mist-anim-legenda { font-size: 11px; color: #7a8a7c; text-align: center; margin-top: 8px; }
+.mist-cena { position: relative; height: 226px; display: flex; align-items: flex-end; justify-content: center; }
+.mist-tanque { position: relative; width: 114px; height: 157px; border: 3px solid #2d8a3e; border-radius: 12px 12px 44px 44px; background: #eef6ef; overflow: hidden; animation: mistShake 10s ease-in-out infinite; box-shadow: 0 3px 10px rgba(26,92,42,0.12); }
 .mist-agua { position: absolute; left: 0; right: 0; bottom: 0; background: linear-gradient(180deg, #bfe3c8, #5dae74); height: 0%; animation: mistFillAgua 10s ease-in-out infinite; }
 .mist-agua::before { content:""; position:absolute; top:-4px; left:0; right:0; height:8px; background:linear-gradient(180deg, rgba(255,255,255,0.5), transparent); }
-.mist-icon { position: absolute; top: -6px; left: 50%; transform: translateX(-50%) translateY(-30px) scale(1); font-size: 26px; opacity: 0; }
+.mist-icon { position: absolute; top: -6px; left: 50%; transform: translateX(-50%) translateY(-30px) scale(1); font-size: 35px; opacity: 0; }
 .mist-icon-po { animation: mistCairPo 10s ease-in infinite; }
 .mist-icon-leite { animation: mistCairLeite 10s ease-in infinite; }
 .mist-icon-oleo { animation: mistCairOleo 10s ease-in infinite; }
-.mist-passos-mini { display: flex; flex-direction: column; gap: 5px; margin-top: 12px; }
-.mist-passo-mini { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: #3d5c40; border-radius: 8px; padding: 4px 8px; background: transparent; }
-.mist-passo-mini-num { width: 16px; height: 16px; border-radius: 50%; background: #cfe4d2; color: #1a5c2a; font-size: 9px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.mist-passos-mini { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+.mist-passo-mini { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #3d5c40; border-radius: 8px; padding: 5px 8px; background: transparent; }
+.mist-passo-mini-num { width: 18px; height: 18px; border-radius: 50%; background: #cfe4d2; color: #1a5c2a; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .mist-p1 { animation: mistDestaque1 10s ease-in-out infinite; }
 .mist-p2 { animation: mistDestaque2 10s ease-in-out infinite; }
 .mist-p3 { animation: mistDestaque3 10s ease-in-out infinite; }
@@ -429,9 +429,9 @@ canvas { display: none; }
 .mist-p5 { animation: mistDestaque5 10s ease-in-out infinite; }
 @keyframes mistFillAgua { 0%{height:0%;} 7%{height:33%;} 67%{height:33%;} 80%{height:95%;} 100%{height:95%;} }
 @keyframes mistShake { 0%,78%{transform:rotate(0deg) translateX(0);} 80%{transform:rotate(-3deg) translateX(-3px);} 82%{transform:rotate(3deg) translateX(3px);} 84%{transform:rotate(-3deg) translateX(-3px);} 86%{transform:rotate(3deg) translateX(3px);} 88%{transform:rotate(-2deg) translateX(-2px);} 90%,100%{transform:rotate(0deg) translateX(0);} }
-@keyframes mistCairPo { 0%,9%{opacity:0;transform:translateX(-50%) translateY(-30px) scale(1);} 12%{opacity:1;} 25%{opacity:1;transform:translateX(-50%) translateY(68px) scale(0.55);} 28%,100%{opacity:0;transform:translateX(-50%) translateY(88px) scale(0.3);} }
-@keyframes mistCairLeite { 0%,29%{opacity:0;transform:translateX(-50%) translateY(-30px) scale(1);} 32%{opacity:1;} 45%{opacity:1;transform:translateX(-50%) translateY(68px) scale(0.55);} 48%,100%{opacity:0;transform:translateX(-50%) translateY(88px) scale(0.3);} }
-@keyframes mistCairOleo { 0%,49%{opacity:0;transform:translateX(-50%) translateY(-30px) scale(1);} 52%{opacity:1;} 64%{opacity:1;transform:translateX(-50%) translateY(68px) scale(0.55);} 67%,100%{opacity:0;transform:translateX(-50%) translateY(88px) scale(0.3);} }
+@keyframes mistCairPo { 0%,9%{opacity:0;transform:translateX(-50%) translateY(-30px) scale(1);} 12%{opacity:1;} 25%{opacity:1;transform:translateX(-50%) translateY(92px) scale(0.55);} 28%,100%{opacity:0;transform:translateX(-50%) translateY(120px) scale(0.3);} }
+@keyframes mistCairLeite { 0%,29%{opacity:0;transform:translateX(-50%) translateY(-30px) scale(1);} 32%{opacity:1;} 45%{opacity:1;transform:translateX(-50%) translateY(92px) scale(0.55);} 48%,100%{opacity:0;transform:translateX(-50%) translateY(120px) scale(0.3);} }
+@keyframes mistCairOleo { 0%,49%{opacity:0;transform:translateX(-50%) translateY(-30px) scale(1);} 52%{opacity:1;} 64%{opacity:1;transform:translateX(-50%) translateY(92px) scale(0.55);} 67%,100%{opacity:0;transform:translateX(-50%) translateY(120px) scale(0.3);} }
 @keyframes mistDestaque1 { 0%,3%{background:#dcefe0;font-weight:800;} 8%,100%{background:transparent;font-weight:400;} }
 @keyframes mistDestaque2 { 0%,9%{background:transparent;font-weight:400;} 12%,25%{background:#dcefe0;font-weight:800;} 29%,100%{background:transparent;font-weight:400;} }
 @keyframes mistDestaque3 { 0%,29%{background:transparent;font-weight:400;} 32%,45%{background:#dcefe0;font-weight:800;} 49%,100%{background:transparent;font-weight:400;} }
@@ -439,26 +439,27 @@ canvas { display: none; }
 @keyframes mistDestaque5 { 0%,74%{background:transparent;font-weight:400;} 78%,95%{background:#dcefe0;font-weight:800;} 99%,100%{background:transparent;font-weight:400;} }
 /* ── ANIMAÇÃO DE TÉCNICA DE APLICAÇÃO NA LAVOURA (CSS puro, ciclo de 10s em loop) ── */
 .aplic-anim-box { margin: 12px 0 0; background: #f7fbf6; border: 2px solid #d5ead8; border-radius: 16px; padding: 16px 14px 12px; }
-.aplic-anim-titulo { font-size: 12px; font-weight: 700; color: #1a5c2a; text-align: center; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 6px; }
-.aplic-anim-legenda { font-size: 10px; color: #7a8a7c; text-align: center; margin-top: 8px; }
-.aplic-cena { position: relative; height: 188px; }
-.aplic-planta { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 108px; height: 156px; }
-.aplic-tronco { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 8px; height: 60px; background: #8d6e46; border-radius: 3px; }
+.aplic-anim-titulo { font-size: 13px; font-weight: 700; color: #1a5c2a; text-align: center; margin-bottom: 2px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.aplic-anim-subtitulo { font-size: 10.5px; color: #7a8a7c; text-align: center; margin-bottom: 10px; }
+.aplic-anim-legenda { font-size: 11px; color: #7a8a7c; text-align: center; margin-top: 8px; }
+.aplic-cena { position: relative; height: 254px; }
+.aplic-planta { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 146px; height: 211px; }
+.aplic-tronco { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 11px; height: 81px; background: #8d6e46; border-radius: 3px; }
 .aplic-folha { position: absolute; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #6bc47f, #2d8a3e); }
-.aplic-folha-1 { width: 78px; height: 60px; left: 15px; bottom: 42px; }
-.aplic-folha-2 { width: 62px; height: 50px; left: -6px; bottom: 62px; }
-.aplic-folha-3 { width: 62px; height: 50px; left: 52px; bottom: 62px; }
-.aplic-folha-4 { width: 66px; height: 54px; left: 21px; bottom: 96px; }
-.aplic-saia-zona { position: absolute; left: -8px; right: -8px; bottom: 0; height: 58px; border: 2px dashed transparent; border-radius: 0 0 30px 30px; animation: aplicSaiaDestaque 10s ease-in-out infinite; }
-.aplic-bico { position: absolute; font-size: 22px; left: 8%; bottom: 6%; animation: aplicMoverBico 10s ease-in-out infinite; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.15)); }
-.aplic-jato { position: absolute; width: 10px; height: 10px; border-radius: 50%; background: radial-gradient(circle, rgba(120,170,220,0.85), rgba(120,170,220,0)); opacity: 0; }
+.aplic-folha-1 { width: 105px; height: 81px; left: 20px; bottom: 57px; }
+.aplic-folha-2 { width: 84px; height: 67px; left: -8px; bottom: 84px; }
+.aplic-folha-3 { width: 84px; height: 67px; left: 70px; bottom: 84px; }
+.aplic-folha-4 { width: 89px; height: 73px; left: 28px; bottom: 130px; }
+.aplic-saia-zona { position: absolute; left: -8px; right: -8px; bottom: 0; height: 78px; border: 2px dashed transparent; border-radius: 0 0 40px 40px; animation: aplicSaiaDestaque 10s ease-in-out infinite; }
+.aplic-bico { position: absolute; font-size: 30px; left: 8%; bottom: 6%; animation: aplicMoverBico 10s ease-in-out infinite; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.15)); }
+.aplic-jato { position: absolute; width: 13px; height: 13px; border-radius: 50%; background: radial-gradient(circle, rgba(120,170,220,0.85), rgba(120,170,220,0)); opacity: 0; }
 .aplic-jato-1 { left: 24%; bottom: 14%; animation: aplicJato1 10s ease-in-out infinite; }
 .aplic-jato-2 { left: 68%; bottom: 14%; animation: aplicJato2 10s ease-in-out infinite; }
 .aplic-jato-3 { left: 18%; bottom: 58%; animation: aplicJato3 10s ease-in-out infinite; }
 .aplic-jato-4 { left: 74%; bottom: 68%; animation: aplicJato4 10s ease-in-out infinite; }
-.aplic-passos-mini { display: flex; flex-direction: column; gap: 5px; margin-top: 12px; }
-.aplic-passo-mini { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: #3d5c40; border-radius: 8px; padding: 4px 8px; background: transparent; }
-.aplic-passo-mini-num { width: 16px; height: 16px; border-radius: 50%; background: #cfe4d2; color: #1a5c2a; font-size: 9px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.aplic-passos-mini { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+.aplic-passo-mini { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #3d5c40; border-radius: 8px; padding: 5px 8px; background: transparent; }
+.aplic-passo-mini-num { width: 18px; height: 18px; border-radius: 50%; background: #cfe4d2; color: #1a5c2a; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .aplic-p1 { animation: aplicDestaque1 10s ease-in-out infinite; }
 .aplic-p2 { animation: aplicDestaque2 10s ease-in-out infinite; }
 .aplic-p3 { animation: aplicDestaque3 10s ease-in-out infinite; }
@@ -473,6 +474,36 @@ canvas { display: none; }
 @keyframes aplicDestaque2 { 0%,23%{background:transparent;font-weight:400;} 26%,42%{background:#dcefe0;font-weight:800;} 46%,100%{background:transparent;font-weight:400;} }
 @keyframes aplicDestaque3 { 0%,48%{background:transparent;font-weight:400;} 51%,66%{background:#dcefe0;font-weight:800;} 70%,100%{background:transparent;font-weight:400;} }
 @keyframes aplicDestaque4 { 0%,71%{background:transparent;font-weight:400;} 74%,90%{background:#dcefe0;font-weight:800;} 94%,100%{background:transparent;font-weight:400;} }
+/* ── ANIMAÇÃO DE APLICAÇÃO NO SOLO (calagem/adubação — Ca, Mg, calcário, adubo) ── */
+.solo-anim-box { margin: 12px 0 0; background: #fbf7f2; border: 2px solid #e8d9c4; border-radius: 16px; padding: 16px 14px 12px; }
+.solo-anim-titulo { font-size: 13px; font-weight: 700; color: #6d4c1f; text-align: center; margin-bottom: 2px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.solo-anim-subtitulo { font-size: 10.5px; color: #9a8567; text-align: center; margin-bottom: 10px; }
+.solo-anim-legenda { font-size: 11px; color: #9a8567; text-align: center; margin-top: 8px; }
+.solo-cena { position: relative; height: 254px; }
+.solo-chao { position: absolute; left: 0; right: 0; bottom: 0; height: 26px; background: linear-gradient(180deg, #c9a672, #a8804a); border-radius: 0 0 14px 14px; }
+.solo-zona { position: absolute; bottom: 8px; width: 54px; height: 20px; border: 2px dashed #b5895a; border-radius: 50%; opacity: 0.9; }
+.solo-zona-esq { left: 4%; animation: soloZonaDestaque1 10s ease-in-out infinite; }
+.solo-zona-dir { right: 4%; animation: soloZonaDestaque2 10s ease-in-out infinite; }
+.solo-proibido { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); font-size: 16px; opacity: 0; animation: soloProibidoPisca 10s ease-in-out infinite; }
+.solo-granulo { position: absolute; top: -6px; font-size: 24px; opacity: 0; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.12)); }
+.solo-granulo-esq { left: 15%; animation: soloCairEsq 10s ease-in infinite; }
+.solo-granulo-dir { right: 15%; animation: soloCairDir 10s ease-in infinite; }
+.solo-passos-mini { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+.solo-passo-mini { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #5c4a30; border-radius: 8px; padding: 5px 8px; background: transparent; }
+.solo-passo-mini-num { width: 18px; height: 18px; border-radius: 50%; background: #ecdcc0; color: #6d4c1f; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.solo-p1 { animation: soloDestaque1 10s ease-in-out infinite; }
+.solo-p2 { animation: soloDestaque2 10s ease-in-out infinite; }
+.solo-p3 { animation: soloDestaque3 10s ease-in-out infinite; }
+.solo-p4 { animation: soloDestaque4 10s ease-in-out infinite; }
+@keyframes soloCairEsq { 0%,9%{opacity:0;transform:translateY(-20px) scale(1);} 12%{opacity:1;} 30%{opacity:1;transform:translateY(190px) scale(0.7);} 34%,46%{opacity:0;transform:translateY(200px) scale(0.4);} 100%{opacity:0;} }
+@keyframes soloCairDir { 0%,29%{opacity:0;transform:translateY(-20px) scale(1);} 32%{opacity:1;} 50%{opacity:1;transform:translateY(190px) scale(0.7);} 54%,66%{opacity:0;transform:translateY(200px) scale(0.4);} 100%{opacity:0;} }
+@keyframes soloZonaDestaque1 { 0%,9%{border-color:#b5895a;} 12%,30%{border-color:#e0a83d;transform:scale(1.08);} 34%,100%{border-color:#b5895a;transform:scale(1);} }
+@keyframes soloZonaDestaque2 { 0%,29%{border-color:#b5895a;} 32%,50%{border-color:#e0a83d;transform:scale(1.08);} 54%,100%{border-color:#b5895a;transform:scale(1);} }
+@keyframes soloProibidoPisca { 0%,52%{opacity:0;} 56%,64%{opacity:1;} 68%,100%{opacity:0;} }
+@keyframes soloDestaque1 { 0%,3%{background:#f3e6d0;font-weight:800;} 8%,100%{background:transparent;font-weight:400;} }
+@keyframes soloDestaque2 { 0%,9%{background:transparent;font-weight:400;} 12%,50%{background:#f3e6d0;font-weight:800;} 54%,100%{background:transparent;font-weight:400;} }
+@keyframes soloDestaque3 { 0%,53%{background:transparent;font-weight:400;} 56%,67%{background:#f3e6d0;font-weight:800;} 71%,100%{background:transparent;font-weight:400;} }
+@keyframes soloDestaque4 { 0%,74%{background:transparent;font-weight:400;} 78%,95%{background:#f3e6d0;font-weight:800;} 99%,100%{background:transparent;font-weight:400;} }
 .modal-cad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 1000; align-items: flex-end; justify-content: center; }
 .modal-cad-overlay.ativo { display: flex; }
 .daninha-produto { background: white; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; border: 1px solid #e0ede0; font-size: 12px; color: #555; }
@@ -1445,10 +1476,10 @@ function obterGPS(){if(!navigator.geolocation){document.getElementById("regiaoTa
 
 // ── CALCULADORA FUNGICIDA ──
 function formulacaoDoNome(nome){
-  if(/\bWG\b/i.test(nome))return{passo:2,label:"Pós molhável (WG)"};
-  if(/\bWP\b/i.test(nome))return{passo:2,label:"Pós molhável (WP)"};
-  if(/\bSC\b/i.test(nome))return{passo:3,label:"Suspensão concentrada (SC)"};
-  if(/\bEC\b/i.test(nome))return{passo:4,label:"Concentrado emulsionável (EC)"};
+  if(/WG\b/i.test(nome))return{passo:2,label:"Pós molhável (WG)"};
+  if(/WP\b/i.test(nome))return{passo:2,label:"Pós molhável (WP)"};
+  if(/SC\b/i.test(nome))return{passo:3,label:"Suspensão concentrada (SC)"};
+  if(/EC\b/i.test(nome))return{passo:4,label:"Concentrado emulsionável (EC)"};
   return null;
 }
 function buildAnimacaoMistura(passosUsados){
@@ -1470,7 +1501,8 @@ function buildAnimacaoAplicacao(){
     {n:3,txt:"Direcione também pra face de BAIXO das folhas"},
     {n:4,txt:"Suba até o topo, cobrindo toda a copa"}
   ];
-  var html='<div class="aplic-anim-box"><div class="aplic-anim-titulo">🎬 Como aplicar na planta</div>';
+  var html='<div class="aplic-anim-box"><div class="aplic-anim-titulo">🎬 Como aplicar os defensivos na planta</div>';
+  html+='<div class="aplic-anim-subtitulo">Válido pra pulverização de fungicidas/inseticidas listados acima</div>';
   html+='<div class="aplic-cena"><div class="aplic-planta"><div class="aplic-saia-zona"></div><div class="aplic-tronco"></div><div class="aplic-folha aplic-folha-2"></div><div class="aplic-folha aplic-folha-3"></div><div class="aplic-folha aplic-folha-1"></div><div class="aplic-folha aplic-folha-4"></div></div>';
   html+='<span class="aplic-jato aplic-jato-1"></span><span class="aplic-jato aplic-jato-2"></span><span class="aplic-jato aplic-jato-3"></span><span class="aplic-jato aplic-jato-4"></span>';
   html+='<span class="aplic-bico">💦</span></div>';
@@ -1480,6 +1512,26 @@ function buildAnimacaoAplicacao(){
   });
   html+='</div><div style="font-size:11px;color:#5a6b5c;line-height:1.5;margin-top:10px">💡 Evite aplicar com vento forte ou sol quente — o produto se perde por deriva ou evapora antes de agir, reduzindo a eficácia.</div>';
   html+='<div class="aplic-anim-legenda">▶ Ciclo de ~10s, repete sozinho — assista quantas vezes precisar</div></div>';
+  return html;
+}
+function buildAnimacaoSolo(){
+  var passos=[
+    {n:1,txt:"Aplique SOB A SAIA (projeção da copa) — é onde ficam as raízes que absorvem o nutriente"},
+    {n:2,txt:"Distribua dos DOIS lados, em círculo ao redor da planta"},
+    {n:3,txt:"NÃO encoste o produto no CAULE — pode queimar a base da planta"},
+    {n:4,txt:"Se possível, incorpore levemente ao solo (leve capina) pra melhor aproveitamento"}
+  ];
+  var html='<div class="solo-anim-box"><div class="solo-anim-titulo">🎬 Como aplicar calcário/adubo no solo</div>';
+  html+='<div class="solo-anim-subtitulo">Diferente de fungicida — aqui não se pulveriza, se aplica na terra</div>';
+  html+='<div class="solo-cena"><div class="aplic-planta"><div class="aplic-tronco"></div><div class="aplic-folha aplic-folha-2"></div><div class="aplic-folha aplic-folha-3"></div><div class="aplic-folha aplic-folha-1"></div><div class="aplic-folha aplic-folha-4"></div></div>';
+  html+='<div class="solo-chao"></div><div class="solo-zona solo-zona-esq"></div><div class="solo-zona solo-zona-dir"></div>';
+  html+='<span class="solo-proibido">🚫</span>';
+  html+='<span class="solo-granulo solo-granulo-esq">🧂</span><span class="solo-granulo solo-granulo-dir">🧂</span></div>';
+  html+='<div class="solo-passos-mini">';
+  passos.forEach(function(p){
+    html+='<div class="solo-passo-mini solo-p'+p.n+'"><span class="solo-passo-mini-num">'+p.n+'</span><span>'+p.txt+'</span></div>';
+  });
+  html+='</div><div class="solo-anim-legenda">▶ Ciclo de ~10s, repete sozinho — assista quantas vezes precisar</div></div>';
   return html;
 }
 function buildCalcFungicida(fungicidas,diagIdx){if(!fungicidas||fungicidas.length===0)return "";var html='<div class="calc-box"><div class="calc-titulo">\uD83E\uDDEA Calcular Dosagem</div>';var passosUsados={};var temProtetor=false,temSistemico=false;fungicidas.forEach(function(f,fi){var badgeClass="calc-tipo-"+(f.tipo||"protetor");var badgeTxt=f.tipo==="sistemico"?"Sistêmico":f.tipo==="biologico"?"Biológico":f.tipo==="acaricida"?"Acaricida":f.tipo==="inseticida"?"Inseticida":"Protetor";if(f.tipo==="sistemico")temSistemico=true;else if(!f.tipo||f.tipo==="protetor")temProtetor=true;var inputId="calc_"+diagIdx+"_"+fi;var resTanque=(f.proporcao_por_litro*20).toFixed(1);var fmt=formulacaoDoNome(f.nome);var passoTxt="";if(fmt){passosUsados[fmt.passo]=f.nome;passoTxt='<div style="font-size:11px;color:#1a5c2a;margin-top:4px">\uD83D\uDCCB Este produto entra no <strong>passo '+fmt.passo+'</strong> da mistura (veja a ordem completa abaixo)</div>';}html+='<div class="calc-produto"><div class="calc-produto-nome">\uD83E\uDDF4 '+f.nome+' <span class="calc-tipo-badge '+badgeClass+'">'+badgeTxt+'</span></div>';html+='<div class="calc-inputs"><div class="calc-input-group"><label>Área (hectares)</label><input type="number" id="'+inputId+'_ha" value="1" min="0.1" step="0.1" oninput="calcular(\''+inputId+'\','+f.dose_min+','+f.dose_max+','+f.proporcao_por_litro+',\''+f.unidade+'\',\''+(f.unidade_proporcao||'g')+'\')"></div>';html+='<div class="calc-input-group"><label>Tanque (litros)</label><input type="number" id="'+inputId+'_tanque" value="20" min="1" step="1" oninput="calcular(\''+inputId+'\','+f.dose_min+','+f.dose_max+','+f.proporcao_por_litro+',\''+f.unidade+'\',\''+(f.unidade_proporcao||'g')+'\')"></div></div>';html+='<div class="calc-resultado" id="'+inputId+'_res"><div class="calc-resultado-linha"><span class="calc-resultado-label">Dose total no hectare</span><span class="calc-resultado-valor">'+f.dose_min+'\u2013'+f.dose_max+' '+f.unidade+'</span></div><div class="calc-resultado-linha"><span class="calc-resultado-label">Por tanque de 20L</span><span class="calc-resultado-valor">'+resTanque+' '+(f.unidade_proporcao||'g')+'</span></div><div class="calc-aviso">\u26A0\uFE0F Confirme sempre no rótulo do produto comprado</div></div>'+passoTxt+'</div>';});
@@ -1939,6 +1991,8 @@ function mostrarResultadoStreaming(diags,fotoBase64,isVideo){
   });
   var temAlgumFungicida=diags.some(function(d){return d.fungicidas&&d.fungicidas.length>0;});
   if(temAlgumFungicida) html+=buildAnimacaoAplicacao();
+  var temDeficienciaSolo=diags.some(function(d){return d.diagnostico==="calcio"||d.diagnostico==="magnesio";});
+  if(temDeficienciaSolo) html+=buildAnimacaoSolo();
   var naoSaudavel=diags.filter(function(d){return d.diagnostico!=="saudavel";});
   var nomesVoz=naoSaudavel.map(function(d){return NOMES_VOZ[d.diagnostico]||d.diagnostico.replace(/_/g," ");}).join(", ");
   var textoVoz=naoSaudavel.length>0?"Sua planta tem: "+nomesVoz+". ":"Planta saudável. ";
@@ -1957,7 +2011,7 @@ function mostrarResultadoStreaming(diags,fotoBase64,isVideo){
 
 function mostrarResultado(data,isVideo){var div=document.getElementById("resultado");div.style.display="block";var diags=data.diagnosticos||[{diagnostico:data.diagnostico||"saudavel",estagio:data.estagio||1,confianca:data.confianca||"media",visto:data.visto||"",acao:data.acao||"Tente novamente.",fungicidas:[]}];var regiao=dadosGPS.regiao||"";salvarHistorico(diags,ultimaFotoBase64,regiao);mostrarResultadoStreaming(diags,ultimaFotoBase64,isVideo);}
 
-function mostrarResultadoSolo(data){var div=document.getElementById("resultado");div.style.display="block";var acao=data.acao||"Consulte um agrônomo para mais detalhes.";var textoVoz="Análise de solo. "+acao+(data.calagem_gessagem?(" Recomenda-se "+data.calagem_gessagem.dose_recomendada_t_ha+" toneladas de calcário por hectare."):"");var thumbHtml=ultimaFotoBase64?'<img class="card-foto-thumb" src="data:image/jpeg;base64,'+ultimaFotoBase64+'" alt="laudo">':"<div class='card-foto-thumb-placeholder'>🧪</div>";var html='<div class="card-resultado"><div class="card-topo">'+thumbHtml+'<div class="card-titulo"><h2>Análise de Solo</h2><div class="categoria">Recomendação para Café</div></div></div>';html+='<div class="badges"><span class="badge badge-solo">🌱 Laudo Interpretado</span>';if(dadosGPS.regiao)html+='<span class="badge badge-regiao">📍 '+dadosGPS.regiao+'</span>';html+='</div>';if(data.valores){html+='<div class="solo-grid">';for(var k in data.valores){var v=data.valores[k],sc=v.status==="ok"?"solo-ok":v.status==="baixo"?"solo-baixo":"solo-alto",st=v.status==="ok"?"✓ Adequado":v.status==="baixo"?"↓ Baixo":"↑ Alto";html+='<div class="solo-item"><div class="solo-label">'+k+'</div><div class="solo-valor">'+v.valor+'</div><div class="solo-status '+sc+'">'+st+'</div></div>';}html+='</div>';}if(data.calagem_gessagem){var cg=data.calagem_gessagem;html+='<div class="calc-box" style="margin:0 20px 14px"><div class="calc-titulo">🪨 Calagem e Gessagem Recomendada</div>';html+='<div class="calc-produto"><div class="calc-produto-nome">Calcário <span class="calc-tipo-badge calc-tipo-protetor">correção de acidez</span></div>';html+='<div style="font-size:13px;color:#555;margin-top:4px">Dose recomendada: <strong>'+cg.dose_recomendada_t_ha+' t/ha</strong> (considerando calcário com PRNT ~'+cg.prnt_considerado+'%)</div>';html+='<div class="calc-aviso">⚠️ '+cg.observacao+'</div></div>';if(cg.gessagem&&cg.gessagem.necessario){html+='<div class="calc-produto"><div class="calc-produto-nome">Gesso agrícola <span class="calc-tipo-badge calc-tipo-biologico">subsolo</span></div>';html+='<div style="font-size:13px;color:#555;margin-top:4px">Dose recomendada: <strong>'+cg.gessagem.dose_recomendada_t_ha+' t/ha</strong> — motivo: '+cg.gessagem.motivo+'</div>';html+='<div class="calc-aviso">'+cg.gessagem.observacao+'</div></div>';}html+='</div>';}if(data.adubacao_npk){var np=data.adubacao_npk;html+='<div class="calc-box" style="margin:0 20px 14px"><div class="calc-titulo">🌱 Adubação NPK Recomendada (para '+np.produtividade_esperada_sc_ha+' sc/ha)</div>';if(np.nitrogenio_kg_ha_ano!==null)html+='<div class="calc-produto"><div class="calc-produto-nome">Nitrogênio (N) <span class="calc-tipo-badge calc-tipo-sistemico">ureia/nitrato</span></div><div style="font-size:13px;color:#555;margin-top:4px">Dose anual: <strong>'+np.nitrogenio_kg_ha_ano+' kg/ha</strong></div></div>';if(np.fosforo_p2o5_kg_ha_ano!==null)html+='<div class="calc-produto"><div class="calc-produto-nome">Fósforo (P₂O₅) <span class="calc-tipo-badge calc-tipo-protetor">superfosfato</span></div><div style="font-size:13px;color:#555;margin-top:4px">Dose anual: <strong>'+np.fosforo_p2o5_kg_ha_ano+' kg/ha</strong></div></div>';if(np.potassio_k2o_kg_ha_ano!==null)html+='<div class="calc-produto"><div class="calc-produto-nome">Potássio (K₂O) <span class="calc-tipo-badge calc-tipo-acaricida">cloreto de potássio</span></div><div style="font-size:13px;color:#555;margin-top:4px">Dose anual: <strong>'+np.potassio_k2o_kg_ha_ano+' kg/ha</strong></div></div>';html+='<div class="calc-aviso">⚠️ '+np.observacao+'</div></div>';}html+='<div class="divisor"></div><div class="acao-box"><h3>Recomendação</h3><p>'+acao+'</p></div>';html+='<div class="disclaimer-legal">💡 <strong>Use para agir cedo:</strong> identifique a necessidade agora e chegue mais preparado numa visita do Engenheiro Agrônomo — pra ajustes de maior escala, uma análise de solo laboratorial completa dá mais precisão na dose exata.</div>';html+='<div class="btns-resultado"><button class="btn-voz" onclick="falar(\''+textoVoz.replace(/'/g,"\\'")+'\')">🔊 Ouvir</button><button class="btn-nova" onclick="resetar()">📷 Nova análise</button></div></div>';div.innerHTML=html;falar(textoVoz);div.scrollIntoView({behavior:"smooth",block:"start"});}
+function mostrarResultadoSolo(data){var div=document.getElementById("resultado");div.style.display="block";var acao=data.acao||"Consulte um agrônomo para mais detalhes.";var textoVoz="Análise de solo. "+acao+(data.calagem_gessagem?(" Recomenda-se "+data.calagem_gessagem.dose_recomendada_t_ha+" toneladas de calcário por hectare."):"");var thumbHtml=ultimaFotoBase64?'<img class="card-foto-thumb" src="data:image/jpeg;base64,'+ultimaFotoBase64+'" alt="laudo">':"<div class='card-foto-thumb-placeholder'>🧪</div>";var html='<div class="card-resultado"><div class="card-topo">'+thumbHtml+'<div class="card-titulo"><h2>Análise de Solo</h2><div class="categoria">Recomendação para Café</div></div></div>';html+='<div class="badges"><span class="badge badge-solo">🌱 Laudo Interpretado</span>';if(dadosGPS.regiao)html+='<span class="badge badge-regiao">📍 '+dadosGPS.regiao+'</span>';html+='</div>';if(data.valores){html+='<div class="solo-grid">';for(var k in data.valores){var v=data.valores[k],sc=v.status==="ok"?"solo-ok":v.status==="baixo"?"solo-baixo":"solo-alto",st=v.status==="ok"?"✓ Adequado":v.status==="baixo"?"↓ Baixo":"↑ Alto";html+='<div class="solo-item"><div class="solo-label">'+k+'</div><div class="solo-valor">'+v.valor+'</div><div class="solo-status '+sc+'">'+st+'</div></div>';}html+='</div>';}if(data.calagem_gessagem){var cg=data.calagem_gessagem;html+='<div class="calc-box" style="margin:0 20px 14px"><div class="calc-titulo">🪨 Calagem e Gessagem Recomendada</div>';html+='<div class="calc-produto"><div class="calc-produto-nome">Calcário <span class="calc-tipo-badge calc-tipo-protetor">correção de acidez</span></div>';html+='<div style="font-size:13px;color:#555;margin-top:4px">Dose recomendada: <strong>'+cg.dose_recomendada_t_ha+' t/ha</strong> (considerando calcário com PRNT ~'+cg.prnt_considerado+'%)</div>';html+='<div class="calc-aviso">⚠️ '+cg.observacao+'</div></div>';if(cg.gessagem&&cg.gessagem.necessario){html+='<div class="calc-produto"><div class="calc-produto-nome">Gesso agrícola <span class="calc-tipo-badge calc-tipo-biologico">subsolo</span></div>';html+='<div style="font-size:13px;color:#555;margin-top:4px">Dose recomendada: <strong>'+cg.gessagem.dose_recomendada_t_ha+' t/ha</strong> — motivo: '+cg.gessagem.motivo+'</div>';html+='<div class="calc-aviso">'+cg.gessagem.observacao+'</div></div>';}html+='</div>';}if(data.adubacao_npk){var np=data.adubacao_npk;html+='<div class="calc-box" style="margin:0 20px 14px"><div class="calc-titulo">🌱 Adubação NPK Recomendada (para '+np.produtividade_esperada_sc_ha+' sc/ha)</div>';if(np.nitrogenio_kg_ha_ano!==null)html+='<div class="calc-produto"><div class="calc-produto-nome">Nitrogênio (N) <span class="calc-tipo-badge calc-tipo-sistemico">ureia/nitrato</span></div><div style="font-size:13px;color:#555;margin-top:4px">Dose anual: <strong>'+np.nitrogenio_kg_ha_ano+' kg/ha</strong></div></div>';if(np.fosforo_p2o5_kg_ha_ano!==null)html+='<div class="calc-produto"><div class="calc-produto-nome">Fósforo (P₂O₅) <span class="calc-tipo-badge calc-tipo-protetor">superfosfato</span></div><div style="font-size:13px;color:#555;margin-top:4px">Dose anual: <strong>'+np.fosforo_p2o5_kg_ha_ano+' kg/ha</strong></div></div>';if(np.potassio_k2o_kg_ha_ano!==null)html+='<div class="calc-produto"><div class="calc-produto-nome">Potássio (K₂O) <span class="calc-tipo-badge calc-tipo-acaricida">cloreto de potássio</span></div><div style="font-size:13px;color:#555;margin-top:4px">Dose anual: <strong>'+np.potassio_k2o_kg_ha_ano+' kg/ha</strong></div></div>';html+='<div class="calc-aviso">⚠️ '+np.observacao+'</div></div>';}if(data.calagem_gessagem)html+=buildAnimacaoSolo();html+='<div class="divisor"></div><div class="acao-box"><h3>Recomendação</h3><p>'+acao+'</p></div>';html+='<div class="disclaimer-legal">💡 <strong>Use para agir cedo:</strong> identifique a necessidade agora e chegue mais preparado numa visita do Engenheiro Agrônomo — pra ajustes de maior escala, uma análise de solo laboratorial completa dá mais precisão na dose exata.</div>';html+='<div class="btns-resultado"><button class="btn-voz" onclick="falar(\''+textoVoz.replace(/'/g,"\\'")+'\')">🔊 Ouvir</button><button class="btn-nova" onclick="resetar()">📷 Nova análise</button></div></div>';div.innerHTML=html;falar(textoVoz);div.scrollIntoView({behavior:"smooth",block:"start"});}
 
 function mostrarResultadoDaninha(data){
   var div=document.getElementById("resultado");div.style.display="block";
