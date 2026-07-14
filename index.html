@@ -1201,6 +1201,50 @@ function mensagemErroRede(erro){
   return "Ainda sem conexão estável. A foto continua salva na fila — tente de novo assim que o sinal melhorar.";
 }
 
+// fetchSSEFinal: le uma resposta em streaming (SSE) — usada pelos endpoints
+// /diagnostico e /identifica-daninha — e devolve so o evento final ("fim"),
+// ignorando os eventos parciais (que so servem pra UI ao vivo durante a
+// captura direta). Necessario porque r.json() nao sabe interpretar SSE: uma
+// resposta SSE nunca e um JSON valido sozinha, entao r.json() sempre falha
+// nesses dois endpoints — mesmo quando o servidor respondeu 200 com sucesso.
+// Isso fazia o reprocessamento de fotos de folha e de planta daninha vindas
+// da fila offline SEMPRE cair no erro de "sem conexao", mesmo com conexao ok.
+function fetchSSEFinal(url, opcoes, ms, callback) {
+  fetchComRetry(url, opcoes, ms).then(function(r){
+    if(!r.ok){ var err=new Error("Servidor respondeu HTTP "+r.status); err.httpStatus=r.status; callback(err); return; }
+    var reader=r.body.getReader(), dec=new TextDecoder(), buf="", resultadoFinal=null, erroRecebido=null;
+    function processarBloco(bloco){
+      bloco.split("\n").forEach(function(linha){
+        if(!linha.startsWith("data: ")) return;
+        var jsonStr=linha.slice(6).trim();
+        if(!jsonStr) return;
+        try {
+          var ev=JSON.parse(jsonStr);
+          if(ev.tipo==="fim") resultadoFinal=ev.resultado;
+          else if(ev.tipo==="erro") erroRecebido=new Error(ev.mensagem||"O servidor sinalizou um erro durante a análise.");
+        } catch(e){}
+      });
+    }
+    function ler(){
+      reader.read().then(function(res){
+        if(res.done){
+          if(buf.trim()) processarBloco(buf);
+          if(erroRecebido){ callback(erroRecebido); }
+          else if(resultadoFinal){ callback(null, resultadoFinal); }
+          else { callback(new Error("O servidor encerrou a conexão sem enviar um resultado final.")); }
+          return;
+        }
+        buf += dec.decode(res.value, {stream:true});
+        var blocos = buf.split("\n\n");
+        buf = blocos.pop();
+        blocos.forEach(processarBloco);
+        ler();
+      }).catch(function(erro){ callback(erro); });
+    }
+    ler();
+  }).catch(function(erro){ callback(erro); });
+}
+
 var EMOJIS = {ferrugem:"\uD83D\uDFE0",bicho:"\uD83E\uDEB2",cercosporiose:"\uD83D\uDD35",aureolada:"\uD83D\uDFE3",phoma:"\u26AB",antracnose:"\uD83E\uDED9",ascochyta:"\uD83D\uDFE4",manteigosa:"\uD83E\uDED7",roseliniose:"\uD83D\uDC80",helmintosporiose:"\uD83D\uDD34",broca:"\uD83D\uDD73\uFE0F",acaro:"\uD83D\uDFEB",acaro_ferrugem:"\uD83D\uDFE5",cigarra:"\uD83E\uDD97",cochonilha:"\uD83E\uDD0D",lagarta:"\uD83D\uDC1B",nematoide:"\uD83E\uDEB1",nitrogenio:"\uD83C\uDF3F",magnesio:"\uD83D\uDFE1",potassio:"\uD83D\uDD25",fosforo:"\uD83D\uDC9C",calcio:"\uD83E\uDDB4",enxofre:"\uD83C\uDF15",boro:"\uD83D\uDFE6",zinco:"\uD83E\uDED7",ferro:"\uD83E\uDEA8",manganes:"\uD83D\uDFE4",cobre:"\uD83E\uDDE1",estresse_hidrico:"\uD83D\uDCA7",fitotoxicidade:"\u2697\uFE0F",escaldadura:"\u2600\uFE0F",fruto_verde:"\uD83D\uDFE2",fruto_maduro:"\uD83D\uDD34",fruto_passado:"\u26AB",antracnose_fruto:"\u26AB",fusariose_fruto:"\uD83D\uDFE4",cercosporiose_fruto:"\u26AA",phoma_fruto:"\u26AB",acaro_fruto:"\uD83D\uDFE4",mancha_manteigosa:"\uD83D\uDFE1",corynespora:"\uD83D\uDFE0",koleroga:"\uD83D\uDEA8",rizoctoniose:"\uD83D\uDFEB",cochonilha_raiz:"\uD83D\uDFE4",amarelinho:"\uD83E\uDDA0",mancha_anular:"\uD83C\uDFAF",vento_frio:"\uD83C\uDF2C\uFE0F",geada_frio:"\u2744\uFE0F",dano_mecanico:"\uD83D\uDD27",saudavel:"\u2705"};
 var NOMES_VOZ = {ferrugem:"Ferrugem do café",bicho:"Bicho mineiro",cercosporiose:"Cercosporiose",aureolada:"Mancha aureolada",phoma:"Phoma",antracnose:"Antracnose",ascochyta:"Mancha Ascochyta",manteigosa:"Mancha manteigosa",roseliniose:"Roseliniose",helmintosporiose:"Helmintosporiose",broca:"Broca do café",acaro:"Ácaro vermelho",acaro_ferrugem:"Ácaro ferrugem falsa",cigarra:"Cigarra do cafeeiro",cochonilha:"Cochonilha",lagarta:"Lagarta das rosetas",nematoide:"Nematoide das galhas",nitrogenio:"Deficiência de nitrogênio",magnesio:"Deficiência de magnésio",potassio:"Deficiência de potássio",fosforo:"Deficiência de fósforo",calcio:"Deficiência de cálcio",enxofre:"Deficiência de enxofre",boro:"Deficiência de boro",zinco:"Deficiência de zinco",ferro:"Deficiência de ferro",manganes:"Deficiência de manganês",cobre:"Deficiência de cobre",estresse_hidrico:"Estresse hídrico",fitotoxicidade:"Fitotoxicidade",escaldadura:"Escaldadura solar",fruto_verde:"Fruto verde saudável",fruto_maduro:"Fruto maduro para colheita",fruto_passado:"Fruto passado do ponto",antracnose_fruto:"Antracnose nos frutos",fusariose_fruto:"Fusariose nos frutos",cercosporiose_fruto:"Cercosporiose nos frutos",phoma_fruto:"Phoma nos frutos",acaro_fruto:"Ácaro nos frutos",mancha_manteigosa:"Mancha manteigosa",corynespora:"Mancha de Corynespora",koleroga:"Koleroga queima do fio",rizoctoniose:"Rizoctoniose tardia",cochonilha_raiz:"Cochonilha das raízes",lagarta:"Lagarta desfolhadora",nematoide:"Nematoide",amarelinho:"Amarelinho (Xylella fastidiosa)",mancha_anular:"Mancha anular (leprose)",vento_frio:"Dano de vento frio",geada_frio:"Dano de geada/friagem",dano_mecanico:"Dano mecânico",saudavel:"Planta saudável"};
 var CATEGORIAS = {ferrugem:"Doença Fúngica",bicho:"Praga",cercosporiose:"Doença Fúngica",aureolada:"Doença Bacteriana",phoma:"Doença Fúngica",antracnose:"Doença Fúngica",ascochyta:"Doença Fúngica",manteigosa:"Doença Fúngica",roseliniose:"Doença Fúngica",helmintosporiose:"Doença Fúngica",broca:"Praga",acaro:"Praga",acaro_ferrugem:"Praga",cigarra:"Praga",cochonilha:"Praga",lagarta:"Praga",nematoide:"Praga",nitrogenio:"Deficiência Nutricional",magnesio:"Deficiência Nutricional",potassio:"Deficiência Nutricional",fosforo:"Deficiência Nutricional",calcio:"Deficiência Nutricional",enxofre:"Deficiência Nutricional",boro:"Deficiência Nutricional",zinco:"Deficiência Nutricional",ferro:"Deficiência Nutricional",manganes:"Deficiência Nutricional",cobre:"Deficiência Nutricional",estresse_hidrico:"Estresse Ambiental",fitotoxicidade:"Estresse Ambiental",escaldadura:"Estresse Ambiental",fruto_verde:"Fruto",fruto_maduro:"Fruto",fruto_passado:"Fruto Danificado",antracnose_fruto:"Doença Fúngica — Fruto",fusariose_fruto:"Doença Fúngica — Fruto",cercosporiose_fruto:"Doença Fúngica — Fruto",phoma_fruto:"Doença Fúngica — Fruto",acaro_fruto:"Praga — Fruto",mancha_manteigosa:"Doença Viral/Fúngica",corynespora:"Doença Fúngica",koleroga:"Doença Fúngica",rizoctoniose:"Doença Fúngica — Caule",cochonilha_raiz:"Praga — Raiz",amarelinho:"Doença Bacteriana Sistêmica",mancha_anular:"Virose (Leprose)",vento_frio:"Estresse Ambiental",geada_frio:"Estresse Ambiental",dano_mecanico:"Estresse Ambiental",saudavel:"Planta Saudável"};
@@ -1310,9 +1354,10 @@ function analisarDaFilaConfirmado(id) {
           document.getElementById("spinnerSub").textContent = "Lendo o que ela revela sobre o seu solo (fila offline)";
           var bodyD = { imagem: item.foto, tipo: "image/jpeg" };
           if (dadosGPS.regiao) bodyD.regiao = dadosGPS.regiao;
-          fetchComRetry("https://doutor-cafe-production.up.railway.app/identifica-daninha",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bodyD)},TIMEOUT_MS)
-          .then(checarResposta).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultadoDaninha(data);incrementarAnalise();})
-          .catch(function(erro){document.getElementById("spinner").style.display="none";adicionarNaFila(item.foto,null,"daninha",function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert(mensagemErroRede(erro));}});});
+          fetchSSEFinal("https://doutor-cafe-production.up.railway.app/identifica-daninha",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bodyD)},TIMEOUT_MS,function(erro,data){
+            if(erro){document.getElementById("spinner").style.display="none";adicionarNaFila(item.foto,null,"daninha",function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert(mensagemErroRede(erro));}});return;}
+            document.getElementById("spinner").style.display="none";mostrarResultadoDaninha(data);incrementarAnalise();
+          });
         } else if (item.tipo === "solo") {
           // OBS: fotos reprocessadas da fila offline nao passam pelo modal de
           // produtividade (o app ja esta em outro fluxo nesse ponto) — o calculo
@@ -1338,9 +1383,10 @@ function analisarDaFilaConfirmado(id) {
           var bodyF = { imagem: item.foto, tipo: "image/jpeg" };
           if (dadosGPS.regiao) bodyF.regiao = dadosGPS.regiao;
           if (dadosGPS.altitude) bodyF.altitude = dadosGPS.altitude;
-          fetchComTimeout("https://doutor-cafe-production.up.railway.app/diagnostico",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bodyF)},TIMEOUT_MS)
-          .then(checarResposta).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultado(data,false);incrementarAnalise();})
-          .catch(function(erro){document.getElementById("spinner").style.display="none";adicionarNaFila(item.foto,null,"folha",function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert(mensagemErroRede(erro));}});});
+          fetchSSEFinal("https://doutor-cafe-production.up.railway.app/diagnostico",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bodyF)},TIMEOUT_MS,function(erro,data){
+            if(erro){document.getElementById("spinner").style.display="none";adicionarNaFila(item.foto,null,"folha",function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert(mensagemErroRede(erro));}});return;}
+            document.getElementById("spinner").style.display="none";mostrarResultado(data,false);incrementarAnalise();
+          });
         }
       };
     };
