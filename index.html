@@ -42,6 +42,13 @@ body { font-family: 'DM Sans', sans-serif; background: var(--creme); min-height:
 .contador-fill.vermelho { background: #ff5252; }
 .wave { display: block; height: 36px; background: var(--creme); clip-path: ellipse(55% 100% at 50% 100%); margin-top: -1px; position: relative; z-index: 3; }
 .corpo { max-width: 420px; margin: 0 auto; padding: 16px 20px 40px; display: flex; flex-direction: column; gap: 12px; }
+.banner-ios { display:none; align-items:flex-start; gap:10px; background:linear-gradient(135deg,#fff8e1,#fff3cd); border:1.5px solid #ffe0a3; border-radius:16px; padding:14px 14px 14px 16px; }
+.banner-ios-icon { font-size:22px; line-height:1; margin-top:1px; }
+.banner-ios-corpo { flex:1; }
+.banner-ios-titulo { font-size:13px; font-weight:700; color:#7a4a00; margin-bottom:3px; }
+.banner-ios-texto { font-size:12px; color:#8a6a2a; line-height:1.45; }
+.banner-ios-texto b { color:#7a4a00; }
+.banner-ios-fechar { background:none; border:none; font-size:16px; color:#b8935a; cursor:pointer; padding:2px 4px; line-height:1; }
 .secao-titulo { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--cinza); padding: 4px 4px 0; }
 
 /* ── CARDS DE SEÇÃO (identidade visual por tema) ────────────── */
@@ -864,6 +871,15 @@ canvas { display: none; }
   <input id="graosGal" type="file" accept="image/*">
   <canvas id="canvas"></canvas>
 
+  <div class="banner-ios" id="bannerIOS">
+    <span class="banner-ios-icon">📲</span>
+    <div class="banner-ios-corpo">
+      <div class="banner-ios-titulo">Instale o Doutor Café no seu iPhone</div>
+      <div class="banner-ios-texto">Toque em <b>Compartilhar</b> (ícone abaixo, no Safari) e depois em <b>"Adicionar à Tela de Início"</b>. Assim o app funciona offline e não perde seu histórico.</div>
+    </div>
+    <button class="banner-ios-fechar" onclick="fecharBannerIOS()">✕</button>
+  </div>
+
   <div class="secao-card tema-folha">
     <div class="secao-card-head">
       <div class="secao-badge">&#127807;</div>
@@ -1330,6 +1346,25 @@ function abrirOnboardSeNecessario(){
   onboardPasso=0;
   renderOnboard();
   document.getElementById("modalOnboard").classList.add("ativo");
+}
+
+// ── BANNER INSTALAR NO iOS ──
+function isIOS(){return /iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;}
+function isStandalone(){return window.navigator.standalone===true||window.matchMedia("(display-mode: standalone)").matches;}
+function verificarBannerIOS(){
+  var el=document.getElementById("bannerIOS");
+  if(!el)return;
+  if(isStandalone()||!isIOS()){el.style.display="none";return;}
+  var dismiss=localStorage.getItem("doutorcafe_ios_banner_dismiss");
+  if(dismiss){
+    var dias=(Date.now()-parseInt(dismiss))/(1000*60*60*24);
+    if(dias<3){el.style.display="none";return;}
+  }
+  el.style.display="flex";
+}
+function fecharBannerIOS(){
+  document.getElementById("bannerIOS").style.display="none";
+  localStorage.setItem("doutorcafe_ios_banner_dismiss",Date.now().toString());
 }
 
 function mascararCelular(input){var v=input.value.replace(/\D/g,'');if(v.length>11)v=v.slice(0,11);if(v.length>7)v='('+v.slice(0,2)+') '+v.slice(2,7)+'-'+v.slice(7);else if(v.length>2)v='('+v.slice(0,2)+') '+v.slice(2);else if(v.length>0)v='('+v;input.value=v;}
@@ -2418,7 +2453,7 @@ function navegarMais(){
   var el=document.getElementById("cardClima");
   if(el)el.scrollIntoView({behavior:"smooth",block:"start"});
 }
-function entrarNoApp(nome){usuarioAtual=verificarCadastroInicial();mostrarTela('tela-principal');var nav=document.getElementById('navInferior');if(nav)nav.style.display='flex';sincronizarIdentidade(function(){atualizarContador();sincronizarContadorServidor();});renderAreaHistorico();renderCalendario();obterGPS();obterPrecoCafe();checarLembretesPendentes();if(nome){var primeiroNome=nome.split(' ')[0];setTimeout(function(){var tag=document.getElementById('regiaoTag');if(tag)tag.innerHTML='Olá, '+primeiroNome+'! Vamos diagnosticar';setTimeout(function(){obterGPS();},3000);},600);}}
+function entrarNoApp(nome){usuarioAtual=verificarCadastroInicial();mostrarTela('tela-principal');var nav=document.getElementById('navInferior');if(nav)nav.style.display='flex';sincronizarIdentidade(function(){atualizarContador();sincronizarContadorServidor();});renderAreaHistorico();renderCalendario();obterGPS();obterPrecoCafe();checarLembretesPendentes();verificarBannerIOS();if(nome){var primeiroNome=nome.split(' ')[0];setTimeout(function(){var tag=document.getElementById('regiaoTag');if(tag)tag.innerHTML='Olá, '+primeiroNome+'! Vamos diagnosticar';setTimeout(function(){obterGPS();},3000);},600);}}
 function verificarCadastroInicial(){try{return JSON.parse(localStorage.getItem(CADASTRO_INICIAL_KEY));}catch(e){return null;}}
 
 // ── TALHÕES ──
