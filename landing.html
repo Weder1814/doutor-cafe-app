@@ -3,285 +3,325 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Doutor Café — Fundo Original</title>
+<title>Doutor Café — Diagnóstico do seu cafezal, por IA</title>
+<meta name="description" content="Fotografe a folha, o fruto ou o grão do seu café e receba o diagnóstico na hora. Em breve na Play Store.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --terra-profundo: #1c1107;
-    /* Gradiente fiel: marrom chocolate aquecido no topo, quase preto na base */
-    --terra-gradiente: linear-gradient(180deg, #3d2716 0%, #1a1008 100%);
-    --texto-claro: #f5f0e8;
-    --pin-bg: #fbf6ee;
-    --borda-alpha: rgba(245, 240, 232, 0.15);
+  :root{
+    --terra:#3d2b1a;
+    --mata:#1a5c2a;
+    --folha:#2d8a3e;
+    --sol:#d9a441;
+    --cereja:#a5342a;
+    --papel:#f5f0e8;
+    --papel-2:#ece4d6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'DM Sans',sans-serif;
+    background:var(--papel);
+    color:var(--terra);
+    line-height:1.5;
+    overflow-x:hidden;
+  }
+  img,svg{display:block;max-width:100%;}
+  a{color:inherit;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+  h1,h2,h3{font-family:'Fraunces',serif;font-weight:700;line-height:1.08;letter-spacing:-0.01em;}
+  .eyebrow{
+    font-family:'Space Mono',monospace;
+    font-size:12px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:6px 14px;
+    border:1.5px solid currentColor;
+    border-radius:100px;
+  }
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-family:'DM Sans',sans-serif;
+    font-weight:700;
+    font-size:16px;
+    padding:15px 28px;
+    border-radius:14px;
+    text-decoration:none;
+    border:none;
+    cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn:focus-visible{outline:3px solid var(--sol);outline-offset:3px;}
+  .btn-primario{background:var(--sol);color:var(--terra);box-shadow:0 6px 0 #a97a26;}
+  .btn-primario:hover{box-shadow:0 8px 0 #a97a26;}
+  .btn-primario:active{transform:translateY(2px);box-shadow:0 3px 0 #a97a26;}
+  .btn-fantasma{background:transparent;color:var(--papel);border:1.5px solid rgba(245,240,232,0.5);}
+  .btn-fantasma:hover{border-color:var(--papel);}
+
+  /* ===== HEADER ===== */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(61,43,26,0.92);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid rgba(245,240,232,0.12);
+  }
+  .header-inner{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;color:var(--papel);}
+  .logo{font-family:'Fraunces',serif;font-weight:700;font-size:20px;display:flex;align-items:center;gap:8px;}
+  .logo-leaf{width:22px;height:22px;color:var(--sol);}
+  header .btn{padding:9px 18px;font-size:14px;}
+
+  /* ===== HERO ===== */
+  .hero{
+    background:radial-gradient(ellipse 900px 500px at 15% -10%, rgba(217,164,65,0.18), transparent),
+               linear-gradient(160deg, var(--terra) 0%, #2b1f13 100%);
+    color:var(--papel);
+    padding:64px 0 88px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";position:absolute;inset:0;
+    background-image:repeating-linear-gradient(115deg, rgba(245,240,232,0.025) 0 2px, transparent 2px 60px);
+    pointer-events:none;
+  }
+  .hero-grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:48px;align-items:center;position:relative;}
+  .hero h1{font-size:clamp(34px,5.2vw,56px);margin:20px 0 18px;}
+  .hero h1 em{font-style:normal;color:var(--sol);}
+  .hero p.sub{font-size:clamp(16px,2vw,19px);color:rgba(245,240,232,0.82);max-width:46ch;margin-bottom:32px;}
+  .hero-ctas{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:14px;}
+  .hero-nota{font-size:13px;color:rgba(245,240,232,0.55);}
+
+  /* signature: diagnostic leaf */
+  .leaf-stage{position:relative;display:flex;align-items:center;justify-content:center;min-height:340px;}
+  .leaf-stage svg{width:min(320px,80%);filter:drop-shadow(0 20px 40px rgba(0,0,0,0.35));}
+  .pin{
+    position:absolute;
+    font-family:'Space Mono',monospace;
+    font-size:12px;
+    background:var(--papel);
+    color:var(--terra);
+    padding:6px 11px;
+    border-radius:100px;
+    display:flex;align-items:center;gap:6px;
+    opacity:0;
+    transform:translateY(6px) scale(0.94);
+    animation:pinIn .5s ease forwards;
+    box-shadow:0 8px 18px rgba(0,0,0,0.25);
+    white-space:nowrap;
+  }
+  .pin i{width:7px;height:7px;border-radius:50%;display:inline-block;}
+  .pin.p1{top:14%;left:-4%;animation-delay:.5s;}
+  .pin.p1 i{background:var(--cereja);}
+  .pin.p2{top:52%;right:-8%;animation-delay:.9s;}
+  .pin.p2 i{background:var(--sol);}
+  .pin.p3{bottom:10%;left:2%;animation-delay:1.3s;}
+  .pin.p3 i{background:var(--folha);}
+  @keyframes pinIn{to{opacity:1;transform:translateY(0) scale(1);}}
+  @media (prefers-reduced-motion:reduce){
+    .pin{animation:none;opacity:1;transform:none;}
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: #0f0a05;
-    font-family: 'DM Sans', sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 20px;
+  @media (max-width:840px){
+    .hero-grid{grid-template-columns:1fr;}
+    .leaf-stage{order:-1;min-height:260px;}
   }
 
-  /* MOCKUP DO NAVEGADOR DO CELULAR */
-  .browser-container {
-    width: 100%;
-    max-width: 390px;
-    height: 844px;
-    background: #3d2716;
-    border-radius: 40px;
-    border: 10px solid #1a1008;
-    box-shadow: 0 30px 70px rgba(0,0,0,0.85);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    position: relative;
+  /* ===== COMO FUNCIONA ===== */
+  .como{padding:88px 0;}
+  .secao-head{max-width:640px;margin-bottom:48px;}
+  .secao-head .eyebrow{color:var(--folha);margin-bottom:16px;}
+  .secao-head h2{font-size:clamp(28px,4vw,40px);color:var(--terra);}
+  .passos{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;}
+  .passo{background:white;border-radius:20px;padding:32px 26px;border:1px solid rgba(61,43,26,0.08);}
+  .passo-num{
+    font-family:'Space Mono',monospace;font-weight:700;font-size:14px;
+    width:34px;height:34px;border-radius:50%;
+    background:var(--papel-2);color:var(--terra);
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:18px;
   }
+  .passo h3{font-size:21px;margin-bottom:8px;color:var(--terra);}
+  .passo p{color:#5c4a38;font-size:15px;}
+  @media (max-width:760px){.passos{grid-template-columns:1fr;}}
 
-  .system-top {
-    background: #f1ebd9;
-    padding: 14px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 14px;
-    font-weight: bold;
-    color: #110904;
-    z-index: 20;
+  /* ===== FEATURES ===== */
+  .features{padding:20px 0 96px;}
+  .grid-feat{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .feat{
+    background:var(--papel-2);border-radius:18px;padding:26px 22px;
   }
-  .system-top .center-title { font-size: 15px; font-weight: 500; }
+  .feat-icon{font-size:26px;margin-bottom:14px;display:block;}
+  .feat h3{font-family:'DM Sans',sans-serif;font-weight:700;font-size:16px;margin-bottom:6px;}
+  .feat p{font-size:14px;color:#5c4a38;}
+  @media (max-width:760px){.grid-feat{grid-template-columns:1fr 1fr;}}
+  @media (max-width:520px){.grid-feat{grid-template-columns:1fr;}}
 
-  /* LINHAS DIAGONAIS DO FUNDO ORIGINAL */
-  .landing-content {
-    flex: 1;
-    background: var(--terra-gradiente);
-    overflow-y: auto;
-    color: var(--texto-claro);
-    position: relative;
-  }
-  
-  /* Camada isolada para as listras diagonais idênticas às do print */
-  .landing-content::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-image: repeating-linear-gradient(
-      115deg, 
-      transparent, 
-      transparent 18px, 
-      rgba(212, 154, 59, 0.04) 18px, 
-      rgba(212, 154, 59, 0.04) 20px
-    );
-    pointer-events: none;
-    z-index: 1;
-  }
+  /* ===== CREDIBILIDADE ===== */
+  .credibilidade{background:var(--mata);color:var(--papel);padding:64px 0;}
+  .cred-inner{display:flex;flex-wrap:wrap;justify-content:space-between;gap:32px;align-items:center;}
+  .cred-texto{max-width:480px;}
+  .cred-texto .eyebrow{color:var(--sol);margin-bottom:14px;}
+  .cred-texto h2{font-size:clamp(22px,3vw,28px);margin-bottom:10px;}
+  .cred-texto p{color:rgba(245,240,232,0.78);font-size:15px;}
+  .cred-fontes{display:flex;flex-direction:column;gap:10px;font-family:'Space Mono',monospace;font-size:13px;letter-spacing:0.04em;}
+  .cred-fontes span{opacity:0.85;}
 
-  /* NAVBAR INTERNA */
-  .site-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 24px 20px;
-    position: relative;
-    z-index: 10;
+  /* ===== FUNDADOR ===== */
+  .fundador{padding:88px 0;}
+  .fundador-box{
+    max-width:720px;margin:0 auto;text-align:center;
   }
-  .brand {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: 21px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .brand-icon {
-    width: 18px;
-    height: 18px;
-    background: #d49a3b;
-    border-radius: 50%;
-    box-shadow: inset -5px 0 #b37d26;
-  }
-  .btn-waitlist {
-    border: 1px solid var(--borda-alpha);
-    padding: 10px 18px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 500;
-    background: transparent;
-    color: var(--texto-claro);
-    font-family: 'DM Sans', sans-serif;
-  }
+  .fundador-marca{width:52px;height:52px;border-radius:50%;background:var(--papel-2);display:flex;align-items:center;justify-content:center;margin:0 auto 22px;font-size:22px;}
+  .fundador-box p{font-size:clamp(17px,2.4vw,21px);color:var(--terra);font-family:'Fraunces',serif;font-weight:500;line-height:1.5;}
+  .fundador-assina{margin-top:22px;font-family:'Space Mono',monospace;font-size:13px;color:#6b5a45;}
 
-  /* PALCO DA FOLHA */
-  .leaf-stage {
-    position: relative;
-    width: 100%;
-    height: 380px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: -5px;
-    z-index: 10;
+  /* ===== CTA FINAL ===== */
+  .cta-final{
+    background:linear-gradient(160deg,var(--folha),var(--mata));
+    color:var(--papel);
+    padding:80px 0;
+    text-align:center;
   }
-  
-  .coffee-leaf-svg {
-    width: 250px;
-    height: 330px;
-    filter: drop-shadow(0 25px 45px rgba(0,0,0,0.7));
-  }
+  .cta-final h2{font-size:clamp(28px,4.5vw,42px);margin-bottom:14px;}
+  .cta-final p{color:rgba(245,240,232,0.85);margin-bottom:30px;max-width:44ch;margin-left:auto;margin-right:auto;}
 
-  /* PINS FLUTUANTES */
-  .badge-pin {
-    position: absolute;
-    background: var(--pin-bg);
-    color: #2b1d11;
-    padding: 8px 14px;
-    border-radius: 24px;
-    font-size: 12px;
-    font-weight: 500;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.35);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-    z-index: 15;
-  }
-  .badge-pin::before {
-    content: '';
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    display: inline-block;
-  }
-
-  .pin-ferrugem { top: 24%; left: 6px; }
-  .pin-ferrugem::before { background: #d45d24; }
-
-  .pin-nutricao { top: 56%; right: 6px; }
-  .pin-nutricao::before { background: #e5a93b; }
-
-  .pin-confianca { bottom: 8%; left: 24px; }
-  .pin-confianca::before { background: #2da147; }
-
-  /* TEXTO INFERIOR */
-  .hero-text-zone {
-    padding: 15px 24px 40px;
-    position: relative;
-    z-index: 10;
-  }
-  .eyebrow-pill {
-    display: inline-block;
-    border: 1px solid var(--borda-alpha);
-    padding: 6px 16px;
-    border-radius: 30px;
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 2px;
-    color: rgba(245, 240, 232, 0.7);
-    margin-bottom: 22px;
-  }
-  .main-heading {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: 34px;
-    line-height: 1.12;
-    color: var(--texto-claro);
-  }
+  /* ===== FOOTER ===== */
+  footer{padding:40px 0;border-top:1px solid rgba(61,43,26,0.1);}
+  .footer-inner{display:flex;flex-wrap:wrap;justify-content:space-between;gap:14px;font-size:13px;color:#7a6a56;}
+  footer a{text-decoration:underline;}
 </style>
 </head>
 <body>
 
-<div class="browser-container">
-  <div class="system-top">
-    <span>✕</span>
-    <span class="center-title">landing</span>
-    <div class="system-icons">•••</div>
+<header>
+  <div class="wrap header-inner">
+    <div class="logo">
+      <svg class="logo-leaf" viewBox="0 0 24 24" fill="none"><path d="M12 2C7 2 3 6 3 12c0 5 3.5 9 9 10 5.5-1 9-5 9-10C21 6 17 2 12 2Z" fill="currentColor" opacity="0.9"/><path d="M12 4v16" stroke="#3d2b1a" stroke-width="1.4"/></svg>
+      Doutor Café
+    </div>
+    <a class="btn btn-fantasma" href="#lista">Lista de espera</a>
   </div>
+</header>
 
-  <div class="landing-content">
-    <nav class="site-nav">
-      <div class="brand">
-        <div class="brand-icon"></div>
-        Doutor Café
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">Safra 2026 · Em breve na Play Store</span>
+      <h1>Sua lavoura tem um problema.<br>Seu celular tem a <em>resposta</em>.</h1>
+      <p class="sub">Tire uma foto da folha, do fruto ou do grão e receba o diagnóstico na hora — pragas, doenças e deficiências, com a mesma base técnica que um agrônomo usa.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primario" href="#lista">Quero ser avisado no lançamento</a>
+        <a class="btn btn-fantasma" href="#como-funciona">Ver como funciona</a>
       </div>
-      <button class="btn-waitlist">Lista de espera</button>
-    </nav>
-
-    <div class="leaf-stage">
-      <svg class="coffee-leaf-svg" viewBox="0 0 240 320" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="limboEsq" x1="35" y1="160" x2="120" y2="160" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#0b2910"/>
-            <stop offset="50%" stop-color="#124219"/>
-            <stop offset="100%" stop-color="#1b5924"/>
-          </linearGradient>
-          
-          <linearGradient id="limboDir" x1="120" y1="160" x2="205" y2="160" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#226e2e"/>
-            <stop offset="25%" stop-color="#2d8c3b"/>
-            <stop offset="70%" stop-color="#1c6126"/>
-            <stop offset="100%" stop-color="#0c2d12"/>
-          </linearGradient>
-
-          <linearGradient id="brilhoCuticula" x1="120" y1="30" x2="190" y2="280" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="rgba(255,255,255,0.18)"/>
-            <stop offset="35%" stop-color="rgba(255,255,255,0.06)"/>
-            <stop offset="70%" stop-color="rgba(255,255,255,0)"/>
-          </linearGradient>
-
-          <radialGradient id="lesaoFerrugem" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="#4a1805"/>
-            <stop offset="35%" stop-color="#9c3a0c"/>
-            <stop offset="65%" stop-color="#d4671a"/>
-            <stop offset="90%" stop-color="#e5ad31" stop-opacity="0.8"/>
-            <stop offset="100%" stop-color="#e5ad31" stop-opacity="0"/>
-          </radialGradient>
-        </defs>
-
-        <!-- Corpo da Folha -->
-        <path d="M120 18 C112 28 92 48 74 75 C55 105 35 138 35 170 C35 205 52 235 76 260 C95 280 112 295 120 302V18Z" fill="url(#limboEsq)"/>
-        <path d="M120 18 C128 28 148 48 166 75 C185 105 205 138 205 170 C205 205 188 235 164 260 C145 280 128 295 120 302V18Z" fill="url(#limboDir)"/>
-        <path d="M120 18 C128 28 148 48 166 75 C185 105 205 138 205 170 C205 205 188 235 164 260 C145 280 128 295 120 302V18Z" fill="url(#brilhoCuticula)"/>
-
-        <!-- Nervuras -->
-        <path d="M120 15V305" stroke="#051708" stroke-width="3.5" stroke-linecap="round"/>
-        <path d="M120.5 16V303" stroke="#5cb36f" stroke-width="1" opacity="0.5"/>
-
-        <path d="M120 65 Q90 75 68 95" stroke="#061a0a" stroke-width="2" fill="none" opacity="0.9"/>
-        <path d="M120 105 Q85 118 56 142" stroke="#061a0a" stroke-width="2" fill="none" opacity="0.9"/>
-        <path d="M120 150 Q82 165 46 195" stroke="#061a0a" stroke-width="2" fill="none" opacity="0.9"/>
-        <path d="M120 195 Q85 212 48 244" stroke="#061a0a" stroke-width="2" fill="none" opacity="0.9"/>
-        <path d="M120 240 Q92 255 65 282" stroke="#061a0a" stroke-width="1.5" fill="none" opacity="0.9"/>
-
-        <path d="M120 65 Q150 75 172 95" stroke="#4fa860" stroke-width="1.5" fill="none" opacity="0.4"/>
-        <path d="M120 105 Q155 118 184 142" stroke="#4fa860" stroke-width="1.5" fill="none" opacity="0.4"/>
-        <path d="M120 150 Q158 165 194 195" stroke="#4fa860" stroke-width="1.5" fill="none" opacity="0.4"/>
-        <path d="M120 195 Q155 212 192 244" stroke="#4fa860" stroke-width="1.5" fill="none" opacity="0.4"/>
-        <path d="M120 240 Q148 255 175 282" stroke="#4fa860" stroke-width="1" fill="none" opacity="0.4"/>
-
-        <!-- Lesões de Ferrugem -->
-        <circle cx="88" cy="132" r="14" fill="url(#lesaoFerrugem)"/>
-        <circle cx="86" cy="130" r="4" fill="#301003" opacity="0.7"/> 
-        <circle cx="74" cy="185" r="8" fill="url(#lesaoFerrugem)" opacity="0.8"/>
-        <circle cx="156" cy="178" r="5" fill="#f0be42" filter="drop-shadow(0 2px 6px rgba(0,0,0,0.3))"/>
-        <circle cx="156" cy="178" r="2" fill="#ffffff" opacity="0.6"/>
-      </svg>
-
-      <!-- Pins da Interface -->
-      <div class="badge-pin pin-ferrugem">Ferrugem detectada</div>
-      <div class="badge-pin pin-nutricao">Nutrição em dia</div>
-      <div class="badge-pin pin-confianca">Confiança: alta</div>
+      <p class="hero-nota">Sem cartão de crédito. Sem compromisso. Só um aviso quando abrir.</p>
     </div>
-
-    <div class="hero-text-zone">
-      <div class="eyebrow-pill">SAFRA 2026 · EM BREVE NA PLAY STORE</div>
-      <h1 class="main-heading">Sua lavoura tem um problema. Seu celular tem a resposta.</h1>
+    <div class="leaf-stage">
+      <svg viewBox="0 0 200 260" aria-hidden="true">
+        <defs>
+          <linearGradient id="folhaGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#3fae55"/>
+            <stop offset="100%" stop-color="#1a5c2a"/>
+          </linearGradient>
+        </defs>
+        <path d="M100 10C40 40 15 110 30 170c8 32 30 58 70 80 40-22 62-48 70-80 15-60-10-130-70-160Z" fill="url(#folhaGrad)" stroke="#0f3d1c" stroke-width="2"/>
+        <path d="M100 30V240" stroke="#0f3d1c" stroke-width="2" opacity="0.6"/>
+        <path d="M100 70 L60 100 M100 70 L140 100 M100 120 L55 150 M100 120 L145 150 M100 170 L65 195 M100 170 L135 195" stroke="#0f3d1c" stroke-width="1.4" opacity="0.5"/>
+        <circle cx="72" cy="95" r="5" fill="#a5342a" opacity="0.85"/>
+        <circle cx="128" cy="150" r="4" fill="#d9a441" opacity="0.9"/>
+      </svg>
+      <span class="pin p1"><i></i>Ferrugem detectada</span>
+      <span class="pin p2"><i></i>Nutrição em dia</span>
+      <span class="pin p3"><i></i>Confiança: alta</span>
     </div>
   </div>
-</div>
+</section>
+
+<section class="como" id="como-funciona">
+  <div class="wrap">
+    <div class="secao-head">
+      <span class="eyebrow">Como funciona</span>
+      <h2>Três passos, do campo ao diagnóstico</h2>
+    </div>
+    <div class="passos">
+      <div class="passo">
+        <div class="passo-num">01</div>
+        <h3>Fotografe</h3>
+        <p>Aponte a câmera pra folha, fruto ou grão. Sem preparo, sem complicação — do jeito que está na lavoura.</p>
+      </div>
+      <div class="passo">
+        <div class="passo-num">02</div>
+        <h3>Diagnostique</h3>
+        <p>A IA identifica o que está acontecendo, com nível de confiança e explicação do que foi observado.</p>
+      </div>
+      <div class="passo">
+        <div class="passo-num">03</div>
+        <h3>Trate certo</h3>
+        <p>Veja a recomendação técnica e a dosagem exata pro seu pulverizador — sem desperdício.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="features">
+  <div class="wrap">
+    <div class="grid-feat">
+      <div class="feat"><span class="feat-icon">🔬</span><h3>Diagnóstico completo</h3><p>Doenças, pragas, plantas daninhas e deficiências nutricionais.</p></div>
+      <div class="feat"><span class="feat-icon">🧮</span><h3>Calculadoras agronômicas</h3><p>Dosagem de defensivo, calagem, gessagem e adubação NPK.</p></div>
+      <div class="feat"><span class="feat-icon">📅</span><h3>Calendário da safra</h3><p>Alertas por época do ano, incluindo risco de broca-do-café.</p></div>
+      <div class="feat"><span class="feat-icon">📶</span><h3>Funciona offline</h3><p>Instale na tela inicial e use mesmo sem sinal no meio do cafezal.</p></div>
+      <div class="feat"><span class="feat-icon">🗂️</span><h3>Histórico por talhão</h3><p>Organize as análises de cada área da sua fazenda separadamente.</p></div>
+      <div class="feat"><span class="feat-icon">☕</span><h3>Cotação do café</h3><p>Referência de preço atualizada, direto na tela principal.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="credibilidade">
+  <div class="wrap cred-inner">
+    <div class="cred-texto">
+      <span class="eyebrow">Base técnica</span>
+      <h2>Não é só reconhecimento de imagem genérico.</h2>
+      <p>As recomendações do Doutor Café são calibradas com boletins técnicos reais — a mesma referência que agrônomos usam em campo.</p>
+    </div>
+    <div class="cred-fontes">
+      <span>— Embrapa</span>
+      <span>— SENAR / CNA</span>
+      <span>— EMATER-MG</span>
+      <span>— EPAMIG</span>
+    </div>
+  </div>
+</section>
+
+<section class="fundador">
+  <div class="wrap fundador-box">
+    <div class="fundador-marca">🌱</div>
+    <p>"Cresci perto de lavoura de café — meu sogro e meu cunhado ainda vivem disso, na Mogiana. Vi de perto como um diagnóstico errado, ou tardio, custa caro pro produtor. O Doutor Café nasceu pra colocar esse conhecimento técnico na mão de quem mais precisa dele: quem está na lavoura, todo dia."</p>
+    <p class="fundador-assina">— Weder Borges, criador do Doutor Café</p>
+  </div>
+</section>
+
+<section class="cta-final" id="lista">
+  <div class="wrap">
+    <h2>O app ainda não saiu.<br>Mas você pode ser um dos primeiros.</h2>
+    <p>Entre na lista de espera e receba um aviso assim que o Doutor Café abrir na Play Store — sem spam, só uma mensagem quando estiver no ar.</p>
+    <div class="hero-ctas" style="justify-content:center;">
+      <a class="btn btn-primario" href="https://wa.me/5535998823395?text=Quero%20entrar%20na%20lista%20de%20espera%20do%20Doutor%20Caf%C3%A9" target="_blank" rel="noopener">Avisar por WhatsApp</a>
+      <a class="btn btn-fantasma" href="mailto:doutorcafe.app@gmail.com?subject=Lista%20de%20espera%20Doutor%20Caf%C3%A9">Avisar por e-mail</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap footer-inner">
+    <span>© 2026 Doutor Café · Weder Calixto Borges (MEI) · CNPJ 67.223.948/0001-87</span>
+    <span>Capetinga / Cássia, MG · <a href="/privacidade.html">Política de Privacidade</a></span>
+  </div>
+</footer>
 
 </body>
 </html>
