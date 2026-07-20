@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teste: Sonnet vs Qwen — Doutor Café</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --verde:#1a5c2a; --verde-claro:#2d8a3e; --marrom:#3d2b1a; --cinza:#7a8a7c; --creme:#f5f0e8; }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--creme);color:var(--marrom);padding:20px;max-width:900px;margin:0 auto;}
+  h1{font-family:'Playfair Display',serif;font-size:26px;margin-bottom:6px;}
+  p.sub{color:var(--cinza);font-size:14px;margin-bottom:24px;}
+  .campo{margin-bottom:14px;}
+  label{display:block;font-size:12.5px;font-weight:700;color:var(--verde);margin-bottom:5px;}
+  input[type=text]{width:100%;padding:10px 12px;border:1.5px solid #ddd3c2;border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;}
+  .dropzone{border:2px dashed #c9bda3;border-radius:14px;padding:28px;text-align:center;background:white;cursor:pointer;margin-bottom:14px;}
+  .dropzone.ativo{border-color:var(--verde-claro);background:#f2f8f3;}
+  .dropzone img{max-width:100%;max-height:220px;border-radius:10px;margin-top:10px;}
+  button{width:100%;padding:14px;background:linear-gradient(135deg,#2d8a3e,#1a5c2a);color:white;border:none;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+  button:disabled{opacity:0.5;cursor:not-allowed;}
+  .resultados{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px;}
+  @media (max-width:640px){.resultados{grid-template-columns:1fr;}}
+  .card{background:white;border-radius:14px;padding:16px;border:1.5px solid #eee2cf;}
+  .card h3{font-family:'Playfair Display',serif;font-size:16px;margin-bottom:10px;}
+  .card.sonnet h3{color:#7a4413;}
+  .card.qwen h3{color:#1a5c2a;}
+  .status{font-size:12px;color:var(--cinza);margin-bottom:10px;}
+  .metrica{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-top:1px solid #f0e9dc;}
+  .metrica:first-of-type{border-top:none;}
+  .metrica b{color:var(--marrom);}
+  pre{font-size:11.5px;background:#faf6ee;padding:10px;border-radius:8px;margin-top:10px;max-height:220px;overflow:auto;white-space:pre-wrap;word-break:break-word;}
+  .aviso{background:#fff8e1;border:1px solid #ffe0a3;border-radius:10px;padding:10px 12px;font-size:12.5px;color:#7a4a00;margin-bottom:18px;}
+</style>
+</head>
+<body>
+
+<h1>🔬 Teste: Sonnet vs Qwen</h1>
+<p class="sub">Ferramenta interna para comparar diagnóstico, custo e tempo de resposta lado a lado.</p>
+
+<div class="aviso">⚠️ O teste com a Sonnet usa o endpoint de produção — ele conta como uma análise de verdade e é registrado no seu custo real. O teste com Qwen é isolado e não afeta nada.</div>
+
+<div class="campo">
+  <label>URL do backend</label>
+  <input type="text" id="baseUrl" value="https://doutor-cafe-production.up.railway.app">
+</div>
+<div class="campo">
+  <label>User ID (para o teste com Sonnet — use seu próprio ID de admin/teste)</label>
+  <input type="text" id="userId" placeholder="ex: user_teste_comparacao">
+</div>
+<div class="campo">
+  <label>Região (opcional)</label>
+  <input type="text" id="regiao" placeholder="ex: Mogiana">
+</div>
+
+<div class="dropzone" id="dropzone">
+  <span id="dropTexto">📷 Toque para escolher uma foto, ou arraste aqui</span>
+  <input type="file" id="fileInput" accept="image/*" style="display:none">
+  <img id="preview" style="display:none">
+</div>
+
+<button id="btnComparar" disabled>Comparar Sonnet vs Qwen</button>
+
+<div class="resultados" id="resultados" style="display:none">
+  <div class="card sonnet">
+    <h3>🔶 Claude Sonnet</h3>
+    <div class="status" id="statusSonnet">Aguardando...</div>
+    <div id="metricasSonnet"></div>
+    <pre id="respostaSonnet"></pre>
+  </div>
+  <div class="card qwen">
+    <h3>🔷 Qwen2.5-VL-72B</h3>
+    <div class="status" id="statusQwen">Aguardando...</div>
+    <div id="metricasQwen"></div>
+    <pre id="respostaQwen"></pre>
+  </div>
+</div>
+
+<script>
+var imagemBase64 = null, tipoImagem = null;
+
+var dropzone = document.getElementById('dropzone');
+var fileInput = document.getElementById('fileInput');
+var preview = document.getElementById('preview');
+var dropTexto = document.getElementById('dropTexto');
+var btnComparar = document.getElementById('btnComparar');
+
+dropzone.addEventListener('click', function(){ fileInput.click(); });
+dropzone.addEventListener('dragover', function(e){ e.preventDefault(); dropzone.classList.add('ativo'); });
+dropzone.addEventListener('dragleave', function(){ dropzone.classList.remove('ativo'); });
+dropzone.addEventListener('drop', function(e){
+  e.preventDefault(); dropzone.classList.remove('ativo');
+  if(e.dataTransfer.files[0]) processarArquivo(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', function(e){
+  if(e.target.files[0]) processarArquivo(e.target.files[0]);
+});
+
+function processarArquivo(file){
+  tipoImagem = file.type || 'image/jpeg';
+  var reader = new FileReader();
+  reader.onload = function(e){
+    var resultado = e.target.result;
+    imagemBase64 = resultado.split(',')[1];
+    preview.src = resultado;
+    preview.style.display = 'block';
+    dropTexto.textContent = '✅ ' + file.name;
+    btnComparar.disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+
+btnComparar.addEventListener('click', function(){
+  var baseUrl = document.getElementById('baseUrl').value.replace(/\/$/,'');
+  var userId = document.getElementById('userId').value || 'user_teste_comparacao';
+  var regiao = document.getElementById('regiao').value || null;
+
+  document.getElementById('resultados').style.display = 'grid';
+  btnComparar.disabled = true;
+  btnComparar.textContent = 'Comparando...';
+
+  rodarSonnet(baseUrl, userId, regiao);
+  rodarQwen(baseUrl, regiao);
+});
+
+function rodarSonnet(baseUrl, userId, regiao){
+  document.getElementById('statusSonnet').textContent = '⏳ Consultando...';
+  var inicio = Date.now();
+  fetch(baseUrl + '/diagnostico-json', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ imagem: imagemBase64, tipo: tipoImagem, userId: userId, regiao: regiao })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    var duracao = ((Date.now() - inicio)/1000).toFixed(1);
+    document.getElementById('statusSonnet').textContent = '✅ Concluído em ' + duracao + 's';
+    document.getElementById('respostaSonnet').textContent = JSON.stringify(data, null, 2);
+    finalizarComparacao();
+  })
+  .catch(function(e){
+    document.getElementById('statusSonnet').textContent = '❌ Erro: ' + e.message;
+    finalizarComparacao();
+  });
+}
+
+function rodarQwen(baseUrl, regiao){
+  document.getElementById('statusQwen').textContent = '⏳ Consultando...';
+  var inicio = Date.now();
+  fetch(baseUrl + '/teste-qwen-diagnostico', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ imagem: imagemBase64, tipo: tipoImagem, regiao: regiao })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    var duracao = ((Date.now() - inicio)/1000).toFixed(1);
+    document.getElementById('statusQwen').textContent = '✅ Concluído em ' + duracao + 's';
+    if(data.custo_usd_estimado !== undefined){
+      document.getElementById('metricasQwen').innerHTML =
+        '<div class="metrica"><span>Custo estimado</span><b>US$ ' + data.custo_usd_estimado + ' (R$ ' + data.custo_brl_estimado + ')</b></div>' +
+        '<div class="metrica"><span>Tokens entrada/saída</span><b>' + (data.usage.prompt_tokens||'-') + ' / ' + (data.usage.completion_tokens||'-') + '</b></div>';
+    }
+    document.getElementById('respostaQwen').textContent = JSON.stringify(data, null, 2);
+    finalizarComparacao();
+  })
+  .catch(function(e){
+    document.getElementById('statusQwen').textContent = '❌ Erro: ' + e.message;
+    finalizarComparacao();
+  });
+}
+
+var chamadasConcluidas = 0;
+function finalizarComparacao(){
+  chamadasConcluidas++;
+  if(chamadasConcluidas >= 2){
+    btnComparar.disabled = false;
+    btnComparar.textContent = 'Comparar Sonnet vs Qwen';
+    chamadasConcluidas = 0;
+  }
+}
+</script>
+
+</body>
+</html>
