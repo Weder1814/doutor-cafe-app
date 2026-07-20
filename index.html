@@ -69,6 +69,25 @@ body { font-family: 'DM Sans', sans-serif; background: var(--creme); min-height:
 /* Botões da seção Mato passam a seguir o tema dourado-oliva (antes eram verdes, confundiam com folha) */
 .tema-mato .btn-daninha { background: linear-gradient(135deg,#c99a2e,#a5730f); box-shadow: 0 4px 16px rgba(160,115,15,0.28); }
 .tema-mato .btn-daninha-gal { color: #7a5a10; border-color: #e6d29a; }
+.tema-safra { --tema: #b5651d; --tema-escuro: #7a4413; --tema-grad: linear-gradient(135deg,#c9782e,#7a4413); --tema-sombra: rgba(122,68,19,0.3); --tema-bg: linear-gradient(180deg, rgba(181,101,29,0.05), rgba(181,101,29,0)); --tema-fundo: #faf4ee; --tema-borda: #b5651d; }
+
+.safra-toggle { display:flex; gap:8px; margin-bottom:14px; background:#f0e6da; border-radius:14px; padding:4px; }
+.safra-toggle-btn { flex:1; border:none; background:none; padding:10px 6px; border-radius:11px; font-family:'DM Sans',sans-serif; font-weight:700; font-size:12.5px; color:#8a6a4a; cursor:pointer; transition:background .2s, color .2s; }
+.safra-toggle-btn.ativo { background:var(--tema-grad); color:white; box-shadow:0 3px 10px var(--tema-sombra); }
+.safra-nota { font-size:11px; color:#9a8265; line-height:1.4; margin-bottom:14px; padding:10px 12px; background:#f5efe6; border-radius:12px; }
+.safra-fase { border-radius:14px; background:white; border:1.5px solid #f0e4d4; margin-bottom:10px; overflow:hidden; }
+.safra-fase-head { display:flex; align-items:center; gap:10px; padding:13px 14px; cursor:pointer; }
+.safra-fase-num { font-family:'Space Mono',monospace; font-size:11px; font-weight:700; color:white; background:var(--tema-grad); width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.safra-fase-info { flex:1; }
+.safra-fase-info h4 { font-size:14.5px; color:var(--tema-escuro); font-weight:700; margin-bottom:2px; }
+.safra-fase-info span { font-size:11px; color:#a5906f; font-weight:600; }
+.safra-fase-seta { font-size:12px; color:#c0ab8a; transition:transform .2s; }
+.safra-fase.aberta .safra-fase-seta { transform:rotate(180deg); }
+.safra-fase-corpo { display:none; padding:0 14px 14px 48px; }
+.safra-fase.aberta .safra-fase-corpo { display:block; }
+.safra-fase-porque { font-size:12.5px; color:#6b5a45; font-style:italic; margin-bottom:10px; line-height:1.4; }
+.safra-fase-acao { font-size:13px; color:#4a3a28; padding:6px 0; border-top:1px solid #f5efe6; display:flex; gap:8px; }
+.safra-fase-acao:first-of-type { border-top:none; }
 .card-clima { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
 .clima-topo { padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
 .clima-dados { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; border-top: 1px solid #f0f0f0; }
@@ -983,6 +1002,19 @@ canvas { display: none; }
   <div class="secao-titulo" style="margin-top:4px">&#128197; Calend&#225;rio Fitossanit&#225;rio</div>
   <div class="card-calendario" id="cardCalendario"></div>
 
+  <div class="secao-titulo" style="margin-top:4px">&#127793; Guia da Safra: Colheita &agrave; Colheita</div>
+  <div class="secao-card tema-safra">
+    <div class="secao-card-head">
+      <div class="secao-badge">🌾</div>
+      <div class="secao-card-tit"><h3>O que fazer em cada fase</h3><p>Passo a passo do pós-colheita até a próxima colheita</p></div>
+    </div>
+    <div class="safra-toggle" id="safraToggle">
+      <button class="safra-toggle-btn" data-tipo="arabica" onclick="renderGuiaSafra('arabica')">Arábica</button>
+      <button class="safra-toggle-btn" data-tipo="conilon" onclick="renderGuiaSafra('conilon')">Conilon / Robusta</button>
+    </div>
+    <div id="guiaSafraLista"></div>
+  </div>
+
   <div class="secao-titulo" style="margin-top:4px" id="tituloSecaoHistorico">&#128203; Hist&#243;rico de An&#225;lises</div>
 
   <div class="talhoes-section" id="secaoTalhoes">
@@ -1584,6 +1616,60 @@ function obterPrecoCafe(){
 // ── CALENDÁRIO ──
 var CALENDARIO={0:{fase:"granacao",faseTxt:"\uD83D\uDFE2 Granção",alertas:[{nivel:"alto",txt:"\uD83D\uDFE0 Ferrugem — alta umidade favorece infecção"},{nivel:"alto",txt:"\uD83E\uDEB2 Bicho-mineiro — pico populacional"},{nivel:"medio",txt:"\uD83D\uDFE3 Mancha aureolada — ventos e chuvas"}],acoes:["\u2705 Aplicar fungicida preventivo para ferrugem","\u2705 Monitorar folhas para trilhas de bicho-mineiro","\u2705 Adubação de cobertura — N e K parcelados"]},1:{fase:"granacao",faseTxt:"\uD83D\uDFE2 Granção",alertas:[{nivel:"alto",txt:"\uD83D\uDFE0 Ferrugem — período crítico"},{nivel:"alto",txt:"\uD83E\uDEB2 Bicho-mineiro — alta incidência"},{nivel:"medio",txt:"\uD83E\uDED9 Antracnose — chuvas intensas"}],acoes:["\u2705 Reaplicar fungicida (21 dias após última aplicação)","\u2705 Controle de bicho-mineiro se >30% folhas com minas","\u2705 Verificar adubação fosfatada"]},2:{fase:"maturacao",faseTxt:"\uD83D\uDD34 Maturação",alertas:[{nivel:"alto",txt:"\uD83D\uDFE0 Ferrugem — frutos pesados reduzem resistência"},{nivel:"medio",txt:"\uD83D\uDD73\uFE0F Broca — monitorar frutos"},{nivel:"medio",txt:"\uD83E\uDEB2 Bicho-mineiro — continua ativo"}],acoes:["\u2705 Monitorar broca nos frutos","\u2705 Aplicar fungicida se necessário","\u2705 Preparar equipamentos para colheita"]},3:{fase:"colheita",faseTxt:"\u2615 Colheita",alertas:[{nivel:"medio",txt:"\uD83D\uDD73\uFE0F Broca — pico nos frutos maduros"},{nivel:"medio",txt:"\uD83D\uDFE0 Ferrugem — desfolha pós-colheita"},{nivel:"alto",txt:"\u26A0\uFE0F Colha no ponto certo — 80% frutos verdes = perda de 20 sacas a cada 100"}],acoes:["\u2705 Colheita seletiva — cereja e passa separados","\u2705 Controle biológico da broca (Beauveria bassiana)","\u2705 Processar café rapidamente após colheita","\u26A0\uFE0F Evite colheita antecipada — prejuízo no peso e qualidade"]},4:{fase:"colheita",faseTxt:"\u2615 Colheita",alertas:[{nivel:"medio",txt:"\uD83D\uDD73\uFE0F Broca — reinfestação em frutos remanescentes"},{nivel:"medio",txt:"\uD83D\uDFE0 Ferrugem — lesões visíveis pós-colheita"},{nivel:"alto",txt:"\u26A0\uFE0F 50% frutos verdes = perda de 13 sacas a cada 100"}],acoes:["\u2705 Recolher todos os frutos caídos (repasse)","\u2705 Aplicar fungicida curativo pós-colheita","\u2705 Iniciar poda de formação e limpeza","\u26A0\uFE0F Aguarde ponto ideal: mínimo 80% cereja/passa"]},5:{fase:"pos",faseTxt:"\uD83C\uDF3F Pós-colheita",alertas:[{nivel:"medio",txt:"\uD83D\uDFE0 Ferrugem — lesões tardias"},{nivel:"medio",txt:"\uD83D\uDFE1 Deficiência de Mg — período seco"}],acoes:["\u2705 Realizar poda e esqueletamento se necessário","\u2705 Calagem e adubação de solo","\u2705 Análise de solo para planejar próxima safra"]},6:{fase:"pos",faseTxt:"\uD83C\uDF3F Pós-colheita",alertas:[{nivel:"medio",txt:"\uD83D\uDFEB Ácaro vermelho — período seco favorece"},{nivel:"medio",txt:"\uD83D\uDFE1 Deficiências nutricionais — solo seco"}],acoes:["\u2705 Monitorar ácaros (folha bronzeada)","\u2705 Adubação fosfatada e potássica","\u2705 Irrigação se disponível"]},7:{fase:"repouso",faseTxt:"\uD83D\uDE34 Repouso vegetativo",alertas:[{nivel:"medio",txt:"\uD83D\uDFEB Ácaro vermelho — pico em período seco"},{nivel:"medio",txt:"\uD83E\uDD0D Cochonilha — favorecida pelo estresse hídrico"}],acoes:["\u2705 Aplicar acaricida se necessário","\u2705 Adubação foliar de micronutrientes","\u2705 Revisar sistema de irrigação"]},8:{fase:"florada",faseTxt:"\uD83C\uDF38 Florada",alertas:[{nivel:"alto",txt:"\uD83C\uDF38 NÃO aplicar inseticidas na florada — proteger abelhas"},{nivel:"medio",txt:"\uD83D\uDFE0 Ferrugem — início das chuvas"},{nivel:"medio",txt:"\u26AB Phoma — regiões acima de 900m"}],acoes:["\u26A0\uFE0F EVITAR agrotóxicos durante a florada","\u2705 Fungicida preventivo ANTES da florada","\u2705 Adubação nitrogenada de cobertura"]},9:{fase:"florada",faseTxt:"\uD83C\uDF38 Florada/Chumbinho",alertas:[{nivel:"alto",txt:"\uD83D\uDFE0 Ferrugem — chuvas reiniciadas, risco alto"},{nivel:"alto",txt:"\uD83E\uDEB2 Bicho-mineiro — nova geração"},{nivel:"medio",txt:"\uD83D\uDFE3 Aureolada — ventos e chuvas"}],acoes:["\u2705 Aplicar fungicida sistêmico para ferrugem","\u2705 Monitorar bicho-mineiro nas folhas novas","\u2705 Adubação NPK completa"]},10:{fase:"granacao",faseTxt:"\uD83D\uDFE2 Granção",alertas:[{nivel:"alto",txt:"\uD83D\uDFE0 Ferrugem — período de máximo risco"},{nivel:"alto",txt:"\uD83E\uDEB2 Bicho-mineiro — alta infestação"},{nivel:"medio",txt:"\u26AB Phoma — em regiões altas"}],acoes:["\u2705 Reaplicar fungicida (intervalo 21 dias)","\u2705 Controle de bicho-mineiro","\u2705 Monitorar deficiência de boro nos ponteiros"]},11:{fase:"granacao",faseTxt:"\uD83D\uDFE2 Granção",alertas:[{nivel:"alto",txt:"\uD83D\uDFE0 Ferrugem — frutos em desenvolvimento"},{nivel:"alto",txt:"\uD83E\uDEB2 Bicho-mineiro — pico"},{nivel:"medio",txt:"\uD83D\uDFE3 Aureolada — ventos de verão"}],acoes:["\u2705 Fungicida preventivo — não deixar passar intervalo","\u2705 Adubação potássica para granção","\u2705 Monitorar broca nos primeiros frutos"]}};
 function renderCalendario(){var mes=new Date().getMonth(),cal=CALENDARIO[mes];var html='<div class="cal-header"><div class="cal-mes">\uD83D\uDCC5 '+MESES[mes]+'</div><div class="cal-fase fase-'+cal.fase+'">'+cal.faseTxt+'</div></div>';html+='<div class="cal-divisor"></div><div class="cal-alertas"><h4>\u26A0\uFE0F Alertas deste mês</h4>';cal.alertas.forEach(function(a){html+='<div class="alerta-item"><span class="alerta-'+a.nivel+'">'+a.txt+'</span></div>';});html+='</div><div class="cal-divisor"></div><div class="cal-acoes"><h4>\uD83D\uDCCB O que fazer agora</h4>';cal.acoes.forEach(function(a){html+='<div class="acao-item">'+a+'</div>';});html+='</div>';document.getElementById("cardCalendario").innerHTML=html;}
+
+// GUIA DA SAFRA: POS-COLHEITA ATE PROXIMA COLHEITA
+var GUIA_SAFRA = {
+  arabica: {
+    nota: "Datas de referência para regiões de altitude (Sul de Minas, Mogiana, Triângulo, Cerrado Mineiro, Paraná, Bahia Cerrado). Em altitudes maiores, as fases podem atrasar 3-4 semanas.",
+    fases: [
+      {titulo:"Pós-colheita", periodo:"Junho / Julho", porque:"A planta está exausta depois de produzir. É a hora de recuperar energia para a próxima safra.", acoes:["Podar e esqueletar ramos improdutivos","Recolher frutos e folhas caídos (repasse) para reduzir broca-do-café","Fazer análise de solo para planejar a correção"]},
+      {titulo:"Preparo do solo", periodo:"Agosto / Setembro", porque:"O solo corrigido agora sustenta a florada e a safra inteira do próximo ciclo.", acoes:["Aplicar calagem e gessagem conforme a análise de solo","Adubação de reposição pós-colheita","Limpeza de plantas daninhas na linha e entrelinha"]},
+      {titulo:"Florada", periodo:"Setembro / Outubro", porque:"A florada define quantos frutos a planta vai carregar nessa safra.", acoes:["Evitar agrotóxico durante a floração — proteja os polinizadores","Fungicida preventivo antes das chuvas de florada","Fique atento a granizo e geada tardia"]},
+      {titulo:"Chumbinho (formação do fruto)", periodo:"Novembro / Dezembro", porque:"O fruto ainda pequeno (chumbinho) é o alvo preferido da broca-do-café.", acoes:["Monitorar broca-do-café desde o início do fruto","Adubação de cobertura (N-P-K)","Manejo hídrico se tiver irrigação disponível"]},
+      {titulo:"Enchimento de grão", periodo:"Janeiro / Março", porque:"É quando o grão ganha peso — e quando ferrugem e cercosporiose mais atacam.", acoes:["Monitorar e tratar ferrugem regularmente","Adubação potássica para ajudar no enchimento","Atenção a veranicos (períodos secos entre chuvas)"]},
+      {titulo:"Maturação", periodo:"Abril / Maio", porque:"O grão muda de verde para cereja — hora de planejar a colheita.", acoes:["Acompanhar o % de frutos cereja para decidir o ponto de colheita","Organizar mão de obra e equipamentos com antecedência","Última aplicação fitossanitária, se necessário"]},
+      {titulo:"Colheita", periodo:"Maio a Setembro (pico Jun-Ago)", porque:"Colher no ponto certo evita perda de peso e de qualidade do café.", acoes:["Colher com pelo menos 80% de frutos cereja/passa","Processar (via seca ou úmida) o quanto antes","Separar lotes por qualidade de maturação"]}
+    ]
+  },
+  conilon: {
+    nota: "Datas de referência gerais (Espírito Santo, litoral da Bahia, Rondônia). No conilon, o manejo de irrigação influencia a florada mais do que o calendário natural — ajuste conforme sua região e sistema de produção.",
+    fases: [
+      {titulo:"Pós-colheita", periodo:"Agosto / Setembro", porque:"A poda de ciclo revigora a planta e prepara a próxima produção.", acoes:["Poda programada de ciclo (retirada de hastes velhas)","Desbrota seletiva dos ramos novos","Adubação de reenergização da planta"]},
+      {titulo:"Preparo e indução da florada", periodo:"Setembro / Outubro", porque:"Em muitas áreas de conilon, a florada é induzida por manejo de água, não só pelo clima natural.", acoes:["Corrigir o solo conforme a análise","Se tiver irrigação, planejar a quebra de dormência para uniformizar a florada","Limpeza geral da lavoura"]},
+      {titulo:"Florada", periodo:"Julho a Setembro (varia por região)", porque:"O conilon pode florir em ondas mais espalhadas do que o arábica.", acoes:["Evitar agrotóxico durante a floração","Monitorar a uniformidade das floradas","Reforçar polinização em áreas mais fechadas"]},
+      {titulo:"Formação do fruto", periodo:"Dezembro / Março", porque:"Fase de maior exigência hídrica — chuva irregular reduz o tamanho do grão.", acoes:["Monitorar disponibilidade de água (irrigação se houver)","Adubação de cobertura","Atenção a broca-do-café e cochonilhas"]},
+      {titulo:"Maturação e colheita", periodo:"Abril a Julho", porque:"A colheita do conilon costuma ser mais concentrada, muitas vezes com apoio de máquina em terreno plano.", acoes:["Acompanhar o ponto de maturação por amostragem","Considerar colheita mecanizada se o terreno permitir","Processar o café rapidamente após a colheita"]}
+    ]
+  }
+};
+var safraTipoAtual = localStorage.getItem("doutorcafe_safra_tipo") || "arabica";
+function renderGuiaSafra(tipo){
+  safraTipoAtual = tipo;
+  localStorage.setItem("doutorcafe_safra_tipo", tipo);
+  document.querySelectorAll(".safra-toggle-btn").forEach(function(b){
+    b.classList.toggle("ativo", b.getAttribute("data-tipo")===tipo);
+  });
+  var dados = GUIA_SAFRA[tipo];
+  var html = '<div class="safra-nota">' + dados.nota + '</div>';
+  dados.fases.forEach(function(f, i){
+    var acoesHtml = f.acoes.map(function(a){ return '<div class="safra-fase-acao">✅ ' + a + '</div>'; }).join("");
+    html += '<div class="safra-fase" id="safraFase' + i + '">' +
+      '<div class="safra-fase-head" onclick="toggleSafraFase(' + i + ')">' +
+        '<div class="safra-fase-num">' + (i+1) + '</div>' +
+        '<div class="safra-fase-info"><h4>' + f.titulo + '</h4><span>' + f.periodo + '</span></div>' +
+        '<div class="safra-fase-seta">▼</div>' +
+      '</div>' +
+      '<div class="safra-fase-corpo"><div class="safra-fase-porque">' + f.porque + '</div>' + acoesHtml + '</div>' +
+    '</div>';
+  });
+  document.getElementById("guiaSafraLista").innerHTML = html;
+}
+function toggleSafraFase(i){
+  var el = document.getElementById("safraFase" + i);
+  if(el) el.classList.toggle("aberta");
+}
+
+
 
 function salvarHistorico(diags,fotoBase64,regiao){try{var hist=JSON.parse(localStorage.getItem(HIST_KEY)||"[]");var agora=new Date();var data=agora.getDate()+"/"+(agora.getMonth()+1)+"/"+agora.getFullYear()+" "+agora.getHours()+":"+String(agora.getMinutes()).padStart(2,"0");var primeiro=diags[0];hist.unshift({diag:primeiro.diagnostico,emoji:EMOJIS[primeiro.diagnostico]||"\uD83C\uDF3F",diags:diags,data:data,regiao:regiao||"",foto:fotoBase64||null});if(hist.length>10)hist=hist.slice(0,10);localStorage.setItem(HIST_KEY,JSON.stringify(hist));}catch(e){}criarLembretesReaplicacao(diags);renderAreaHistorico();}
 
@@ -2453,7 +2539,7 @@ function navegarMais(){
   var el=document.getElementById("cardClima");
   if(el)el.scrollIntoView({behavior:"smooth",block:"start"});
 }
-function entrarNoApp(nome){usuarioAtual=verificarCadastroInicial();mostrarTela('tela-principal');var nav=document.getElementById('navInferior');if(nav)nav.style.display='flex';sincronizarIdentidade(function(){atualizarContador();sincronizarContadorServidor();});renderAreaHistorico();renderCalendario();obterGPS();obterPrecoCafe();checarLembretesPendentes();verificarBannerIOS();if(nome){var primeiroNome=nome.split(' ')[0];setTimeout(function(){var tag=document.getElementById('regiaoTag');if(tag)tag.innerHTML='Olá, '+primeiroNome+'! Vamos diagnosticar';setTimeout(function(){obterGPS();},3000);},600);}}
+function entrarNoApp(nome){usuarioAtual=verificarCadastroInicial();mostrarTela('tela-principal');var nav=document.getElementById('navInferior');if(nav)nav.style.display='flex';sincronizarIdentidade(function(){atualizarContador();sincronizarContadorServidor();});renderAreaHistorico();renderCalendario();renderGuiaSafra(safraTipoAtual);obterGPS();obterPrecoCafe();checarLembretesPendentes();verificarBannerIOS();if(nome){var primeiroNome=nome.split(' ')[0];setTimeout(function(){var tag=document.getElementById('regiaoTag');if(tag)tag.innerHTML='Olá, '+primeiroNome+'! Vamos diagnosticar';setTimeout(function(){obterGPS();},3000);},600);}}
 function verificarCadastroInicial(){try{return JSON.parse(localStorage.getItem(CADASTRO_INICIAL_KEY));}catch(e){return null;}}
 
 // ── TALHÕES ──
