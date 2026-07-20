@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Teste: Sonnet vs Qwen — Doutor Café</title>
+<title>Teste: Sonnet vs Qwen vs Gemini — Doutor Café</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{ --verde:#1a5c2a; --verde-claro:#2d8a3e; --marrom:#3d2b1a; --cinza:#7a8a7c; --creme:#f5f0e8; }
@@ -19,12 +19,13 @@
   .dropzone img{max-width:100%;max-height:220px;border-radius:10px;margin-top:10px;}
   button{width:100%;padding:14px;background:linear-gradient(135deg,#2d8a3e,#1a5c2a);color:white;border:none;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;font-family:'DM Sans',sans-serif;}
   button:disabled{opacity:0.5;cursor:not-allowed;}
-  .resultados{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px;}
-  @media (max-width:640px){.resultados{grid-template-columns:1fr;}}
+  .resultados{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:22px;}
+  @media (max-width:900px){.resultados{grid-template-columns:1fr;}}
   .card{background:white;border-radius:14px;padding:16px;border:1.5px solid #eee2cf;}
   .card h3{font-family:'Playfair Display',serif;font-size:16px;margin-bottom:10px;}
   .card.sonnet h3{color:#7a4413;}
   .card.qwen h3{color:#1a5c2a;}
+  .card.gemini h3{color:#1a56a8;}
   .status{font-size:12px;color:var(--cinza);margin-bottom:10px;}
   .metrica{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-top:1px solid #f0e9dc;}
   .metrica:first-of-type{border-top:none;}
@@ -35,7 +36,7 @@
 </head>
 <body>
 
-<h1>🔬 Teste: Sonnet vs Qwen</h1>
+<h1>🔬 Teste: Sonnet vs Qwen vs Gemini</h1>
 <p class="sub">Ferramenta interna para comparar diagnóstico, custo e tempo de resposta lado a lado.</p>
 
 <div class="aviso">⚠️ O teste com a Sonnet usa o endpoint de produção — ele conta como uma análise de verdade e é registrado no seu custo real. O teste com Qwen é isolado e não afeta nada.</div>
@@ -59,7 +60,7 @@
   <img id="preview" style="display:none">
 </div>
 
-<button id="btnComparar" disabled>Comparar Sonnet vs Qwen</button>
+<button id="btnComparar" disabled>Comparar Sonnet vs Qwen vs Gemini</button>
 
 <div class="resultados" id="resultados" style="display:none">
   <div class="card sonnet">
@@ -73,6 +74,12 @@
     <div class="status" id="statusQwen">Aguardando...</div>
     <div id="metricasQwen"></div>
     <pre id="respostaQwen"></pre>
+  </div>
+  <div class="card gemini">
+    <h3>🔵 Gemini 2.5 Flash</h3>
+    <div class="status" id="statusGemini">Aguardando...</div>
+    <div id="metricasGemini"></div>
+    <pre id="respostaGemini"></pre>
   </div>
 </div>
 
@@ -121,6 +128,7 @@ btnComparar.addEventListener('click', function(){
 
   rodarSonnet(baseUrl, userId, regiao);
   rodarQwen(baseUrl, regiao);
+  rodarGemini(baseUrl, regiao);
 });
 
 function rodarSonnet(baseUrl, userId, regiao){
@@ -170,12 +178,38 @@ function rodarQwen(baseUrl, regiao){
   });
 }
 
+function rodarGemini(baseUrl, regiao){
+  document.getElementById('statusGemini').textContent = '⏳ Consultando...';
+  var inicio = Date.now();
+  fetch(baseUrl + '/teste-gemini-diagnostico', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ imagem: imagemBase64, tipo: tipoImagem, regiao: regiao })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    var duracao = ((Date.now() - inicio)/1000).toFixed(1);
+    document.getElementById('statusGemini').textContent = '✅ Concluído em ' + duracao + 's';
+    if(data.custo_usd_estimado !== undefined){
+      document.getElementById('metricasGemini').innerHTML =
+        '<div class="metrica"><span>Custo estimado</span><b>US$ ' + data.custo_usd_estimado + ' (R$ ' + data.custo_brl_estimado + ')</b></div>' +
+        '<div class="metrica"><span>Tokens entrada/saída</span><b>' + (data.usage.prompt_tokens||'-') + ' / ' + (data.usage.completion_tokens||'-') + '</b></div>';
+    }
+    document.getElementById('respostaGemini').textContent = JSON.stringify(data, null, 2);
+    finalizarComparacao();
+  })
+  .catch(function(e){
+    document.getElementById('statusGemini').textContent = '❌ Erro: ' + e.message;
+    finalizarComparacao();
+  });
+}
+
 var chamadasConcluidas = 0;
 function finalizarComparacao(){
   chamadasConcluidas++;
-  if(chamadasConcluidas >= 2){
+  if(chamadasConcluidas >= 3){
     btnComparar.disabled = false;
-    btnComparar.textContent = 'Comparar Sonnet vs Qwen';
+    btnComparar.textContent = 'Comparar Sonnet vs Qwen vs Gemini';
     chamadasConcluidas = 0;
   }
 }
