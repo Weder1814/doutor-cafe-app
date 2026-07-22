@@ -110,18 +110,54 @@ fileInput.addEventListener('change', function(e){
   if(e.target.files[0]) processarArquivo(e.target.files[0]);
 });
 
+// ── Redimensionamento identico ao app de producao (index.html) ──
+// Mesma funcao, mesmos parametros (1280px, qualidade 0.95) usados no
+// fluxo real de diagnostico de folha. Garante que os 4 modelos testados
+// aqui recebam a MESMA imagem (em bytes) que a Sonnet recebe em producao
+// — antes disso, o teste mandava a foto crua/original, diferente do que
+// o app realmente envia, o que podia levar a leituras diferentes.
+function redimensionarImagem(file, maxDim, qualidade, callback) {
+  var leitor = new FileReader();
+  leitor.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var w = img.width, h = img.height;
+      if (w > maxDim || h > maxDim) {
+        if (w >= h) { h = Math.round(h * maxDim / w); w = maxDim; }
+        else { w = Math.round(w * maxDim / h); h = maxDim; }
+      }
+      var canvas = document.createElement("canvas");
+      canvas.width = w; canvas.height = h;
+      var ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, w, h);
+      var b64;
+      try { b64 = canvas.toDataURL("image/jpeg", qualidade).split(",")[1]; }
+      catch(err) { b64 = e.target.result.split(",")[1]; }
+      callback(b64);
+    };
+    img.onerror = function() { callback(e.target.result.split(",")[1]); };
+    img.src = e.target.result;
+  };
+  leitor.onerror = function() { callback(null); };
+  leitor.readAsDataURL(file);
+}
+
 function processarArquivo(file){
-  tipoImagem = file.type || 'image/jpeg';
+  tipoImagem = 'image/jpeg'; // redimensionarImagem sempre gera JPEG (mesmo padrao do app)
   var reader = new FileReader();
   reader.onload = function(e){
-    var resultado = e.target.result;
-    imagemBase64 = resultado.split(',')[1];
-    preview.src = resultado;
+    preview.src = e.target.result; // preview mostra a foto original, sem perda
     preview.style.display = 'block';
-    dropTexto.textContent = '✅ ' + file.name;
-    btnComparar.disabled = false;
   };
   reader.readAsDataURL(file);
+
+  dropTexto.textContent = '⏳ Redimensionando (igual ao app)...';
+  btnComparar.disabled = true;
+  redimensionarImagem(file, 1280, 0.95, function(b64){
+    imagemBase64 = b64;
+    dropTexto.textContent = '✅ ' + file.name + ' (redimensionada p/ 1280px, igual ao app)';
+    btnComparar.disabled = false;
+  });
 }
 
 btnComparar.addEventListener('click', async function(){
