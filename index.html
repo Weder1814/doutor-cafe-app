@@ -625,7 +625,19 @@ canvas { display: none; }
 .cad-beneficios { margin:16px 16px 0;display:flex;flex-direction:column;gap:8px; }
 .cad-ben-item { display:flex;align-items:center;gap:10px;background:white;border-radius:12px;padding:11px 14px;box-shadow:0 1px 6px rgba(0,0,0,0.06); }
 .cad-ben-item span:first-child { font-size:20px;flex-shrink:0; }
-.cad-ben-item p { margin:0;font-size:13px;color:#333;font-weight:500; }
+.cad-ben-item p { margin:0;font-size:13px;color:#333;font-weight:500; }/* ── CHIP DE PERFIL (avatar + nome) ── */
+#chipPerfil { position: absolute; top: max(14px, env(safe-area-inset-top)); left: 14px; display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.35); backdrop-filter: blur(6px); border-radius: 999px; padding: 6px 14px 6px 6px; z-index: 10; cursor: pointer; }
+#chipPerfilAvatar { width: 34px; height: 34px; border-radius: 50%; background: var(--verde-claro,#2d8a3e); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14px; overflow: hidden; border: 2px solid rgba(255,255,255,0.6); flex-shrink: 0; }
+#chipPerfilAvatar img { width: 100%; height: 100%; object-fit: cover; }
+#chipPerfilNome { color: white; font-size: 13.5px; font-weight: 600; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#inputFotoPerfil { display: none; }
+#modalFotoPerfil { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 999; align-items: center; justify-content: center; }
+#modalFotoPerfil.ativo { display: flex; }
+#modalFotoPerfilConteudo { background: white; border-radius: 16px; padding: 20px; max-width: 300px; text-align: center; }
+#modalFotoPerfilPreview { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin: 12px auto; display: block; border: 3px solid var(--verde-claro,#2d8a3e); }
+#modalFotoPerfilConteudo button { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: 700; margin-top: 8px; cursor: pointer; font-family: inherit; }
+#btnConfirmarFoto { background: var(--verde-claro,#2d8a3e); color: white; }
+#btnCancelarFoto { background: #eee; color: #333; }
 </style>
 </head>
 <body>
@@ -861,6 +873,11 @@ canvas { display: none; }
 <div class="header">
   <img class="header-img" src="cafe.jpeg" alt="Café">
   <div class="header-overlay"></div>
+  <div id="chipPerfil" onclick="document.getElementById('inputFotoPerfil').click()">
+    <div id="chipPerfilAvatar">?</div>
+    <span id="chipPerfilNome">Olá!</span>
+  </div>
+  <input type="file" id="inputFotoPerfil" accept="image/*">
   <div class="header-content">
     <span class="logo-icon">&#127807;</span>
     <h1>Doutor <span>Caf&#233;</span></h1>
@@ -877,6 +894,15 @@ canvas { display: none; }
   </div>
 </div>
 <div class="wave"></div>
+
+<div id="modalFotoPerfil">
+  <div id="modalFotoPerfilConteudo">
+    <div style="font-weight:700;font-size:15px;">Atualizar foto de perfil?</div>
+    <img id="modalFotoPerfilPreview" src="">
+    <button id="btnConfirmarFoto">Confirmar</button>
+    <button id="btnCancelarFoto">Cancelar</button>
+  </div>
+</div>
 
 <div class="corpo">
   <input id="cam" type="file" accept="image/*" capture="environment">
@@ -2539,8 +2565,67 @@ function navegarMais(){
   var el=document.getElementById("cardClima");
   if(el)el.scrollIntoView({behavior:"smooth",block:"start"});
 }
-function entrarNoApp(nome){usuarioAtual=verificarCadastroInicial();mostrarTela('tela-principal');var nav=document.getElementById('navInferior');if(nav)nav.style.display='flex';sincronizarIdentidade(function(){atualizarContador();sincronizarContadorServidor();});renderAreaHistorico();renderCalendario();renderGuiaSafra(safraTipoAtual);obterGPS();obterPrecoCafe();checarLembretesPendentes();verificarBannerIOS();if(nome){var primeiroNome=nome.split(' ')[0];setTimeout(function(){var tag=document.getElementById('regiaoTag');if(tag)tag.innerHTML='Olá, '+primeiroNome+'! Vamos diagnosticar';setTimeout(function(){obterGPS();},3000);},600);}}
+function entrarNoApp(nome){usuarioAtual=verificarCadastroInicial();mostrarTela('tela-principal');var nav=document.getElementById('navInferior');if(nav)nav.style.display='flex';sincronizarIdentidade(function(){atualizarContador();sincronizarContadorServidor();});inicializarChipPerfil();renderAreaHistorico();renderCalendario();renderGuiaSafra(safraTipoAtual);obterGPS();obterPrecoCafe();checarLembretesPendentes();verificarBannerIOS();if(nome){var primeiroNome=nome.split(' ')[0];setTimeout(function(){var tag=document.getElementById('regiaoTag');if(tag)tag.innerHTML='Olá, '+primeiroNome+'! Vamos diagnosticar';setTimeout(function(){obterGPS();},3000);},600);}}
 function verificarCadastroInicial(){try{return JSON.parse(localStorage.getItem(CADASTRO_INICIAL_KEY));}catch(e){return null;}}
+
+// ── CHIP DE PERFIL (avatar + nome) ──────────────────────────────
+function iniciaisDoNome(nome){if(!nome)return "?";var partes=nome.trim().split(" ").filter(Boolean);if(partes.length===1)return partes[0].substr(0,2).toUpperCase();return (partes[0][0]+partes[partes.length-1][0]).toUpperCase();}
+function renderizarChipPerfil(nome,fotoB64){var avatar=document.getElementById('chipPerfilAvatar');var nomeEl=document.getElementById('chipPerfilNome');if(!avatar||!nomeEl)return;nomeEl.textContent=nome?('Olá, '+nome.split(' ')[0]):'Olá!';if(fotoB64){avatar.innerHTML='<img src="data:image/jpeg;base64,'+fotoB64+'">';}else{avatar.innerHTML=iniciaisDoNome(nome);}}
+function inicializarChipPerfil(){
+  if(!usuarioAtual||!usuarioAtual.userId)return;
+  renderizarChipPerfil(usuarioAtual.nome,localStorage.getItem('doutorcafe_foto_perfil')||'');
+  fetch('https://doutor-cafe-production.up.railway.app/perfil-usuario?userId='+encodeURIComponent(usuarioAtual.userId))
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if(data&&data.ok){
+      renderizarChipPerfil(data.nome||usuarioAtual.nome,data.fotoPerfil||'');
+      if(data.fotoPerfil)localStorage.setItem('doutorcafe_foto_perfil',data.fotoPerfil);
+    }
+  })
+  .catch(function(e){console.error('Erro ao buscar perfil:',e);});
+}
+function redimensionarFotoPerfil(file,callback){
+  var leitor=new FileReader();
+  leitor.onload=function(e){
+    var img=new Image();
+    img.onload=function(){
+      var tam=300;
+      var canvas=document.createElement('canvas');
+      canvas.width=tam;canvas.height=tam;
+      var ctx=canvas.getContext('2d');
+      var lado=Math.min(img.width,img.height);
+      var offX=(img.width-lado)/2,offY=(img.height-lado)/2;
+      ctx.drawImage(img,offX,offY,lado,lado,0,0,tam,tam);
+      callback(canvas.toDataURL('image/jpeg',0.85).split(',')[1]);
+    };
+    img.src=e.target.result;
+  };
+  leitor.readAsDataURL(file);
+}
+document.addEventListener('DOMContentLoaded',function(){
+  var inputFoto=document.getElementById('inputFotoPerfil');
+  if(!inputFoto)return;
+  inputFoto.addEventListener('change',function(e){
+    var file=e.target.files[0];
+    if(!file)return;
+    redimensionarFotoPerfil(file,function(b64){
+      document.getElementById('modalFotoPerfilPreview').src='data:image/jpeg;base64,'+b64;
+      document.getElementById('modalFotoPerfil').classList.add('ativo');
+      document.getElementById('btnConfirmarFoto').onclick=function(){
+        if(!usuarioAtual||!usuarioAtual.userId){document.getElementById('modalFotoPerfil').classList.remove('ativo');return;}
+        fetch('https://doutor-cafe-production.up.railway.app/atualizar-foto-perfil',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:usuarioAtual.userId,fotoPerfil:b64})})
+        .then(function(r){return r.json();})
+        .then(function(data){
+          if(data&&data.ok){renderizarChipPerfil(usuarioAtual.nome,b64);localStorage.setItem('doutorcafe_foto_perfil',b64);}
+          document.getElementById('modalFotoPerfil').classList.remove('ativo');
+        })
+        .catch(function(){document.getElementById('modalFotoPerfil').classList.remove('ativo');});
+      };
+    });
+  });
+  var btnCancelar=document.getElementById('btnCancelarFoto');
+  if(btnCancelar)btnCancelar.onclick=function(){document.getElementById('modalFotoPerfil').classList.remove('ativo');document.getElementById('inputFotoPerfil').value='';};
+});
 
 // ── TALHÕES ──
 var TALHOES_KEY = "dc_talhoes_v1";
