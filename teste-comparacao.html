@@ -28,6 +28,7 @@
   .card.pixtral h3{color:#d4622a;}
   .card.gpt h3{color:#0a8a6e;}
   .card.qwenvlmax h3{color:#7a3fc9;}
+  .card.qwen37plus h3{color:#c9303f;}
   .status{font-size:12px;color:var(--cinza);margin-bottom:10px;}
   .metrica{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-top:1px solid #f0e9dc;}
   .metrica:first-of-type{border-top:none;}
@@ -62,7 +63,7 @@
   <img id="preview" style="display:none">
 </div>
 
-<button id="btnComparar" disabled>Comparar Sonnet vs Qwen vs Pixtral vs GPT-5 Mini vs Qwen-VL-Max</button>
+<button id="btnComparar" disabled>Comparar Sonnet vs Qwen vs Pixtral vs GPT-5 Mini vs Qwen-VL-Max vs Qwen3.7-Plus</button>
 
 <div class="resultados" id="resultados" style="display:none">
   <div class="card sonnet">
@@ -94,6 +95,12 @@
     <div class="status" id="statusQwenVlMax">Aguardando...</div>
     <div id="metricasQwenVlMax"></div>
     <pre id="respostaQwenVlMax"></pre>
+  </div>
+  <div class="card qwen37plus">
+    <h3>🔴 Qwen3.7-Plus</h3>
+    <div class="status" id="statusQwen37Plus">Aguardando...</div>
+    <div id="metricasQwen37Plus"></div>
+    <pre id="respostaQwen37Plus"></pre>
   </div>
 </div>
 
@@ -178,23 +185,26 @@ btnComparar.addEventListener('click', async function(){
   // Roda um modelo de cada vez (nao em paralelo) — evita que 4 chamadas
   // pesadas disputem a mesma conexao de internet ao mesmo tempo, o que
   // trava tudo quando o sinal esta fraco (comum no campo).
-  btnComparar.textContent = 'Testando Sonnet (1/5)...';
+  btnComparar.textContent = 'Testando Sonnet (1/6)...';
   await rodarSonnet(baseUrl, userId, regiao);
 
-  btnComparar.textContent = 'Testando Qwen (2/5)...';
+  btnComparar.textContent = 'Testando Qwen (2/6)...';
   await rodarQwen(baseUrl, regiao);
 
-  btnComparar.textContent = 'Testando Pixtral (3/5)...';
+  btnComparar.textContent = 'Testando Pixtral (3/6)...';
   await rodarPixtral(baseUrl, regiao);
 
-  btnComparar.textContent = 'Testando GPT-5 Mini (4/5)...';
+  btnComparar.textContent = 'Testando GPT-5 Mini (4/6)...';
   await rodarGpt5Mini(baseUrl, regiao);
 
-  btnComparar.textContent = 'Testando Qwen-VL-Max (5/5)...';
+  btnComparar.textContent = 'Testando Qwen-VL-Max (5/6)...';
   await rodarQwenVlMax(baseUrl, regiao);
 
+  btnComparar.textContent = 'Testando Qwen3.7-Plus (6/6)...';
+  await rodarQwen37Plus(baseUrl, regiao);
+
   btnComparar.disabled = false;
-  btnComparar.textContent = 'Comparar Sonnet vs Qwen vs Pixtral vs GPT-5 Mini vs Qwen-VL-Max';
+  btnComparar.textContent = 'Comparar Sonnet vs Qwen vs Pixtral vs GPT-5 Mini vs Qwen-VL-Max vs Qwen3.7-Plus';
 });
 
 function rodarSonnet(baseUrl, userId, regiao){
@@ -314,7 +324,35 @@ function rodarQwenVlMax(baseUrl, regiao){
     document.getElementById('statusQwenVlMax').textContent = '❌ Erro: ' + e.message;
   });
 }
+
+function rodarQwen37Plus(baseUrl, regiao){
+  document.getElementById('statusQwen37Plus').textContent = '⏳ Consultando...';
+  var inicio = Date.now();
+  return fetch(baseUrl + '/teste-qwen37plus-diagnostico', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ imagem: imagemBase64, tipo: tipoImagem, regiao: regiao })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    var duracao = ((Date.now() - inicio)/1000).toFixed(1);
+    document.getElementById('statusQwen37Plus').textContent = '✅ Concluído em ' + duracao + 's';
+    if(data.usage){
+      var custoTexto = (data.custo_usd_estimado === null || data.custo_usd_estimado === undefined)
+        ? '<span style="color:#a67c00;">Preço a confirmar no console</span>'
+        : ('US$ ' + data.custo_usd_estimado + ' (R$ ' + data.custo_brl_estimado + ')');
+      document.getElementById('metricasQwen37Plus').innerHTML =
+        '<div class="metrica"><span>Custo estimado</span><b>' + custoTexto + '</b></div>' +
+        '<div class="metrica"><span>Tokens entrada/saída</span><b>' + (data.usage.prompt_tokens||'-') + ' / ' + (data.usage.completion_tokens||'-') + '</b></div>';
+    }
+    document.getElementById('respostaQwen37Plus').textContent = JSON.stringify(data, null, 2);
+  })
+  .catch(function(e){
+    document.getElementById('statusQwen37Plus').textContent = '❌ Erro: ' + e.message;
+  });
+}
 </script>
+
 
 
 </body>
