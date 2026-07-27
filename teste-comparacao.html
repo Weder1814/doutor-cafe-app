@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Teste: Sonnet vs Qwen3.7-Plus vs Qwen3-VL-Flash — Doutor Café</title>
+<title>Teste: Sonnet vs Qwen3.7-Plus vs Qwen3-VL-Flash vs GLM-4.6V-Flash — Doutor Café</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{ --verde:#1a5c2a; --verde-claro:#2d8a3e; --marrom:#3d2b1a; --cinza:#7a8a7c; --creme:#f5f0e8; }
@@ -26,6 +26,7 @@
   .card.sonnet h3{color:#7a4413;}
   .card.qwen37plus h3{color:#c9303f;}
   .card.qwen3vlflash h3{color:#1a7ac9;}
+  .card.glm46vflash h3{color:#7a1ac9;}
   .status{font-size:12px;color:var(--cinza);margin-bottom:10px;}
   .metrica{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-top:1px solid #f0e9dc;}
   .metrica:first-of-type{border-top:none;}
@@ -36,10 +37,10 @@
 </head>
 <body>
 
-<h1>🔬 Teste: 3 Modelos de IA</h1>
-<p class="sub">Ferramenta interna simplificada — Sonnet (produção) vs Qwen3.7-Plus vs Qwen3-VL-Flash, os dois candidatos atuais pra substituir a Sonnet.</p>
+<h1>🔬 Teste: 4 Modelos de IA</h1>
+<p class="sub">Ferramenta interna simplificada — Sonnet (produção) vs Qwen3.7-Plus vs Qwen3-VL-Flash vs GLM-4.6V-Flash, os candidatos atuais pra substituir a Sonnet.</p>
 
-<div class="aviso">⚠️ O teste com a Sonnet usa o endpoint de produção — ele conta como uma análise de verdade e é registrado no seu custo real. Os testes com Qwen3.7-Plus e Qwen3-VL-Flash são isolados e não afetam nada.</div>
+<div class="aviso">⚠️ O teste com a Sonnet usa o endpoint de produção — ele conta como uma análise de verdade e é registrado no seu custo real. Os testes com Qwen3.7-Plus, Qwen3-VL-Flash e GLM-4.6V-Flash são isolados e não afetam nada.</div>
 
 <div class="campo">
   <label>URL do backend</label>
@@ -60,7 +61,7 @@
   <img id="preview" style="display:none">
 </div>
 
-<button id="btnComparar" disabled>Comparar Sonnet vs Qwen3.7-Plus vs Qwen3-VL-Flash</button>
+<button id="btnComparar" disabled>Comparar Sonnet vs Qwen3.7-Plus vs Qwen3-VL-Flash vs GLM-4.6V-Flash</button>
 
 <div class="resultados" id="resultados" style="display:none">
   <div class="card sonnet">
@@ -80,6 +81,12 @@
     <div class="status" id="statusQwen3VlFlash">Aguardando...</div>
     <div id="metricasQwen3VlFlash"></div>
     <pre id="respostaQwen3VlFlash"></pre>
+  </div>
+  <div class="card glm46vflash">
+    <h3>🟣 GLM-4.6V-Flash</h3>
+    <div class="status" id="statusGlm46vFlash">Aguardando...</div>
+    <div id="metricasGlm46vFlash"></div>
+    <pre id="respostaGlm46vFlash"></pre>
   </div>
 </div>
 
@@ -156,17 +163,20 @@ btnComparar.addEventListener('click', async function(){
   document.getElementById('resultados').style.display = 'grid';
   btnComparar.disabled = true;
 
-  btnComparar.textContent = 'Testando Sonnet (1/3)...';
+  btnComparar.textContent = 'Testando Sonnet (1/4)...';
   await rodarSonnet(baseUrl, userId, regiao);
 
-  btnComparar.textContent = 'Testando Qwen3.7-Plus (2/3)...';
+  btnComparar.textContent = 'Testando Qwen3.7-Plus (2/4)...';
   await rodarQwen37Plus(baseUrl, regiao);
 
-  btnComparar.textContent = 'Testando Qwen3-VL-Flash (3/3)...';
+  btnComparar.textContent = 'Testando Qwen3-VL-Flash (3/4)...';
   await rodarQwen3VlFlash(baseUrl, regiao);
 
+  btnComparar.textContent = 'Testando GLM-4.6V-Flash (4/4)...';
+  await rodarGlm46vFlash(baseUrl, regiao);
+
   btnComparar.disabled = false;
-  btnComparar.textContent = 'Comparar Sonnet vs Qwen3.7-Plus vs Qwen3-VL-Flash';
+  btnComparar.textContent = 'Comparar Sonnet vs Qwen3.7-Plus vs Qwen3-VL-Flash vs GLM-4.6V-Flash';
 });
 
 function rodarSonnet(baseUrl, userId, regiao){
@@ -247,6 +257,37 @@ function rodarQwen3VlFlash(baseUrl, regiao){
   })
   .catch(function(e){
     document.getElementById('statusQwen3VlFlash').textContent = '❌ Erro: ' + e.message;
+  });
+}
+
+function rodarGlm46vFlash(baseUrl, regiao){
+  document.getElementById('statusGlm46vFlash').textContent = '⏳ Consultando...';
+  var inicio = Date.now();
+  return fetch(baseUrl + '/teste-glm46vflash-diagnostico', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ imagem: imagemBase64, tipo: tipoImagem, regiao: regiao })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    var duracao = ((Date.now() - inicio)/1000).toFixed(1);
+    document.getElementById('statusGlm46vFlash').textContent = '✅ Concluído em ' + duracao + 's';
+    if(data.usage){
+      var custoTexto = (data.custo_usd_estimado === null || data.custo_usd_estimado === undefined)
+        ? '<span style="color:#a67c00;">Preço a confirmar no console</span>'
+        : ('US$ ' + data.custo_usd_estimado + ' (R$ ' + data.custo_brl_estimado + ')');
+      var notaTxt = data.custo_nota
+        ? ('<div class="metrica"><span colspan="2" style="color:#a67c00;">' + data.custo_nota + '</span></div>')
+        : '';
+      document.getElementById('metricasGlm46vFlash').innerHTML =
+        '<div class="metrica"><span>Custo estimado</span><b>' + custoTexto + '</b></div>' +
+        '<div class="metrica"><span>Tokens entrada/saída</span><b>' + (data.usage.prompt_tokens||'-') + ' / ' + (data.usage.completion_tokens||'-') + '</b></div>' +
+        notaTxt;
+    }
+    document.getElementById('respostaGlm46vFlash').textContent = JSON.stringify(data, null, 2);
+  })
+  .catch(function(e){
+    document.getElementById('statusGlm46vFlash').textContent = '❌ Erro: ' + e.message;
   });
 }
 </script>
