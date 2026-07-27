@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Teste: Sonnet vs Qwen vs Pixtral vs GPT-5 Mini — Doutor Café</title>
+<title>Teste: Sonnet vs Qwen3.7-Plus vs Qwen3-VL-Flash — Doutor Café</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{ --verde:#1a5c2a; --verde-claro:#2d8a3e; --marrom:#3d2b1a; --cinza:#7a8a7c; --creme:#f5f0e8; }
@@ -24,11 +24,8 @@
   .card{background:white;border-radius:14px;padding:16px;border:1.5px solid #eee2cf;}
   .card h3{font-family:'Playfair Display',serif;font-size:16px;margin-bottom:10px;}
   .card.sonnet h3{color:#7a4413;}
-  .card.qwen h3{color:#1a5c2a;}
-  .card.pixtral h3{color:#d4622a;}
-  .card.gpt h3{color:#0a8a6e;}
-  .card.qwenvlmax h3{color:#7a3fc9;}
   .card.qwen37plus h3{color:#c9303f;}
+  .card.qwen3vlflash h3{color:#1a7ac9;}
   .status{font-size:12px;color:var(--cinza);margin-bottom:10px;}
   .metrica{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-top:1px solid #f0e9dc;}
   .metrica:first-of-type{border-top:none;}
@@ -39,10 +36,10 @@
 </head>
 <body>
 
-<h1>🔬 Teste: 4 Modelos de IA</h1>
-<p class="sub">Ferramenta interna para comparar diagnóstico, custo e tempo de resposta lado a lado.</p>
+<h1>🔬 Teste: 3 Modelos de IA</h1>
+<p class="sub">Ferramenta interna simplificada — Sonnet (produção) vs Qwen3.7-Plus vs Qwen3-VL-Flash, os dois candidatos atuais pra substituir a Sonnet.</p>
 
-<div class="aviso">⚠️ O teste com a Sonnet usa o endpoint de produção — ele conta como uma análise de verdade e é registrado no seu custo real. Os testes com Qwen, Pixtral e GPT-5 Mini são isolados e não afetam nada.</div>
+<div class="aviso">⚠️ O teste com a Sonnet usa o endpoint de produção — ele conta como uma análise de verdade e é registrado no seu custo real. Os testes com Qwen3.7-Plus e Qwen3-VL-Flash são isolados e não afetam nada.</div>
 
 <div class="campo">
   <label>URL do backend</label>
@@ -63,7 +60,7 @@
   <img id="preview" style="display:none">
 </div>
 
-<button id="btnComparar" disabled>Comparar Sonnet vs Qwen vs Pixtral vs GPT-5 Mini vs Qwen-VL-Max vs Qwen3.7-Plus</button>
+<button id="btnComparar" disabled>Comparar Sonnet vs Qwen3.7-Plus vs Qwen3-VL-Flash</button>
 
 <div class="resultados" id="resultados" style="display:none">
   <div class="card sonnet">
@@ -72,35 +69,17 @@
     <div id="metricasSonnet"></div>
     <pre id="respostaSonnet"></pre>
   </div>
-  <div class="card qwen">
-    <h3>🔷 Qwen2.5-VL-72B</h3>
-    <div class="status" id="statusQwen">Aguardando...</div>
-    <div id="metricasQwen"></div>
-    <pre id="respostaQwen"></pre>
-  </div>
-  <div class="card pixtral">
-    <h3>🟠 Mistral Small 4</h3>
-    <div class="status" id="statusPixtral">Aguardando...</div>
-    <div id="metricasPixtral"></div>
-    <pre id="respostaPixtral"></pre>
-  </div>
-  <div class="card gpt">
-    <h3>🟢 GPT-5 Mini</h3>
-    <div class="status" id="statusGpt">Aguardando...</div>
-    <div id="metricasGpt"></div>
-    <pre id="respostaGpt"></pre>
-  </div>
-  <div class="card qwenvlmax">
-    <h3>🟣 Qwen-VL-Max</h3>
-    <div class="status" id="statusQwenVlMax">Aguardando...</div>
-    <div id="metricasQwenVlMax"></div>
-    <pre id="respostaQwenVlMax"></pre>
-  </div>
   <div class="card qwen37plus">
     <h3>🔴 Qwen3.7-Plus</h3>
     <div class="status" id="statusQwen37Plus">Aguardando...</div>
     <div id="metricasQwen37Plus"></div>
     <pre id="respostaQwen37Plus"></pre>
+  </div>
+  <div class="card qwen3vlflash">
+    <h3>🔵 Qwen3-VL-Flash</h3>
+    <div class="status" id="statusQwen3VlFlash">Aguardando...</div>
+    <div id="metricasQwen3VlFlash"></div>
+    <pre id="respostaQwen3VlFlash"></pre>
   </div>
 </div>
 
@@ -125,11 +104,6 @@ fileInput.addEventListener('change', function(e){
 });
 
 // ── Redimensionamento identico ao app de producao (index.html) ──
-// Mesma funcao, mesmos parametros (1280px, qualidade 0.95) usados no
-// fluxo real de diagnostico de folha. Garante que os 4 modelos testados
-// aqui recebam a MESMA imagem (em bytes) que a Sonnet recebe em producao
-// — antes disso, o teste mandava a foto crua/original, diferente do que
-// o app realmente envia, o que podia levar a leituras diferentes.
 function redimensionarImagem(file, maxDim, qualidade, callback) {
   var leitor = new FileReader();
   leitor.onload = function(e) {
@@ -157,10 +131,10 @@ function redimensionarImagem(file, maxDim, qualidade, callback) {
 }
 
 function processarArquivo(file){
-  tipoImagem = 'image/jpeg'; // redimensionarImagem sempre gera JPEG (mesmo padrao do app)
+  tipoImagem = 'image/jpeg';
   var reader = new FileReader();
   reader.onload = function(e){
-    preview.src = e.target.result; // preview mostra a foto original, sem perda
+    preview.src = e.target.result;
     preview.style.display = 'block';
   };
   reader.readAsDataURL(file);
@@ -182,29 +156,17 @@ btnComparar.addEventListener('click', async function(){
   document.getElementById('resultados').style.display = 'grid';
   btnComparar.disabled = true;
 
-  // Roda um modelo de cada vez (nao em paralelo) — evita que 4 chamadas
-  // pesadas disputem a mesma conexao de internet ao mesmo tempo, o que
-  // trava tudo quando o sinal esta fraco (comum no campo).
-  btnComparar.textContent = 'Testando Sonnet (1/6)...';
+  btnComparar.textContent = 'Testando Sonnet (1/3)...';
   await rodarSonnet(baseUrl, userId, regiao);
 
-  btnComparar.textContent = 'Testando Qwen (2/6)...';
-  await rodarQwen(baseUrl, regiao);
-
-  btnComparar.textContent = 'Testando Pixtral (3/6)...';
-  await rodarPixtral(baseUrl, regiao);
-
-  btnComparar.textContent = 'Testando GPT-5 Mini (4/6)...';
-  await rodarGpt5Mini(baseUrl, regiao);
-
-  btnComparar.textContent = 'Testando Qwen-VL-Max (5/6)...';
-  await rodarQwenVlMax(baseUrl, regiao);
-
-  btnComparar.textContent = 'Testando Qwen3.7-Plus (6/6)...';
+  btnComparar.textContent = 'Testando Qwen3.7-Plus (2/3)...';
   await rodarQwen37Plus(baseUrl, regiao);
 
+  btnComparar.textContent = 'Testando Qwen3-VL-Flash (3/3)...';
+  await rodarQwen3VlFlash(baseUrl, regiao);
+
   btnComparar.disabled = false;
-  btnComparar.textContent = 'Comparar Sonnet vs Qwen vs Pixtral vs GPT-5 Mini vs Qwen-VL-Max vs Qwen3.7-Plus';
+  btnComparar.textContent = 'Comparar Sonnet vs Qwen3.7-Plus vs Qwen3-VL-Flash';
 });
 
 function rodarSonnet(baseUrl, userId, regiao){
@@ -226,105 +188,6 @@ function rodarSonnet(baseUrl, userId, regiao){
   });
 }
 
-function rodarQwen(baseUrl, regiao){
-  document.getElementById('statusQwen').textContent = '⏳ Consultando...';
-  var inicio = Date.now();
-  return fetch(baseUrl + '/teste-qwen-diagnostico', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ imagem: imagemBase64, tipo: tipoImagem, regiao: regiao })
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(data){
-    var duracao = ((Date.now() - inicio)/1000).toFixed(1);
-    document.getElementById('statusQwen').textContent = '✅ Concluído em ' + duracao + 's';
-    if(data.custo_usd_estimado !== undefined){
-      document.getElementById('metricasQwen').innerHTML =
-        '<div class="metrica"><span>Custo estimado</span><b>US$ ' + data.custo_usd_estimado + ' (R$ ' + data.custo_brl_estimado + ')</b></div>' +
-        '<div class="metrica"><span>Tokens entrada/saída</span><b>' + (data.usage.prompt_tokens||'-') + ' / ' + (data.usage.completion_tokens||'-') + '</b></div>';
-    }
-    document.getElementById('respostaQwen').textContent = JSON.stringify(data, null, 2);
-  })
-  .catch(function(e){
-    document.getElementById('statusQwen').textContent = '❌ Erro: ' + e.message;
-  });
-}
-
-function rodarPixtral(baseUrl, regiao){
-  document.getElementById('statusPixtral').textContent = '⏳ Consultando...';
-  var inicio = Date.now();
-  return fetch(baseUrl + '/teste-pixtral-diagnostico', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ imagem: imagemBase64, tipo: tipoImagem, regiao: regiao })
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(data){
-    var duracao = ((Date.now() - inicio)/1000).toFixed(1);
-    document.getElementById('statusPixtral').textContent = '✅ Concluído em ' + duracao + 's';
-    if(data.custo_usd_estimado !== undefined){
-      document.getElementById('metricasPixtral').innerHTML =
-        '<div class="metrica"><span>Custo estimado</span><b>US$ ' + data.custo_usd_estimado + ' (R$ ' + data.custo_brl_estimado + ')</b></div>' +
-        '<div class="metrica"><span>Tokens entrada/saída</span><b>' + (data.usage.prompt_tokens||'-') + ' / ' + (data.usage.completion_tokens||'-') + '</b></div>';
-    }
-    document.getElementById('respostaPixtral').textContent = JSON.stringify(data, null, 2);
-  })
-  .catch(function(e){
-    document.getElementById('statusPixtral').textContent = '❌ Erro: ' + e.message;
-  });
-}
-
-function rodarGpt5Mini(baseUrl, regiao){
-  document.getElementById('statusGpt').textContent = '⏳ Consultando...';
-  var inicio = Date.now();
-  return fetch(baseUrl + '/teste-gpt5mini-diagnostico', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ imagem: imagemBase64, tipo: tipoImagem, regiao: regiao })
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(data){
-    var duracao = ((Date.now() - inicio)/1000).toFixed(1);
-    document.getElementById('statusGpt').textContent = '✅ Concluído em ' + duracao + 's';
-    if(data.custo_usd_estimado !== undefined){
-      document.getElementById('metricasGpt').innerHTML =
-        '<div class="metrica"><span>Custo estimado</span><b>US$ ' + data.custo_usd_estimado + ' (R$ ' + data.custo_brl_estimado + ')</b></div>' +
-        '<div class="metrica"><span>Tokens entrada/saída</span><b>' + (data.usage.prompt_tokens||'-') + ' / ' + (data.usage.completion_tokens||'-') + '</b></div>';
-    }
-    document.getElementById('respostaGpt').textContent = JSON.stringify(data, null, 2);
-  })
-  .catch(function(e){
-    document.getElementById('statusGpt').textContent = '❌ Erro: ' + e.message;
-  });
-}
-
-function rodarQwenVlMax(baseUrl, regiao){
-  document.getElementById('statusQwenVlMax').textContent = '⏳ Consultando...';
-  var inicio = Date.now();
-  return fetch(baseUrl + '/teste-qwen-vl-max-diagnostico', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ imagem: imagemBase64, tipo: tipoImagem, regiao: regiao })
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(data){
-    var duracao = ((Date.now() - inicio)/1000).toFixed(1);
-    document.getElementById('statusQwenVlMax').textContent = '✅ Concluído em ' + duracao + 's';
-    if(data.usage){
-      var custoTexto = (data.custo_usd_estimado === null || data.custo_usd_estimado === undefined)
-        ? '<span style="color:#a67c00;">Preço a confirmar no console</span>'
-        : ('US$ ' + data.custo_usd_estimado + ' (R$ ' + data.custo_brl_estimado + ')');
-      document.getElementById('metricasQwenVlMax').innerHTML =
-        '<div class="metrica"><span>Custo estimado</span><b>' + custoTexto + '</b></div>' +
-        '<div class="metrica"><span>Tokens entrada/saída</span><b>' + (data.usage.prompt_tokens||'-') + ' / ' + (data.usage.completion_tokens||'-') + '</b></div>';
-    }
-    document.getElementById('respostaQwenVlMax').textContent = JSON.stringify(data, null, 2);
-  })
-  .catch(function(e){
-    document.getElementById('statusQwenVlMax').textContent = '❌ Erro: ' + e.message;
-  });
-}
-
 function rodarQwen37Plus(baseUrl, regiao){
   document.getElementById('statusQwen37Plus').textContent = '⏳ Consultando...';
   var inicio = Date.now();
@@ -341,9 +204,13 @@ function rodarQwen37Plus(baseUrl, regiao){
       var custoTexto = (data.custo_usd_estimado === null || data.custo_usd_estimado === undefined)
         ? '<span style="color:#a67c00;">Preço a confirmar no console</span>'
         : ('US$ ' + data.custo_usd_estimado + ' (R$ ' + data.custo_brl_estimado + ')');
+      var reasoningTxt = (data.usage.completion_tokens_details && data.usage.completion_tokens_details.reasoning_tokens)
+        ? ('<div class="metrica"><span>Tokens de raciocínio interno</span><b>' + data.usage.completion_tokens_details.reasoning_tokens + '</b></div>')
+        : '';
       document.getElementById('metricasQwen37Plus').innerHTML =
         '<div class="metrica"><span>Custo estimado</span><b>' + custoTexto + '</b></div>' +
-        '<div class="metrica"><span>Tokens entrada/saída</span><b>' + (data.usage.prompt_tokens||'-') + ' / ' + (data.usage.completion_tokens||'-') + '</b></div>';
+        '<div class="metrica"><span>Tokens entrada/saída</span><b>' + (data.usage.prompt_tokens||'-') + ' / ' + (data.usage.completion_tokens||'-') + '</b></div>' +
+        reasoningTxt;
     }
     document.getElementById('respostaQwen37Plus').textContent = JSON.stringify(data, null, 2);
   })
@@ -351,9 +218,38 @@ function rodarQwen37Plus(baseUrl, regiao){
     document.getElementById('statusQwen37Plus').textContent = '❌ Erro: ' + e.message;
   });
 }
+
+function rodarQwen3VlFlash(baseUrl, regiao){
+  document.getElementById('statusQwen3VlFlash').textContent = '⏳ Consultando...';
+  var inicio = Date.now();
+  return fetch(baseUrl + '/teste-qwen3vlflash-diagnostico', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ imagem: imagemBase64, tipo: tipoImagem, regiao: regiao })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    var duracao = ((Date.now() - inicio)/1000).toFixed(1);
+    document.getElementById('statusQwen3VlFlash').textContent = '✅ Concluído em ' + duracao + 's';
+    if(data.usage){
+      var custoTexto = (data.custo_usd_estimado === null || data.custo_usd_estimado === undefined)
+        ? '<span style="color:#a67c00;">Preço a confirmar no console</span>'
+        : ('US$ ' + data.custo_usd_estimado + ' (R$ ' + data.custo_brl_estimado + ')');
+      var reasoningTxt = (data.usage.completion_tokens_details && data.usage.completion_tokens_details.reasoning_tokens)
+        ? ('<div class="metrica"><span>Tokens de raciocínio interno</span><b>' + data.usage.completion_tokens_details.reasoning_tokens + '</b></div>')
+        : '';
+      document.getElementById('metricasQwen3VlFlash').innerHTML =
+        '<div class="metrica"><span>Custo estimado</span><b>' + custoTexto + '</b></div>' +
+        '<div class="metrica"><span>Tokens entrada/saída</span><b>' + (data.usage.prompt_tokens||'-') + ' / ' + (data.usage.completion_tokens||'-') + '</b></div>' +
+        reasoningTxt;
+    }
+    document.getElementById('respostaQwen3VlFlash').textContent = JSON.stringify(data, null, 2);
+  })
+  .catch(function(e){
+    document.getElementById('statusQwen3VlFlash').textContent = '❌ Erro: ' + e.message;
+  });
+}
 </script>
-
-
 
 </body>
 </html>
