@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Teste: Sonnet vs Qwen3.7-Plus vs Qwen3-VL-Flash vs GLM-4.6V-Flash — Doutor Café</title>
+<title>Teste: Sonnet vs Qwen — Análise de Solo — Doutor Café</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{ --verde:#1a5c2a; --verde-claro:#2d8a3e; --marrom:#3d2b1a; --cinza:#7a8a7c; --creme:#f5f0e8; }
   *{box-sizing:border-box;margin:0;padding:0;}
   body{font-family:'DM Sans',sans-serif;background:var(--creme);color:var(--marrom);padding:20px;max-width:900px;margin:0 auto;}
-  h1{font-family:'Playfair Display',serif;font-size:26px;margin-bottom:6px;}
+  h1{font-family:'Playfair Display',serif;font-size:24px;margin-bottom:6px;}
   p.sub{color:var(--cinza);font-size:14px;margin-bottom:24px;}
   .campo{margin-bottom:14px;}
   label{display:block;font-size:12.5px;font-weight:700;color:var(--verde);margin-bottom:5px;}
@@ -20,73 +20,68 @@
   button{width:100%;padding:14px;background:linear-gradient(135deg,#2d8a3e,#1a5c2a);color:white;border:none;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;font-family:'DM Sans',sans-serif;}
   button:disabled{opacity:0.5;cursor:not-allowed;}
   .resultados{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px;}
-  @media (max-width:900px){.resultados{grid-template-columns:1fr;}}
+  @media (max-width:800px){.resultados{grid-template-columns:1fr;}}
   .card{background:white;border-radius:14px;padding:16px;border:1.5px solid #eee2cf;}
   .card h3{font-family:'Playfair Display',serif;font-size:16px;margin-bottom:10px;}
   .card.sonnet h3{color:#7a4413;}
-  .card.qwen37plus h3{color:#c9303f;}
-  .card.qwen3vlflash h3{color:#1a7ac9;}
-  .card.glm46vflash h3{color:#7a1ac9;}
+  .card.qwen h3{color:#c9303f;}
   .status{font-size:12px;color:var(--cinza);margin-bottom:10px;}
   .metrica{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-top:1px solid #f0e9dc;}
   .metrica:first-of-type{border-top:none;}
   .metrica b{color:var(--marrom);}
-  pre{font-size:11.5px;background:#faf6ee;padding:10px;border-radius:8px;margin-top:10px;max-height:220px;overflow:auto;white-space:pre-wrap;word-break:break-word;}
+  table.valores{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:10px;}
+  table.valores th{text-align:left;background:#faf6ee;padding:5px 6px;font-size:11px;color:var(--cinza);}
+  table.valores td{padding:5px 6px;border-top:1px solid #f0e9dc;}
+  .status-ok{color:#2d8a3e;font-weight:700;}
+  .status-baixo{color:#c9303f;font-weight:700;}
+  .status-alto{color:#c98a30;font-weight:700;}
+  .diff{background:#fff8e1;}
+  pre{font-size:11px;background:#faf6ee;padding:10px;border-radius:8px;margin-top:10px;max-height:200px;overflow:auto;white-space:pre-wrap;word-break:break-word;}
   .aviso{background:#fff8e1;border:1px solid #ffe0a3;border-radius:10px;padding:10px 12px;font-size:12.5px;color:#7a4a00;margin-bottom:18px;}
 </style>
 </head>
 <body>
 
-<h1>🔬 Teste: 4 Modelos de IA</h1>
-<p class="sub">Ferramenta interna simplificada — Sonnet (produção) vs Qwen3.7-Plus vs Qwen3-VL-Flash vs GLM-4.6V-Flash, os candidatos atuais pra substituir a Sonnet.</p>
+<h1>🧪 Teste: Sonnet vs Qwen — Análise de Solo</h1>
+<p class="sub">Ferramenta interna — compara leitura de laudo de solo entre a Sonnet (gabarito) e o Qwen3.7-Plus (que já está em produção no /analise-solo). Foco: números batendo exatamente, não só o texto de recomendação.</p>
 
-<div class="aviso">⚠️ O teste com a Sonnet usa o endpoint de produção — ele conta como uma análise de verdade e é registrado no seu custo real. Os testes com Qwen3.7-Plus, Qwen3-VL-Flash e GLM-4.6V-Flash são isolados e não afetam nada.</div>
+<div class="aviso">⚠️ O card "Qwen" chama o endpoint de PRODUÇÃO (/analise-solo) — conta como uso real, mas não consome análises do usuário porque não passa userId. O card "Sonnet" é isolado e não afeta nada.</div>
 
 <div class="campo">
   <label>URL do backend</label>
   <input type="text" id="baseUrl" value="https://doutor-cafe-production.up.railway.app">
 </div>
 <div class="campo">
-  <label>User ID (para o teste com Sonnet — use seu próprio ID de admin/teste)</label>
-  <input type="text" id="userId" placeholder="ex: user_teste_comparacao">
-</div>
-<div class="campo">
   <label>Região (opcional)</label>
   <input type="text" id="regiao" placeholder="ex: Mogiana">
 </div>
+<div class="campo">
+  <label>Produtividade esperada em sacas/ha (opcional, só afeta cálculo de NPK)</label>
+  <input type="text" id="produtividade" placeholder="ex: 40">
+</div>
 
 <div class="dropzone" id="dropzone">
-  <span id="dropTexto">📷 Toque para escolher uma foto, ou arraste aqui</span>
+  <span id="dropTexto">📷 Toque para escolher a foto do laudo, ou arraste aqui</span>
   <input type="file" id="fileInput" accept="image/*" style="display:none">
   <img id="preview" style="display:none">
 </div>
 
-<button id="btnComparar" disabled>Comparar Sonnet vs Qwen3.7-Plus vs Qwen3-VL-Flash vs GLM-4.6V-Flash</button>
+<button id="btnComparar" disabled>Comparar Sonnet vs Qwen (Solo)</button>
 
 <div class="resultados" id="resultados" style="display:none">
   <div class="card sonnet">
-    <h3>🔶 Claude Sonnet</h3>
+    <h3>🔶 Claude Sonnet (gabarito)</h3>
     <div class="status" id="statusSonnet">Aguardando...</div>
     <div id="metricasSonnet"></div>
+    <div id="tabelaSonnet"></div>
     <pre id="respostaSonnet"></pre>
   </div>
-  <div class="card qwen37plus">
-    <h3>🔴 Qwen3.7-Plus</h3>
-    <div class="status" id="statusQwen37Plus">Aguardando...</div>
-    <div id="metricasQwen37Plus"></div>
-    <pre id="respostaQwen37Plus"></pre>
-  </div>
-  <div class="card qwen3vlflash">
-    <h3>🔵 Qwen3-VL-Flash</h3>
-    <div class="status" id="statusQwen3VlFlash">Aguardando...</div>
-    <div id="metricasQwen3VlFlash"></div>
-    <pre id="respostaQwen3VlFlash"></pre>
-  </div>
-  <div class="card glm46vflash">
-    <h3>🟣 GLM-4.6V-Flash</h3>
-    <div class="status" id="statusGlm46vFlash">Aguardando...</div>
-    <div id="metricasGlm46vFlash"></div>
-    <pre id="respostaGlm46vFlash"></pre>
+  <div class="card qwen">
+    <h3>🔴 Qwen3.7-Plus (produção)</h3>
+    <div class="status" id="statusQwen">Aguardando...</div>
+    <div id="metricasQwen"></div>
+    <div id="tabelaQwen"></div>
+    <pre id="respostaQwen"></pre>
   </div>
 </div>
 
@@ -110,7 +105,7 @@ fileInput.addEventListener('change', function(e){
   if(e.target.files[0]) processarArquivo(e.target.files[0]);
 });
 
-// ── Redimensionamento identico ao app de producao (index.html) ──
+// Redimensionamento igual ao app de producao pra laudo de solo (1600px)
 function redimensionarImagem(file, maxDim, qualidade, callback) {
   var leitor = new FileReader();
   leitor.onload = function(e) {
@@ -148,146 +143,101 @@ function processarArquivo(file){
 
   dropTexto.textContent = '⏳ Redimensionando (igual ao app)...';
   btnComparar.disabled = true;
-  redimensionarImagem(file, 1280, 0.95, function(b64){
+  redimensionarImagem(file, 1600, 0.90, function(b64){
     imagemBase64 = b64;
-    dropTexto.textContent = '✅ ' + file.name + ' (redimensionada p/ 1280px, igual ao app)';
+    dropTexto.textContent = '✅ ' + file.name + ' (redimensionada p/ 1600px, igual ao app)';
     btnComparar.disabled = false;
   });
 }
 
+function buildTabelaValores(valores){
+  if(!valores) return '';
+  var linhas = Object.keys(valores).map(function(k){
+    var v = valores[k];
+    if(!v) return '';
+    var statusClass = v.status==='ok'?'status-ok':v.status==='baixo'?'status-baixo':v.status==='alto'?'status-alto':'';
+    return '<tr><td><b>'+k+'</b></td><td>'+(v.valor!==undefined&&v.valor!==null?v.valor:'-')+'</td><td class="'+statusClass+'">'+(v.status||'-')+'</td></tr>';
+  }).join('');
+  return '<table class="valores"><tr><th>Campo</th><th>Valor</th><th>Status</th></tr>'+linhas+'</table>';
+}
+
+function buildTabelaCalculo(vc){
+  if(!vc) return '';
+  var linhas = Object.keys(vc).map(function(k){
+    return '<tr><td><b>'+k+'</b></td><td>'+(vc[k]!==undefined&&vc[k]!==null?vc[k]:'null')+'</td></tr>';
+  }).join('');
+  return '<table class="valores"><tr><th colspan="2">valores_calculo (brutos do laudo)</th></tr>'+linhas+'</table>';
+}
+
 btnComparar.addEventListener('click', async function(){
   var baseUrl = document.getElementById('baseUrl').value.replace(/\/$/,'');
-  var userId = document.getElementById('userId').value || 'user_teste_comparacao';
   var regiao = document.getElementById('regiao').value || null;
+  var produtividade = document.getElementById('produtividade').value || null;
 
   document.getElementById('resultados').style.display = 'grid';
   btnComparar.disabled = true;
 
-  btnComparar.textContent = 'Testando Sonnet (1/4)...';
-  await rodarSonnet(baseUrl, userId, regiao);
+  btnComparar.textContent = 'Testando Sonnet (1/2)...';
+  await rodarSonnet(baseUrl, regiao);
 
-  btnComparar.textContent = 'Testando Qwen3.7-Plus (2/4)...';
-  await rodarQwen37Plus(baseUrl, regiao);
-
-  btnComparar.textContent = 'Testando Qwen3-VL-Flash (3/4)...';
-  await rodarQwen3VlFlash(baseUrl, regiao);
-
-  btnComparar.textContent = 'Testando GLM-4.6V-Flash (4/4)...';
-  await rodarGlm46vFlash(baseUrl, regiao);
+  btnComparar.textContent = 'Testando Qwen (2/2)...';
+  await rodarQwen(baseUrl, regiao, produtividade);
 
   btnComparar.disabled = false;
-  btnComparar.textContent = 'Comparar Sonnet vs Qwen3.7-Plus vs Qwen3-VL-Flash vs GLM-4.6V-Flash';
+  btnComparar.textContent = 'Comparar Sonnet vs Qwen (Solo)';
 });
 
-function rodarSonnet(baseUrl, userId, regiao){
+function rodarSonnet(baseUrl, regiao){
   document.getElementById('statusSonnet').textContent = '⏳ Consultando...';
   var inicio = Date.now();
-  return fetch(baseUrl + '/diagnostico-json', {
+  return fetch(baseUrl + '/teste-solo-sonnet', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ imagem: imagemBase64, tipo: tipoImagem, userId: userId, regiao: regiao })
+    body: JSON.stringify({ imagem: imagemBase64, tipo: tipoImagem, regiao: regiao })
   })
   .then(function(r){ return r.json(); })
   .then(function(data){
     var duracao = ((Date.now() - inicio)/1000).toFixed(1);
     document.getElementById('statusSonnet').textContent = '✅ Concluído em ' + duracao + 's';
-    document.getElementById('respostaSonnet').textContent = JSON.stringify(data, null, 2);
+    if(data.usage){
+      var custoTexto = data.custo_usd_estimado!=null ? ('US$ ' + data.custo_usd_estimado.toFixed(5) + ' (R$ ' + data.custo_brl_estimado.toFixed(4) + ')') : '-';
+      document.getElementById('metricasSonnet').innerHTML =
+        '<div class="metrica"><span>Custo estimado</span><b>' + custoTexto + '</b></div>' +
+        '<div class="metrica"><span>Tokens entrada/saída</span><b>' + (data.usage.input_tokens||'-') + ' / ' + (data.usage.output_tokens||'-') + '</b></div>';
+    }
+    if(data.resultado_parseado){
+      document.getElementById('tabelaSonnet').innerHTML =
+        buildTabelaValores(data.resultado_parseado.valores) +
+        buildTabelaCalculo(data.resultado_parseado.valores_calculo);
+    }
+    document.getElementById('respostaSonnet').textContent = JSON.stringify(data.resultado_parseado||data, null, 2);
   })
   .catch(function(e){
     document.getElementById('statusSonnet').textContent = '❌ Erro: ' + e.message;
   });
 }
 
-function rodarQwen37Plus(baseUrl, regiao){
-  document.getElementById('statusQwen37Plus').textContent = '⏳ Consultando...';
+function rodarQwen(baseUrl, regiao, produtividade){
+  document.getElementById('statusQwen').textContent = '⏳ Consultando (produção)...';
   var inicio = Date.now();
-  return fetch(baseUrl + '/teste-qwen37plus-diagnostico', {
+  var body = { imagem: imagemBase64, tipo: tipoImagem, userId: 'anonimo', regiao: regiao };
+  if(produtividade) body.produtividadeSc = produtividade;
+  return fetch(baseUrl + '/analise-solo', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ imagem: imagemBase64, tipo: tipoImagem, regiao: regiao })
+    body: JSON.stringify(body)
   })
   .then(function(r){ return r.json(); })
   .then(function(data){
     var duracao = ((Date.now() - inicio)/1000).toFixed(1);
-    document.getElementById('statusQwen37Plus').textContent = '✅ Concluído em ' + duracao + 's';
-    if(data.usage){
-      var custoTexto = (data.custo_usd_estimado === null || data.custo_usd_estimado === undefined)
-        ? '<span style="color:#a67c00;">Preço a confirmar no console</span>'
-        : ('US$ ' + data.custo_usd_estimado + ' (R$ ' + data.custo_brl_estimado + ')');
-      var reasoningTxt = (data.usage.completion_tokens_details && data.usage.completion_tokens_details.reasoning_tokens)
-        ? ('<div class="metrica"><span>Tokens de raciocínio interno</span><b>' + data.usage.completion_tokens_details.reasoning_tokens + '</b></div>')
-        : '';
-      document.getElementById('metricasQwen37Plus').innerHTML =
-        '<div class="metrica"><span>Custo estimado</span><b>' + custoTexto + '</b></div>' +
-        '<div class="metrica"><span>Tokens entrada/saída</span><b>' + (data.usage.prompt_tokens||'-') + ' / ' + (data.usage.completion_tokens||'-') + '</b></div>' +
-        reasoningTxt;
-    }
-    document.getElementById('respostaQwen37Plus').textContent = JSON.stringify(data, null, 2);
+    document.getElementById('statusQwen').textContent = '✅ Concluído em ' + duracao + 's (endpoint de produção)';
+    document.getElementById('tabelaQwen').innerHTML =
+      buildTabelaValores(data.valores) +
+      buildTabelaCalculo(data.valores_calculo);
+    document.getElementById('respostaQwen').textContent = JSON.stringify(data, null, 2);
   })
   .catch(function(e){
-    document.getElementById('statusQwen37Plus').textContent = '❌ Erro: ' + e.message;
-  });
-}
-
-function rodarQwen3VlFlash(baseUrl, regiao){
-  document.getElementById('statusQwen3VlFlash').textContent = '⏳ Consultando...';
-  var inicio = Date.now();
-  return fetch(baseUrl + '/teste-qwen3vlflash-diagnostico', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ imagem: imagemBase64, tipo: tipoImagem, regiao: regiao })
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(data){
-    var duracao = ((Date.now() - inicio)/1000).toFixed(1);
-    document.getElementById('statusQwen3VlFlash').textContent = '✅ Concluído em ' + duracao + 's';
-    if(data.usage){
-      var custoTexto = (data.custo_usd_estimado === null || data.custo_usd_estimado === undefined)
-        ? '<span style="color:#a67c00;">Preço a confirmar no console</span>'
-        : ('US$ ' + data.custo_usd_estimado + ' (R$ ' + data.custo_brl_estimado + ')');
-      var reasoningTxt = (data.usage.completion_tokens_details && data.usage.completion_tokens_details.reasoning_tokens)
-        ? ('<div class="metrica"><span>Tokens de raciocínio interno</span><b>' + data.usage.completion_tokens_details.reasoning_tokens + '</b></div>')
-        : '';
-      document.getElementById('metricasQwen3VlFlash').innerHTML =
-        '<div class="metrica"><span>Custo estimado</span><b>' + custoTexto + '</b></div>' +
-        '<div class="metrica"><span>Tokens entrada/saída</span><b>' + (data.usage.prompt_tokens||'-') + ' / ' + (data.usage.completion_tokens||'-') + '</b></div>' +
-        reasoningTxt;
-    }
-    document.getElementById('respostaQwen3VlFlash').textContent = JSON.stringify(data, null, 2);
-  })
-  .catch(function(e){
-    document.getElementById('statusQwen3VlFlash').textContent = '❌ Erro: ' + e.message;
-  });
-}
-
-function rodarGlm46vFlash(baseUrl, regiao){
-  document.getElementById('statusGlm46vFlash').textContent = '⏳ Consultando...';
-  var inicio = Date.now();
-  return fetch(baseUrl + '/teste-glm46vflash-diagnostico', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ imagem: imagemBase64, tipo: tipoImagem, regiao: regiao })
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(data){
-    var duracao = ((Date.now() - inicio)/1000).toFixed(1);
-    document.getElementById('statusGlm46vFlash').textContent = '✅ Concluído em ' + duracao + 's';
-    if(data.usage){
-      var custoTexto = (data.custo_usd_estimado === null || data.custo_usd_estimado === undefined)
-        ? '<span style="color:#a67c00;">Preço a confirmar no console</span>'
-        : ('US$ ' + data.custo_usd_estimado + ' (R$ ' + data.custo_brl_estimado + ')');
-      var notaTxt = data.custo_nota
-        ? ('<div class="metrica"><span colspan="2" style="color:#a67c00;">' + data.custo_nota + '</span></div>')
-        : '';
-      document.getElementById('metricasGlm46vFlash').innerHTML =
-        '<div class="metrica"><span>Custo estimado</span><b>' + custoTexto + '</b></div>' +
-        '<div class="metrica"><span>Tokens entrada/saída</span><b>' + (data.usage.prompt_tokens||'-') + ' / ' + (data.usage.completion_tokens||'-') + '</b></div>' +
-        notaTxt;
-    }
-    document.getElementById('respostaGlm46vFlash').textContent = JSON.stringify(data, null, 2);
-  })
-  .catch(function(e){
-    document.getElementById('statusGlm46vFlash').textContent = '❌ Erro: ' + e.message;
+    document.getElementById('statusQwen').textContent = '❌ Erro: ' + e.message;
   });
 }
 </script>
