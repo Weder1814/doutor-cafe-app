@@ -1267,7 +1267,87 @@ function atualizarBadgeVideo(){
 function abrirModal(esgotado){document.getElementById("modalPlanos").classList.add("ativo");document.getElementById("modalEsgotado").style.display=esgotado?"block":"none";document.getElementById("modalSubtitulo").textContent=esgotado?"Continue diagnosticando sua lavoura sem limites":"Escolha o plano ideal para sua lavoura";}
 function fecharModal(){document.getElementById("modalPlanos").classList.remove("ativo");}
 function setCiclo(c){cicloAtual=c;document.getElementById("btnMensal").className="toggle-btn"+(c==="mensal"?" ativo":"");document.getElementById("btnAnual").className="toggle-btn"+(c==="anual"?" ativo":"");document.getElementById("precoBasico").textContent=c==="mensal"?"R$29,90":"R$24,92";document.getElementById("precoPro").textContent=c==="mensal"?"R$39,90":"R$33,25";var pp=document.getElementById("precoPremium");if(pp)pp.textContent=c==="mensal"?"R$49,90":"R$41,58";document.getElementById("descBasico").style.display=c==="anual"?"block":"none";document.getElementById("descPro").style.display=c==="anual"?"block":"none";var dp=document.getElementById("descPremium");if(dp)dp.style.display=c==="anual"?"block":"none";}
-function assinar(tipo){var links={basico_mensal:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=3bdcbffc028a4d259f32fe37a96ae224",basico_anual:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=bd08a04de79f4213886611769b6c9486",pro_mensal:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=106181c5ed584a65af06403bd1af0608",pro_anual:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=661a046d15c9415a9508970d2f45c819",premium_mensal:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=5bcfb2b27c6241b8a433b3ec0fb2a5c7",premium_anual:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=346f4589aca84ba3b4e76351563fdbe1"};var url=links[tipo+"_"+cicloAtual];if(url)window.open(url,"_blank");else alert("Plano não encontrado.");}
+// ══════════════════════════════════════════════════════════════════
+// GOOGLE PLAY BILLING (28/07/2026) — fluxo de assinatura dentro do TWA
+// ══════════════════════════════════════════════════════════════════
+// SETUP NECESSARIO NO PLAY CONSOLE (fazer uma vez, fora do codigo):
+//   Monetizacao > Produtos > Assinaturas > criar 3 produtos:
+//     "plano_basico", "plano_pro", "plano_premium"
+//   Dentro de cada produto, criar 2 planos base (base plans):
+//     "mensal" e "anual", com os precos correspondentes.
+//   Os IDs abaixo (PLAY_PRODUTOS) precisam bater exatamente com o que
+//   foi cadastrado la.
+var PLAY_PRODUTOS = {
+  basico:  "plano_basico",
+  pro:     "plano_pro",
+  premium: "plano_premium"
+};
+
+// Mapeia tipo+ciclo pro basePlanId que o backend usa (bate com as
+// chaves do objeto PLANOS no server_2.js: basico_mensal, pro_anual, etc)
+function basePlanIdFor(tipo, ciclo){ return tipo + "_" + ciclo; }
+
+// Verifica se o app esta rodando dentro da TWA com suporte a Play
+// Billing (Digital Goods API so existe nesse contexto, nunca em
+// navegador comum nem em iOS).
+function playBillingDisponivel(){
+  return ('getDigitalGoodsService' in window);
+}
+
+async function assinarPlayBilling(tipo, ciclo){
+  var productId = PLAY_PRODUTOS[tipo];
+  var basePlanId = basePlanIdFor(tipo, ciclo);
+  if(!productId){ alert("Plano não encontrado."); return; }
+
+  try{
+    var service = await window.getDigitalGoodsService("https://play.google.com/billing");
+
+    var request = new PaymentRequest(
+      [{ supportedMethods:"https://play.google.com/billing", data:{ sku: productId } }],
+      { total:{ label:"Assinatura", amount:{ currency:"BRL", value:"0" } } } // valor real vem do Play Console, isso e so obrigatorio pela spec da API
+    );
+
+    var response = await request.show();
+    var purchaseToken = response.details && response.details.purchaseToken;
+    await response.complete("success");
+
+    if(!purchaseToken){ alert("Não foi possível concluir a compra. Tente novamente."); return; }
+
+    // Confirma no nosso backend, que valida o token direto na Play API
+    // antes de liberar o plano (nunca confia so no que o navegador diz)
+    var r = await fetch('https://doutor-cafe-production.up.railway.app/verificar-compra-play', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ userId: obterUserId(), productId: productId, basePlanId: basePlanId, purchaseToken: purchaseToken })
+    });
+    var data = await r.json();
+    if(data.ok){
+      alert("Assinatura ativada! Aproveite o plano "+tipo+".");
+      location.reload();
+    } else {
+      alert("Compra recebida, mas não conseguimos confirmar automaticamente. Se o valor foi cobrado, entre em contato pelo suporte. Detalhe: "+(data.erro||''));
+    }
+  } catch(e){
+    if(e && e.name === "AbortError"){
+      // usuario cancelou o fluxo de pagamento — nao mostra erro, so nao faz nada
+      return;
+    }
+    console.error("Erro no fluxo Play Billing:", e);
+    alert("Não foi possível iniciar o pagamento pelo Google Play. Tente novamente em instantes.");
+  }
+}
+
+function assinar(tipo){
+  if (playBillingDisponivel()) {
+    assinarPlayBilling(tipo, cicloAtual);
+    return;
+  }
+  // Fallback: usuario acessando fora do app Android (navegador comum,
+  // iOS, etc) — mantem o fluxo antigo do Mercado Pago, que so e proibido
+  // DENTRO do app Android pela politica do Google Play, nao na web solta.
+  var links={basico_mensal:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=3bdcbffc028a4d259f32fe37a96ae224",basico_anual:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=bd08a04de79f4213886611769b6c9486",pro_mensal:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=106181c5ed584a65af06403bd1af0608",pro_anual:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=661a046d15c9415a9508970d2f45c819",premium_mensal:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=5bcfb2b27c6241b8a433b3ec0fb2a5c7",premium_anual:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=346f4589aca84ba3b4e76351563fdbe1"};
+  var url=links[tipo+"_"+cicloAtual];
+  if(url)window.open(url,"_blank");else alert("Plano não encontrado.");
+}
 function contatoEmpresarial(){window.open("https://wa.me/5535998823395?text="+encodeURIComponent("Olá! Tenho interesse no Plano Empresarial do Doutor Café."),"_blank");fecharModal();}
 function verificarRetornoPagamento(){var params=new URLSearchParams(window.location.search),pagamento=params.get("pagamento"),planoId=params.get("plano");if(pagamento==="sucesso"&&planoId){var tipo=planoId.indexOf("premium")>-1?"premium":planoId.indexOf("pro")>-1?"pro":"basico";var nomePlano={premium:"Premium",pro:"Pro",basico:"Básico"}[tipo];salvarPlano({tipo:tipo,planoId:planoId,dataAssinatura:new Date().toISOString()});localStorage.setItem(ANALISES_KEY,"0");atualizarContador();alert("Bem-vindo ao Plano "+nomePlano+"! Suas análises estão liberadas.");window.history.replaceState({},"",window.location.pathname);}}
 
