@@ -882,6 +882,7 @@ canvas { display: none; }
     <div id="chipPerfilAvatar">?</div>
     <span id="chipPerfilNome">Olá!</span>
   </div>
+  <button id="btnSairConta" onclick="event.stopPropagation();encerrarConta();" title="Sair da conta" style="position:absolute;top:14px;right:14px;z-index:5;background:rgba(0,0,0,0.28);border:none;color:white;width:34px;height:34px;border-radius:50%;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;">&#8618;</button>
   <input type="file" id="inputFotoPerfil" accept="image/*">
   <div class="header-content">
     <span class="logo-icon">&#127807;</span>
@@ -2653,6 +2654,20 @@ function navegarMais(){
 }
 function entrarNoApp(nome){usuarioAtual=verificarCadastroInicial();mostrarTela('tela-principal');var nav=document.getElementById('navInferior');if(nav)nav.style.display='flex';sincronizarIdentidade(function(){atualizarContador();sincronizarContadorServidor();});inicializarChipPerfil();renderAreaHistorico();renderCalendario();renderGuiaSafra(safraTipoAtual);obterGPS();obterPrecoCafe();checarLembretesPendentes();verificarBannerIOS();if(nome){var primeiroNome=nome.split(' ')[0];setTimeout(function(){var tag=document.getElementById('regiaoTag');if(tag)tag.innerHTML='Olá, '+primeiroNome+'! Vamos diagnosticar';setTimeout(function(){obterGPS();},3000);},600);}}
 function verificarCadastroInicial(){try{return JSON.parse(localStorage.getItem(CADASTRO_INICIAL_KEY));}catch(e){return null;}}
+
+// ── SAIR DA CONTA (30/07/2026) ────────────────────────────────
+// Limpa todos os dados locais ligados a conta, permitindo logar limpo
+// noutra conta ou refazer o login sem interferencia de dados antigos.
+// Nao apaga nada do servidor — so o que fica guardado neste aparelho.
+function encerrarConta(){
+  if(!confirm("Sair da conta? Você vai precisar entrar de novo com seu PIN ou celular. Seus dados continuam salvos no servidor.")) return;
+  [CADASTRO_INICIAL_KEY, CADASTRO_KEY, PLANO_KEY, ANALISES_KEY, 'doutorcafe_uid',
+   'doutorcafe_videos_usados', HIST_KEY, TALHOES_KEY, 'dc_analise_talhao_id',
+   LEMBRETES_KEY, 'doutorcafe_foto_perfil'].forEach(function(k){
+    try{ localStorage.removeItem(k); }catch(e){}
+  });
+  location.reload();
+}
 
 // ── CHIP DE PERFIL (avatar + nome) ──────────────────────────────
 function iniciaisDoNome(nome){if(!nome)return "?";var partes=nome.trim().split(" ").filter(Boolean);if(partes.length===1)return partes[0].substr(0,2).toUpperCase();return (partes[0][0]+partes[partes.length-1][0]).toUpperCase();}
