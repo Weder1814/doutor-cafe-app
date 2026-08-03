@@ -2780,7 +2780,14 @@ function confirmarLoginPin(){
   erroEl.textContent="🔄 Verificando...";
   fetch("https://doutor-cafe-production.up.railway.app/entrar-pin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({pin:pin})})
   .then(checarResposta)
-  .then(function(d){if(!d.ok){erroEl.textContent=d.erro||"Conta não encontrada.";return;}var cadastro={userId:d.userId,nome:d.nome,celular:d.celular,email:d.email,regiao:d.regiao};localStorage.setItem(CADASTRO_INICIAL_KEY,JSON.stringify(cadastro));if(d.plano&&d.plano!=="gratuito"){salvarPlano({tipo:d.plano,planoId:d.planoId});}document.getElementById("modalLoginCpf").classList.remove("ativo");
+  .then(function(d){if(!d.ok){erroEl.textContent=d.erro||"Conta não encontrada.";return;}var cadastro={userId:d.userId,nome:d.nome,celular:d.celular,email:d.email,regiao:d.regiao};localStorage.setItem(CADASTRO_INICIAL_KEY,JSON.stringify(cadastro));
+    // CORREÇÃO (30/07/2026): sincronizar doutorcafe_uid com o userId recuperado
+    // aqui. Sem isso, sincronizarIdentidade() (chamada logo depois via entrarNoApp)
+    // mandava pro servidor o ID antigo gerado localmente no aparelho, em vez do
+    // ID da conta recem-recuperada — o que fazia o app "esquecer" a conta certa
+    // (com plano/análises) e voltar a mostrar uma conta zerada.
+    localStorage.setItem('doutorcafe_uid', d.userId);
+    if(d.plano&&d.plano!=="gratuito"){salvarPlano({tipo:d.plano,planoId:d.planoId});}document.getElementById("modalLoginCpf").classList.remove("ativo");
     // Recuperar talhões do servidor ao logar em novo dispositivo
     fetch('https://doutor-cafe-production.up.railway.app/talhoes/'+d.userId)
     .then(function(r2){return r2.json();})
