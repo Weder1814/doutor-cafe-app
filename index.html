@@ -2007,7 +2007,7 @@ function processar(file, isVideo) {
         }
       }
       document.getElementById("spinner").style.display="none";
-      mostrarResultadoStreaming(diags,b64,isVideo);
+      revelarDiagnosticosEmSequencia(diags,b64,isVideo);
       incrementarAnalise();
       var ok=diags.every(function(d){return d.diagnostico==="saudavel";});
       if(diags.length>0&&!ok){
@@ -2305,6 +2305,27 @@ var _textoParaFalar = "";
 var _ultimosDiags = [];
 var _ultimoPlano = null;
 
+// Revela cada achado com uma pausa REAL entre eles (setTimeout), em vez
+// de confiar em CSS animation-delay — porque o Qwen (rapido, sem
+// thinking) costuma gerar todos os achados quase juntos, entao depender
+// so de CSS nao criava pausa perceptivel nenhuma. Aqui a pausa e forcada
+// de proposito, mesmo que os dados ja tenham chegado tudo de uma vez.
+function revelarDiagnosticosEmSequencia(diagsFinal, fotoBase64, isVideoFlag){
+  var PAUSA_MS = 1400;
+  var revelados = [];
+  var i = 0;
+  function proximo(){
+    if(i >= diagsFinal.length) return;
+    revelados.push(diagsFinal[i]);
+    mostrarResultadoStreaming(revelados, fotoBase64, isVideoFlag);
+    i++;
+    if(i < diagsFinal.length){
+      setTimeout(proximo, PAUSA_MS);
+    }
+  }
+  proximo();
+}
+
 function mostrarResultadoStreaming(diags,fotoBase64,isVideo){
   var div=document.getElementById("resultado");
   div.style.display="block";
@@ -2530,7 +2551,7 @@ function mostrarSemCreditos(){
 }
 
 // ── PLANO DE AÇÃO ──
-function buildResumo(diags){if(!diags||diags.length===0)return "";var doencas=diags.filter(function(d){return d.diagnostico!=="saudavel"&&CATEGORIAS[d.diagnostico]!=="Deficiência Nutricional"&&CATEGORIAS[d.diagnostico]!=="Deficiencia Nutricional";});var nutricao=diags.filter(function(d){return CATEGORIAS[d.diagnostico]==="Deficiência Nutricional"||CATEGORIAS[d.diagnostico]==="Deficiencia Nutricional";});var saudavel=diags.length===1&&diags[0].diagnostico==="saudavel";var html='<div class="resumo-diag-card"><div class="resumo-diag-titulo">🔬 Diagnóstico do seu cafeeiro</div>';var _idxAnim=0;var ATRASO=0.9;if(saudavel){html+='<div class="resumo-diag-linha resumo-linha-destaque" style="animation-delay:0s">✅ Nenhum problema detectado — planta saudável!</div>';}else{if(doencas.length>0){html+='<div class="resumo-diag-secao">🦠 '+doencas.length+' doença(s) detectada(s):</div>';doencas.forEach(function(d){var cor=d.estagio>=4?"#e53935":d.estagio>=3?"#ef6c00":"#f9a825";var delay=(_idxAnim*ATRASO).toFixed(2);var classeExtra=(_idxAnim===0)?" resumo-linha-destaque":"";_idxAnim++;html+='<div class="resumo-diag-linha'+classeExtra+'" style="animation-delay:'+delay+'s"><span style="color:'+cor+'">'+(EMOJIS[d.diagnostico]||"🌿")+'</span> <strong>'+d.diagnostico.replace(/_/g," ")+'</strong> <span style="color:#aaa;font-size:12px">— Estágio '+d.estagio+'/5</span>'+(d.parcial?' <span style="font-size:11px;color:#bbb">⏳</span>':'')+'</div>';});}if(nutricao.length>0){html+='<div class="resumo-diag-secao" style="margin-top:8px">⚗️ '+nutricao.length+' deficiência(s) nutricional(is):</div>';nutricao.forEach(function(d){var delay=(_idxAnim*ATRASO).toFixed(2);var classeExtra=(_idxAnim===0)?" resumo-linha-destaque":"";_idxAnim++;html+='<div class="resumo-diag-linha'+classeExtra+'" style="animation-delay:'+delay+'s">'+(EMOJIS[d.diagnostico]||"🔥")+' <strong>'+d.diagnostico.replace(/_/g," ")+'</strong>'+(d.parcial?' <span style="font-size:11px;color:#bbb">⏳</span>':'')+'</div>';});}}html+='</div>';return html;}
+function buildResumo(diags){if(!diags||diags.length===0)return "";var doencas=diags.filter(function(d){return d.diagnostico!=="saudavel"&&CATEGORIAS[d.diagnostico]!=="Deficiência Nutricional"&&CATEGORIAS[d.diagnostico]!=="Deficiencia Nutricional";});var nutricao=diags.filter(function(d){return CATEGORIAS[d.diagnostico]==="Deficiência Nutricional"||CATEGORIAS[d.diagnostico]==="Deficiencia Nutricional";});var saudavel=diags.length===1&&diags[0].diagnostico==="saudavel";var html='<div class="resumo-diag-card"><div class="resumo-diag-titulo">🔬 Diagnóstico do seu cafeeiro</div>';var _idxAnim=0;var ATRASO=0;if(saudavel){html+='<div class="resumo-diag-linha resumo-linha-destaque" style="animation-delay:0s">✅ Nenhum problema detectado — planta saudável!</div>';}else{if(doencas.length>0){html+='<div class="resumo-diag-secao">🦠 '+doencas.length+' doença(s) detectada(s):</div>';doencas.forEach(function(d){var cor=d.estagio>=4?"#e53935":d.estagio>=3?"#ef6c00":"#f9a825";var delay=(_idxAnim*ATRASO).toFixed(2);var classeExtra=(_idxAnim===0)?" resumo-linha-destaque":"";_idxAnim++;html+='<div class="resumo-diag-linha'+classeExtra+'" style="animation-delay:'+delay+'s"><span style="color:'+cor+'">'+(EMOJIS[d.diagnostico]||"🌿")+'</span> <strong>'+d.diagnostico.replace(/_/g," ")+'</strong> <span style="color:#aaa;font-size:12px">— Estágio '+d.estagio+'/5</span>'+(d.parcial?' <span style="font-size:11px;color:#bbb">⏳</span>':'')+'</div>';});}if(nutricao.length>0){html+='<div class="resumo-diag-secao" style="margin-top:8px">⚗️ '+nutricao.length+' deficiência(s) nutricional(is):</div>';nutricao.forEach(function(d){var delay=(_idxAnim*ATRASO).toFixed(2);var classeExtra=(_idxAnim===0)?" resumo-linha-destaque":"";_idxAnim++;html+='<div class="resumo-diag-linha'+classeExtra+'" style="animation-delay:'+delay+'s">'+(EMOJIS[d.diagnostico]||"🔥")+' <strong>'+d.diagnostico.replace(/_/g," ")+'</strong>'+(d.parcial?' <span style="font-size:11px;color:#bbb">⏳</span>':'')+'</div>';});}}html+='</div>';return html;}
 function buildPlanoAcao(plano){if(!plano)return "";var html='<div class="plano-acao-card"><div class="plano-acao-header"><div class="plano-acao-titulo">📋 O que sua planta precisa</div>';if(plano.resumo_geral)html+='<div class="plano-acao-resumo">'+plano.resumo_geral+'</div>';html+='</div>';if(plano.urgente)html+='<div class="plano-acao-item plano-acao-urgente"><strong>🔴 Esta semana:</strong> '+plano.urgente+'</div>';if(plano.em_21_dias)html+='<div class="plano-acao-item plano-acao-21dias"><strong>🟡 Em 21 dias:</strong> '+plano.em_21_dias+'</div>';if(plano.nutricao)html+='<div class="plano-acao-item plano-acao-nutricao"><strong>🟢 Nutrição:</strong> '+plano.nutricao+'</div>';html+='</div>';return html;}
 
 // ── VOZ ──
