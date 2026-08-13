@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teste: Plus vs Flash — Diagnóstico de Folha — Doutor Café</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --verde:#1a5c2a; --verde-claro:#2d8a3e; --marrom:#3d2b1a; --cinza:#7a8a7c; --creme:#f5f0e8; }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--creme);color:var(--marrom);padding:20px;max-width:1000px;margin:0 auto;}
+  h1{font-family:'Playfair Display',serif;font-size:24px;margin-bottom:6px;}
+  p.sub{color:var(--cinza);font-size:14px;margin-bottom:20px;}
+  .campo{margin-bottom:14px;}
+  label{display:block;font-size:12.5px;font-weight:700;color:var(--verde);margin-bottom:5px;}
+  input[type=text]{width:100%;padding:10px 12px;border:1.5px solid #ddd3c2;border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;}
+  .dropzone{border:2px dashed #c9bda3;border-radius:14px;padding:28px;text-align:center;background:white;cursor:pointer;margin-bottom:14px;}
+  .dropzone.ativo{border-color:var(--verde-claro);background:#f2f8f3;}
+  .dropzone img{max-width:100%;max-height:220px;border-radius:10px;margin-top:10px;}
+  button{width:100%;padding:14px;background:linear-gradient(135deg,#2d8a3e,#1a5c2a);color:white;border:none;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+  button:disabled{opacity:0.5;cursor:not-allowed;}
+  .veredito{margin-top:22px;padding:16px;border-radius:14px;background:white;border:2px solid #eee2cf;display:none;}
+  .veredito h2{font-family:'Playfair Display',serif;font-size:17px;margin-bottom:10px;}
+  .veredito.ok{border-color:#2d8a3e;background:#f2f8f3;}
+  .veredito.atencao{border-color:#c98a30;background:#fffaf0;}
+  .veredito.falha{border-color:#c9303f;background:#fdf3f3;}
+  .linha-diff{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-top:1px solid #f0e9dc;gap:10px;}
+  .linha-diff:first-of-type{border-top:none;}
+  .linha-diff .campo-nome{font-weight:700;min-width:130px;}
+  .linha-diff .vals{text-align:right;flex:1;}
+  .bate{color:#2d8a3e;font-weight:700;}
+  .nbate{color:#c9303f;font-weight:700;}
+  .quase{color:#c98a30;font-weight:700;}
+  .resultados{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px;}
+  @media (max-width:800px){.resultados{grid-template-columns:1fr;}}
+  .card{background:white;border-radius:14px;padding:16px;border:1.5px solid #eee2cf;}
+  .card h3{font-family:'Playfair Display',serif;font-size:16px;margin-bottom:10px;}
+  .card.plus h3{color:#c9303f;}
+  .card.flash h3{color:#1a5c8a;}
+  .status{font-size:12px;color:var(--cinza);margin-bottom:10px;}
+  .metrica{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-top:1px solid #f0e9dc;gap:8px;}
+  .metrica:first-of-type{border-top:none;}
+  .metrica b{color:var(--marrom);text-align:right;}
+  .diag{border:1px solid #eee2cf;border-radius:10px;padding:10px;margin-top:10px;background:#faf6ee;}
+  .diag .nome{font-weight:700;font-size:14px;color:var(--verde);}
+  .diag .meta{font-size:12px;color:var(--cinza);margin-top:3px;}
+  .diag .visto{font-size:12px;margin-top:6px;}
+  .diag .fung{font-size:11.5px;margin-top:6px;color:#7a4413;}
+  pre{font-size:11px;background:#faf6ee;padding:10px;border-radius:8px;margin-top:10px;max-height:200px;overflow:auto;white-space:pre-wrap;word-break:break-word;}
+  .aviso{background:#fff8e1;border:1px solid #ffe0a3;border-radius:10px;padding:10px 12px;font-size:12.5px;color:#7a4a00;margin-bottom:18px;}
+</style>
+</head>
+<body>
+
+<h1>🧪 Plus vs Flash — Diagnóstico de Folha</h1>
+<p class="sub">Compara o Qwen3.7-Plus (produção) com o Qwen3.7-Flash (~13x mais barato) no diagnóstico que responde pela maior parte do volume do app. Os dois endpoints são idênticos exceto pelo nome do modelo — mesmo prompt, mesmo max_tokens, thinking desligado nos dois.</p>
+
+<div class="aviso">⚠️ Os dois cards usam endpoints isolados de teste (<code>/teste-qwen37plus-diagnostico</code> e <code>/teste-qwen37flash-diagnostico</code>). Nenhum toca a produção nem consome análises de usuário.</div>
+
+<div class="campo">
+  <label>URL do backend</label>
+  <input type="text" id="baseUrl" value="https://doutor-cafe-production.up.railway.app">
+</div>
+<div class="campo">
+  <label>Região (opcional — afeta a regra de raridade da corynespora)</label>
+  <input type="text" id="regiao" placeholder="ex: Mogiana">
+</div>
+<div class="campo">
+  <label>Altitude em metros (opcional)</label>
+  <input type="text" id="altitude" placeholder="ex: 900">
+</div>
+
+<div class="dropzone" id="dropzone">
+  <span id="dropTexto">📷 Toque para escolher a foto da folha, ou arraste aqui</span>
+  <input type="file" id="fileInput" accept="image/*" style="display:none">
+  <img id="preview" style="display:none">
+</div>
+
+<button id="btnComparar" disabled>Comparar</button>
+
+<div class="veredito" id="veredito"></div>
+
+<div class="resultados" id="resultados" style="display:none">
+  <div class="card plus">
+    <h3>🔴 Qwen3.7-Plus (produção)</h3>
+    <div class="status" id="statusPlus">Aguardando...</div>
+    <div id="metricasPlus"></div>
+    <div id="diagsPlus"></div>
+    <pre id="respostaPlus"></pre>
+  </div>
+  <div class="card flash">
+    <h3>🔵 Qwen3.7-Flash (candidato)</h3>
+    <div class="status" id="statusFlash">Aguardando...</div>
+    <div id="metricasFlash"></div>
+    <div id="diagsFlash"></div>
+    <pre id="respostaFlash"></pre>
+  </div>
+</div>
+
+<script>
+var imagemBase64 = null, tipoImagem = null;
+var dadosPlus = null, dadosFlash = null;
+var custoPlus = null, custoFlash = null;
+
+var dropzone = document.getElementById('dropzone');
+var fileInput = document.getElementById('fileInput');
+var preview = document.getElementById('preview');
+var dropTexto = document.getElementById('dropTexto');
+var btnComparar = document.getElementById('btnComparar');
+
+dropzone.addEventListener('click', function(){ fileInput.click(); });
+dropzone.addEventListener('dragover', function(e){ e.preventDefault(); dropzone.classList.add('ativo'); });
+dropzone.addEventListener('dragleave', function(){ dropzone.classList.remove('ativo'); });
+dropzone.addEventListener('drop', function(e){
+  e.preventDefault(); dropzone.classList.remove('ativo');
+  if(e.dataTransfer.files[0]) processarArquivo(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', function(e){
+  if(e.target.files[0]) processarArquivo(e.target.files[0]);
+});
+
+// Redimensionamento igual ao app de producao pra foto de folha (1024px)
+function redimensionarImagem(file, maxDim, qualidade, callback) {
+  var leitor = new FileReader();
+  leitor.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var w = img.width, h = img.height;
+      if (w > maxDim || h > maxDim) {
+        if (w >= h) { h = Math.round(h * maxDim / w); w = maxDim; }
+        else { w = Math.round(w * maxDim / h); h = maxDim; }
+      }
+      var canvas = document.createElement("canvas");
+      canvas.width = w; canvas.height = h;
+      var ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, w, h);
+      var b64;
+      try { b64 = canvas.toDataURL("image/jpeg", qualidade).split(",")[1]; }
+      catch(err) { b64 = e.target.result.split(",")[1]; }
+      callback(b64);
+    };
+    img.onerror = function() { callback(e.target.result.split(",")[1]); };
+    img.src = e.target.result;
+  };
+  leitor.onerror = function() { callback(null); };
+  leitor.readAsDataURL(file);
+}
+
+function processarArquivo(file){
+  tipoImagem = 'image/jpeg';
+  var reader = new FileReader();
+  reader.onload = function(e){
+    preview.src = e.target.result;
+    preview.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+
+  dropTexto.textContent = '⏳ Redimensionando...';
+  btnComparar.disabled = true;
+  redimensionarImagem(file, 1024, 0.90, function(b64){
+    imagemBase64 = b64;
+    dropTexto.textContent = '✅ ' + file.name + ' (redimensionada p/ 1024px)';
+    btnComparar.disabled = false;
+  });
+}
+
+function listaDiags(r){
+  if(!r || !r.diagnosticos || !r.diagnosticos.length) return '<div class="diag"><span class="nome">— nenhum diagnóstico retornado —</span></div>';
+  return r.diagnosticos.map(function(d){
+    var fung = (d.fungicidas||[]).map(function(f){ return f.nome || f.nome_comercial || '?'; }).join(', ');
+    return '<div class="diag">'+
+      '<div class="nome">'+(d.diagnostico||'?')+'</div>'+
+      '<div class="meta">estágio '+(d.estagio!=null?d.estagio:'?')+' · confiança '+(d.confianca||'?')+
+      (d.po_esporulacao_confirmado!==undefined ? ' · pó confirmado: <b>'+d.po_esporulacao_confirmado+'</b>' : '')+'</div>'+
+      '<div class="visto">'+(d.visto||'')+'</div>'+
+      (d.diagnostico_diferencial ? '<div class="meta">dif.: '+d.diagnostico_diferencial+'</div>' : '')+
+      (fung ? '<div class="fung">💊 '+fung+'</div>' : '')+
+    '</div>';
+  }).join('');
+}
+
+function nomesDe(r){
+  if(!r || !r.diagnosticos) return [];
+  return r.diagnosticos.map(function(d){ return String(d.diagnostico||'').trim().toLowerCase(); });
+}
+
+function montarVeredito(){
+  var el = document.getElementById('veredito');
+  if(!dadosPlus || !dadosFlash){ el.style.display='none'; return; }
+
+  var nP = nomesDe(dadosPlus), nF = nomesDe(dadosFlash);
+  var dP = (dadosPlus.diagnosticos||[]), dF = (dadosFlash.diagnosticos||[]);
+
+  var html = '';
+  var principalBate = (nP.length && nF.length && nP[0] === nF[0]);
+
+  // 1. Achado principal — o que decide
+  html += '<h2>Achado principal (define o fungicida)</h2>';
+  html += '<div class="linha-diff"><span class="campo-nome">diagnóstico</span><span class="vals">'+
+          'Plus: <b>'+(nP[0]||'—')+'</b> &nbsp;|&nbsp; Flash: <b>'+(nF[0]||'—')+'</b> '+
+          '<span class="'+(principalBate?'bate':'nbate')+'">'+(principalBate?'✓':'✗')+'</span></span></div>';
+
+  if(dP[0] && dF[0]){
+    var estP = dP[0].estagio, estF = dF[0].estagio;
+    var difEst = (estP!=null && estF!=null) ? Math.abs(estP-estF) : null;
+    var clsEst = difEst===0?'bate':(difEst===1?'quase':'nbate');
+    html += '<div class="linha-diff"><span class="campo-nome">estágio</span><span class="vals">'+
+            'Plus: <b>'+(estP!=null?estP:'?')+'</b> &nbsp;|&nbsp; Flash: <b>'+(estF!=null?estF:'?')+'</b> '+
+            '<span class="'+clsEst+'">'+(difEst===0?'✓':(difEst===1?'~ 1 degrau':'✗'))+'</span></span></div>';
+
+    var cP = String(dP[0].confianca||'').toLowerCase(), cF = String(dF[0].confianca||'').toLowerCase();
+    html += '<div class="linha-diff"><span class="campo-nome">confiança</span><span class="vals">'+
+            'Plus: <b>'+(cP||'?')+'</b> &nbsp;|&nbsp; Flash: <b>'+(cF||'?')+'</b> '+
+            '<span class="'+(cP===cF?'bate':'quase')+'">'+(cP===cF?'✓':'~')+'</span></span></div>';
+
+    if(dP[0].po_esporulacao_confirmado!==undefined || dF[0].po_esporulacao_confirmado!==undefined){
+      var pP = dP[0].po_esporulacao_confirmado, pF = dF[0].po_esporulacao_confirmado;
+      html += '<div class="linha-diff"><span class="campo-nome">pó esporulação</span><span class="vals">'+
+              'Plus: <b>'+pP+'</b> &nbsp;|&nbsp; Flash: <b>'+pF+'</b> '+
+              '<span class="'+(pP===pF?'bate':'nbate')+'">'+(pP===pF?'✓':'✗')+'</span></span></div>';
+    }
+  }
+
+  // 2. Lista completa de achados
+  html += '<h2 style="margin-top:14px;">Todos os achados</h2>';
+  html += '<div class="linha-diff"><span class="campo-nome">quantidade</span><span class="vals">'+
+          'Plus: <b>'+nP.length+'</b> &nbsp;|&nbsp; Flash: <b>'+nF.length+'</b> '+
+          '<span class="'+(nP.length===nF.length?'bate':'quase')+'">'+(nP.length===nF.length?'✓':'~')+'</span></span></div>';
+
+  var soPlus  = nP.filter(function(x){ return nF.indexOf(x) === -1; });
+  var soFlash = nF.filter(function(x){ return nP.indexOf(x) === -1; });
+  if(soPlus.length)  html += '<div class="linha-diff"><span class="campo-nome">só no Plus</span><span class="vals nbate">'+soPlus.join(', ')+'</span></div>';
+  if(soFlash.length) html += '<div class="linha-diff"><span class="campo-nome">só no Flash</span><span class="vals nbate">'+soFlash.join(', ')+'</span></div>';
+  if(!soPlus.length && !soFlash.length) html += '<div class="linha-diff"><span class="campo-nome">divergências</span><span class="vals bate">nenhuma — mesma lista nos dois ✓</span></div>';
+
+  // 3. Economia
+  if(custoPlus!=null && custoFlash!=null && custoFlash > 0){
+    var fator = (custoPlus/custoFlash).toFixed(1);
+    html += '<h2 style="margin-top:14px;">Custo desta análise</h2>';
+    html += '<div class="linha-diff"><span class="campo-nome">Plus</span><span class="vals">US$ '+custoPlus.toFixed(6)+'</span></div>';
+    html += '<div class="linha-diff"><span class="campo-nome">Flash</span><span class="vals">US$ '+custoFlash.toFixed(6)+'</span></div>';
+    html += '<div class="linha-diff"><span class="campo-nome">Flash é</span><span class="vals bate">'+fator+'x mais barato</span></div>';
+  }
+
+  var classe, resumo;
+  if(!principalBate){
+    classe = 'falha';
+    resumo = '<p style="margin-bottom:10px;color:#c9303f;font-weight:700;">❌ O achado principal divergiu. Isso muda o produto que o produtor compra e aplica — reprovado nesta foto.</p>';
+  } else if(soPlus.length || soFlash.length){
+    classe = 'atencao';
+    resumo = '<p style="margin-bottom:10px;color:#c98a30;font-weight:700;">⚠️ Achado principal bateu, mas os secundários divergiram. O prompt já sinaliza que secundários são o ponto fraco do Qwen — avalie se o que faltou/sobrou é relevante.</p>';
+  } else {
+    classe = 'ok';
+    resumo = '<p style="margin-bottom:10px;color:#1a5c2a;font-weight:700;">✅ Mesma lista de achados nos dois modelos nesta foto.</p>';
+  }
+
+  el.className = 'veredito ' + classe;
+  el.innerHTML = resumo + html +
+    '<p style="margin-top:12px;font-size:12px;color:#7a8a7c;">Uma foto não decide nada. A troca Sonnet→Plus foi feita com 9 fotos reais — use pelo menos o mesmo rigor aqui, incluindo os casos difíceis (só face superior da folha, ferrugem inicial, deficiência nutricional, folha com duas condições ao mesmo tempo).</p>';
+  el.style.display = 'block';
+}
+
+btnComparar.addEventListener('click', async function(){
+  var baseUrl = document.getElementById('baseUrl').value.replace(/\/$/,'');
+  var regiao = document.getElementById('regiao').value || null;
+  var altitude = document.getElementById('altitude').value || null;
+
+  dadosPlus = null; dadosFlash = null; custoPlus = null; custoFlash = null;
+  document.getElementById('veredito').style.display = 'none';
+  document.getElementById('resultados').style.display = 'grid';
+  btnComparar.disabled = true;
+
+  btnComparar.textContent = 'Testando Plus (1/2)...';
+  await rodar('/teste-qwen37plus-diagnostico', 'Plus', baseUrl, regiao, altitude);
+
+  btnComparar.textContent = 'Testando Flash (2/2)...';
+  await rodar('/teste-qwen37flash-diagnostico', 'Flash', baseUrl, regiao, altitude);
+
+  montarVeredito();
+
+  btnComparar.disabled = false;
+  btnComparar.textContent = 'Comparar';
+});
+
+function metricasHTML(data){
+  var u = data.usage || {};
+  var custoTexto = data.custo_usd_estimado!=null
+    ? ('US$ ' + data.custo_usd_estimado.toFixed(6) + ' (R$ ' + (data.custo_brl_estimado||0).toFixed(5) + ')')
+    : '-';
+  return '<div class="metrica"><span>Custo</span><b>' + custoTexto + '</b></div>' +
+         '<div class="metrica"><span>Entrada / saída</span><b>' + (u.input_tokens!=null?u.input_tokens:'-') + ' / ' + (u.output_tokens!=null?u.output_tokens:'-') + '</b></div>' +
+         '<div class="metrica"><span>Cache leitura</span><b>' + (u.cache_read_input_tokens||0) + '</b></div>';
+}
+
+function rodar(rota, qual, baseUrl, regiao, altitude){
+  var elStatus = document.getElementById('status'+qual);
+  elStatus.textContent = '⏳ Consultando...';
+  var inicio = Date.now();
+  var body = { imagem: imagemBase64, tipo: tipoImagem, regiao: regiao };
+  if(altitude) body.altitude = altitude;
+  return fetch(baseUrl + rota, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(body)
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    var duracao = ((Date.now() - inicio)/1000).toFixed(1);
+    if(data.erro){ elStatus.textContent = '❌ ' + data.erro; return; }
+    elStatus.textContent = '✅ ' + duracao + 's';
+    document.getElementById('metricas'+qual).innerHTML = metricasHTML(data);
+    document.getElementById('diags'+qual).innerHTML = listaDiags(data.resultado_parseado);
+    document.getElementById('resposta'+qual).textContent = JSON.stringify(data.resultado_parseado||data, null, 2);
+    if(qual==='Plus'){  dadosPlus  = data.resultado_parseado; custoPlus  = data.custo_usd_estimado; }
+    if(qual==='Flash'){ dadosFlash = data.resultado_parseado; custoFlash = data.custo_usd_estimado; }
+  })
+  .catch(function(e){
+    elStatus.textContent = '❌ Erro: ' + e.message;
+  });
+}
+</script>
+
+</body>
+</html>
