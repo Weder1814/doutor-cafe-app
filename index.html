@@ -2007,24 +2007,77 @@ function processar(file, isVideo) {
         }
       }
       document.getElementById("spinner").style.display="none";
-      revelarDiagnosticosEmSequencia(diags,b64,isVideo);
+      revelarDiagnosticosEmSequencia(diags,b64,isVideo,diagsSSE.length);
       incrementarAnalise();
       var ok=diags.every(function(d){return d.diagnostico==="saudavel";});
       if(diags.length>0&&!ok){
-        var bp={diagnosticos:diags}; if(dadosGPS.regiao) bp.regiao=dadosGPS.regiao;
-        fetch("https://doutor-cafe-production.up.railway.app/plano-acao",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bp)})
-        .then(function(r2){return r2.json();})
-        .then(function(plano){
-          var ct=document.getElementById("planoAcaoContainer");
-          if(ct&&plano&&(plano.urgente||plano.resumo_geral)){
-            _ultimoPlano=plano;
-            var ph=buildPlanoAcao(plano);
-            if(ph){ct.innerHTML=ph;ct.style.animation="slideUp 0.4s ease";}
-            if(plano.urgente) _textoParaFalar+=" Esta semana: "+plano.urgente+".";
-            if(plano.em_21_dias) _textoParaFalar+=" Em 21 dias: "+plano.em_21_dias+".";
-          }
-        }).catch(function(){});
+        pedirPlanoAcaoComSeguranca(diags);
       }
+    }
+    // ── PLANO DE ACAO OTIMISTA ──
+    // O /plano-acao so pode ser gerado com a lista FINAL e corrigida de
+    // diagnosticos (pos corrigirFerrugemSemConfirmacao/focarNoPrincipal no
+    // servidor), que so existe quando o evento "fim" chega — entao as duas
+    // chamadas de modelo (diagnostico + plano-acao) sao uma dependencia real
+    // em cadeia, nao um atraso artificial do frontend.
+    // Para nao pagar o round-trip do plano-acao inteiro DEPOIS do
+    // diagnostico terminar, disparamos ele de forma OTIMISTA assim que o
+    // stream fica "quieto" por QUIET_MS (sinal de que o modelo
+    // provavelmente esta fechando o JSON), usando a lista que ja apareceu
+    // ao vivo. Quando o "fim" chega de verdade, comparamos com a lista
+    // corrigida: se bateu, usamos a resposta otimista (que pode ja ter
+    // voltado, economizando o round-trip inteiro); se divergiu (ex: algo
+    // caiu por confianca baixa), descartamos e pedimos de novo com a lista
+    // certa. Custo do caso raro de divergencia: uma chamada a mais ao
+    // Flash, que a essa altura e barata o suficiente pra nao pesar.
+    var QUIET_MS = 900;
+    var _planoOtimistaTimer = null;
+    var _planoOtimistaPromise = null;
+    var _planoOtimistaChaveEnviada = null;
+    var _planoOtimistaDisparado = false;
+
+    function chaveDiags(lista){
+      return lista.map(function(d){ return d.diagnostico; }).join("|");
+    }
+
+    function dispararPlanoOtimista(){
+      if(_planoOtimistaDisparado) return;
+      if(!diagsSSE.length) return;
+      var ok=diagsSSE.every(function(d){return d.diagnostico==="saudavel";});
+      if(ok) return;
+      _planoOtimistaDisparado = true;
+      _planoOtimistaChaveEnviada = chaveDiags(diagsSSE);
+      var bp={diagnosticos:diagsSSE}; if(dadosGPS.regiao) bp.regiao=dadosGPS.regiao;
+      _planoOtimistaPromise = fetch("https://doutor-cafe-production.up.railway.app/plano-acao",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bp)})
+        .then(function(r2){return r2.json();})
+        .catch(function(){return null;});
+    }
+
+    function renderPlano(plano){
+      var ct=document.getElementById("planoAcaoContainer");
+      if(ct&&plano&&(plano.urgente||plano.resumo_geral)){
+        _ultimoPlano=plano;
+        var ph=buildPlanoAcao(plano);
+        if(ph){ct.innerHTML=ph;ct.style.animation="slideUp 0.4s ease";}
+        if(plano.urgente) _textoParaFalar+=" Esta semana: "+plano.urgente+".";
+        if(plano.em_21_dias) _textoParaFalar+=" Em 21 dias: "+plano.em_21_dias+".";
+      }
+    }
+
+    function pedirPlanoAcaoComSeguranca(diagsFinaisCorrigidos){
+      if(_planoOtimistaTimer){ clearTimeout(_planoOtimistaTimer); _planoOtimistaTimer=null; }
+      var chaveFinal = chaveDiags(diagsFinaisCorrigidos);
+      if(_planoOtimistaDisparado && _planoOtimistaChaveEnviada===chaveFinal){
+        // a lista nao mudou depois da correcao — reaproveita a chamada otimista
+        _planoOtimistaPromise.then(renderPlano);
+        return;
+      }
+      // ou nunca disparamos, ou a correcao mudou a lista — pede de novo com a certa
+      var bp={diagnosticos:diagsFinaisCorrigidos}; if(dadosGPS.regiao) bp.regiao=dadosGPS.regiao;
+      fetch("https://doutor-cafe-production.up.railway.app/plano-acao",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bp)})
+        .then(function(r2){return r2.json();})
+        .then(renderPlano)
+        .catch(function(){});
     }
     fetch("https://doutor-cafe-production.up.railway.app/diagnostico",{
       method:"POST", headers:{"Content-Type":"application/json"},
@@ -2053,9 +2106,13 @@ function processar(file, isVideo) {
                 diagsSSE.push(ev.diag);
                 document.getElementById("spinner").style.display="none";
                 try { mostrarResultadoStreaming(diagsSSE,b64,isVideo); } catch(err) {}
+                if(_planoOtimistaTimer) clearTimeout(_planoOtimistaTimer);
+                _planoOtimistaTimer = setTimeout(dispararPlanoOtimista, QUIET_MS);
               } else if(ev.tipo==="diag_completo"){
                 if(ev.index<diagsSSE.length) diagsSSE[ev.index]=ev.diag; else diagsSSE.push(ev.diag);
                 mostrarResultadoStreaming(diagsSSE,b64,isVideo);
+                if(_planoOtimistaTimer) clearTimeout(_planoOtimistaTimer);
+                _planoOtimistaTimer = setTimeout(dispararPlanoOtimista, QUIET_MS);
               } else if(ev.tipo==="fim"){
                 var dF=(ev.resultado&&ev.resultado.diagnosticos)||[];
                 var fb=dF.length===1&&dF[0].diagnostico==="saudavel"&&dF[0].confianca==="baixa";
@@ -2308,12 +2365,32 @@ var _ultimoPlano = null;
 // Revela cada achado com uma pausa REAL entre eles (setTimeout), em vez
 // de confiar em CSS animation-delay — porque o Qwen (rapido, sem
 // thinking) costuma gerar todos os achados quase juntos, entao depender
-// so de CSS nao criava pausa perceptivel nenhuma. Aqui a pausa e forcada
-// de proposito, mesmo que os dados ja tenham chegado tudo de uma vez.
-function revelarDiagnosticosEmSequencia(diagsFinal, fotoBase64, isVideoFlag){
-  var PAUSA_MS = 1400;
-  var revelados = [];
-  var i = 0;
+// so de CSS nao criava pausa perceptivel nenhuma.
+//
+// ATUALIZADO 12/08/2026 (troca de modelo p/ qwen3.7-flash): antes desta
+// correcao, a funcao SEMPRE recomecava a revelacao do zero aqui no "fim",
+// mesmo que os cards ja tivessem aparecido ao vivo durante o streaming
+// (eventos "diag"/"diag_completo" ja chamam mostrarResultadoStreaming).
+// Com o Plus (14-25s, thinking) isso ficava escondido dentro do tempo real
+// de espera. Com o Flash (8-13s) virou visivel e feio: o produtor via os
+// cards completos, e entao via eles SUMIREM e reaparecerem um a um de novo
+// com 1400ms de pausa cada — ou seja, tempo extra de espera em cima de
+// dados que ja estavam na tela.
+//
+// Corrigido recebendo quantos achados ja apareceram ao vivo (qtdJaAoVivo,
+// = diagsSSE.length no momento do "fim"): esses entram todos de uma vez,
+// sem pausa. So os achados que so vieram completos no evento final (nunca
+// tinham aparecido antes) ganham a pausa de revelacao — e mesmo assim bem
+// mais curta que antes, porque o motivo original da pausa longa (Qwen sem
+// thinking gera tudo junto, cache 0.2x acelera o prefill) ficou mais forte
+// ainda com o Flash, entao nem esses achados "novos" costumam ficar
+// perceptivelmente separados um do outro sem ajuda.
+function revelarDiagnosticosEmSequencia(diagsFinal, fotoBase64, isVideoFlag, qtdJaAoVivo){
+  var PAUSA_MS = 350;
+  qtdJaAoVivo = Math.min(qtdJaAoVivo||0, diagsFinal.length);
+  var revelados = diagsFinal.slice(0, qtdJaAoVivo);
+  var i = qtdJaAoVivo;
+  if(revelados.length){ mostrarResultadoStreaming(revelados, fotoBase64, isVideoFlag); }
   function proximo(){
     if(i >= diagsFinal.length) return;
     revelados.push(diagsFinal[i]);
@@ -2323,7 +2400,8 @@ function revelarDiagnosticosEmSequencia(diagsFinal, fotoBase64, isVideoFlag){
       setTimeout(proximo, PAUSA_MS);
     }
   }
-  proximo();
+  if(i < diagsFinal.length){ proximo(); }
+
 }
 
 function mostrarResultadoStreaming(diags,fotoBase64,isVideo){
@@ -2468,7 +2546,13 @@ function iniciarEtapasSpinner() {
   pararEtapasSpinner();
   var etapas = document.querySelectorAll(".spinner-etapa");
   etapas.forEach(function(el){ el.classList.remove("ativo","concluido"); });
-  var tempos = [0, 3000, 6500, 10000]; // quando cada etapa acende (ms) — ajustado para o tempo real mais rapido apos otimizacoes de cache/imagem
+  // Ajustado em 12/08/2026 apos troca de MODELO_PRODUCAO p/ qwen3.7-flash.
+  // Os tempos antigos (0/3000/6500/10000) foram calibrados para o
+  // qwen3.7-plus (14-25s medidos). Com o Flash rodando em 8-13s, a 4a etapa
+  // quase nao chegava a acender antes do resultado pronto. Reduzido
+  // proporcionalmente para a faixa nova; se trocar de modelo de novo,
+  // reajustar aqui com base no tempo real observado nos logs.
+  var tempos = [0, 1800, 3800, 6000]; // quando cada etapa acende (ms)
   tempos.forEach(function(t, i){
     _spinnerEtapaTimers.push(setTimeout(function(){
       var atuais = document.querySelectorAll(".spinner-etapa");
