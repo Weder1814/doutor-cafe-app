@@ -157,6 +157,10 @@ function processarArquivo(file){
 
   dropTexto.textContent = '⏳ Redimensionando...';
   btnComparar.disabled = true;
+// 1024/0.90 = exatamente o que o processar() do index.html usa em producao
+// (desde 12/08/2026 — antes o app usava 1280/0.95 e este teste ja usava 1024,
+// o que invalidava silenciosamente qualquer comparacao de TEMPO entre os dois).
+// Se mudar la, mude aqui junto.
   redimensionarImagem(file, 1024, 0.90, function(b64){
     imagemBase64 = b64;
     dropTexto.textContent = '✅ ' + file.name + ' (redimensionada p/ 1024px)';
