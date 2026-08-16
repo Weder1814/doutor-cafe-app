@@ -1951,7 +1951,23 @@ function processar(file, isVideo) {
   document.getElementById("spinnerTexto").textContent="Analisando...";
   iniciarDicasSpinner(DICAS_FOLHA);
   document.getElementById("spinner").scrollIntoView({behavior:"smooth",block:"center"});
-  redimensionarImagem(file, 1280, 0.95, function(b64) {
+  // ALTERADO 12/08/2026: era 1280/0.95. Baixado para 1024/0.90 por dois motivos.
+  // (1) VALIDACAO: toda a bateria de comparacao Plus vs Flash que embasou a
+  //     troca de modelo rodou em 1024/0.90 (era o valor no teste-folha-flash.html).
+  //     Ou seja, 1024 e o tamanho em que a acuracia foi de fato verificada em ~8
+  //     fotos reais — o Flash identificou aneis concentricos, halo amarelo,
+  //     textura de po e clorose internerval sem dificuldade nesse tamanho.
+  //     Manter producao em 1280 significava rodar num tamanho NAO testado.
+  // (2) TEMPO: 1280x1280 tem ~56% mais area que 1024x1024, e qualidade 0.95 pesa
+  //     desproporcionalmente no JPEG — o base64 ficava perto do dobro. Isso custa
+  //     duas vezes: no upload (gargalo real no 4G do sitio, chegou a estourar o
+  //     timeout e cair na fila offline) e no prefill do modelo (mais pixels =
+  //     mais tokens de imagem). Explica a diferenca observada de 12086 tokens em
+  //     producao contra 11990 no teste com a mesma foto.
+  // NAO replicar essa reducao cegamente nos outros fluxos: solo (1600/0.85) e
+  // graos (1600/0.88) precisam de resolucao para LER NUMEROS de laudo e ver
+  // detalhe fino de defeito no grao — ali baixar resolucao quebra a funcao.
+  redimensionarImagem(file, 1024, 0.90, function(b64) {
     if(!navigator.onLine){
       pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";
       adicionarNaFila(b64,null,"folha",function(ok){ if(ok){renderAreaHistorico();alert("Sem sinal — foto salva na fila. Assim que a internet voltar, toque nela para analisar.");} });
