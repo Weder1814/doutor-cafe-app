@@ -1340,6 +1340,32 @@ async function assinarPlayBilling(tipo, ciclo){
   }
 }
 
+// Reconcilia compras Play Billing pendentes de confirmacao no backend.
+// Cobre os casos em que o usuario fechou o app no meio do fluxo de compra,
+// trocou de aparelho, ou reinstalou antes do RTDN confirmar a ativacao.
+// Roda em segundo plano no boot do app (chamado dentro de entrarNoApp),
+// sem bloquear a tela nem avisar o usuario se nao houver nada pendente.
+async function reconciliarComprasPlayNoBoot(){
+  if (!playBillingDisponivel()) return;
+  try {
+    var service = await window.getDigitalGoodsService("https://play.google.com/billing");
+    var compras = await service.listPurchases();
+    if (!compras || !compras.length) return;
+    var tokens = compras.map(function(p){ return p.purchaseToken; }).filter(Boolean);
+    if (!tokens.length) return;
+
+    var r = await fetch('https://doutor-cafe-production.up.railway.app/reconciliar-compras-play', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ userId: obterUserId(), purchaseTokens: tokens })
+    });
+    var data = await r.json();
+    var algumaAtivada = data && data.ok && data.resultados && data.resultados.some(function(x){ return x.ok; });
+    if (algumaAtivada) { atualizarContador(); }
+  } catch(e) {
+    console.error("Erro ao reconciliar compras Play no boot:", e);
+  }
+}
+
 function assinar(tipo){
   if (playBillingDisponivel()) {
     assinarPlayBilling(tipo, cicloAtual);
@@ -2735,7 +2761,7 @@ function navegarMais(){
   var el=document.getElementById("cardClima");
   if(el)el.scrollIntoView({behavior:"smooth",block:"start"});
 }
-function entrarNoApp(nome){usuarioAtual=verificarCadastroInicial();mostrarTela('tela-principal');var nav=document.getElementById('navInferior');if(nav)nav.style.display='flex';sincronizarIdentidade(function(){atualizarContador();sincronizarContadorServidor();});inicializarChipPerfil();renderAreaHistorico();renderCalendario();renderGuiaSafra(safraTipoAtual);obterGPS();obterPrecoCafe();checarLembretesPendentes();verificarBannerIOS();if(nome){var primeiroNome=nome.split(' ')[0];setTimeout(function(){var tag=document.getElementById('regiaoTag');if(tag)tag.innerHTML='Olá, '+primeiroNome+'! Vamos diagnosticar';setTimeout(function(){obterGPS();},3000);},600);}}
+function entrarNoApp(nome){usuarioAtual=verificarCadastroInicial();mostrarTela('tela-principal');var nav=document.getElementById('navInferior');if(nav)nav.style.display='flex';sincronizarIdentidade(function(){atualizarContador();sincronizarContadorServidor();});inicializarChipPerfil();renderAreaHistorico();renderCalendario();renderGuiaSafra(safraTipoAtual);obterGPS();obterPrecoCafe();checarLembretesPendentes();reconciliarComprasPlayNoBoot();verificarBannerIOS();if(nome){var primeiroNome=nome.split(' ')[0];setTimeout(function(){var tag=document.getElementById('regiaoTag');if(tag)tag.innerHTML='Olá, '+primeiroNome+'! Vamos diagnosticar';setTimeout(function(){obterGPS();},3000);},600);}}
 function verificarCadastroInicial(){try{return JSON.parse(localStorage.getItem(CADASTRO_INICIAL_KEY));}catch(e){return null;}}
 
 // ── SAIR DA CONTA (30/07/2026) ────────────────────────────────
