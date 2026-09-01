@@ -656,10 +656,10 @@ canvas { display: none; }
       <div class="landing-logo">🌿</div>
       <h1 class="landing-titulo">Doutor <span>Café</span></h1>
       <div class="landing-sub">O agrônomo no seu bolso</div>
-      <div class="landing-badge">✓ 15 análises grátis para começar</div>
+      <div class="landing-badge">✓ <span class="txt-gratis">6</span> análises grátis para começar</div>
     </div>
     <div class="landing-features">
-      <div class="landing-feat"><div class="landing-feat-icon">🔬</div><div class="landing-feat-info"><h4>Diagnóstico por Foto</h4><p>IA identifica ferrugem, cercosporiose, helmintosporiose e mais 30 doenças com alta precisão</p></div></div>
+      <div class="landing-feat"><div class="landing-feat-icon">🔬</div><div class="landing-feat-info"><h4>Diagnóstico por Foto</h4><p>IA identifica ferrugem, cercosporiose, phoma e mais de 30 problemas da lavoura com alta precisão</p></div></div>
       <div class="landing-feat"><div class="landing-feat-icon">📋</div><div class="landing-feat-info"><h4>Plano de Ação com Dosagens</h4><p>Recebe o que fazer essa semana, em 21 dias e a dosagem exata por tanque de 20L</p></div></div>
       <div class="landing-feat"><div class="landing-feat-icon">🧪</div><div class="landing-feat-info"><h4>Análise de Solo e Daninhas</h4><p>Interpreta laudo de solo e identifica plantas daninhas indicadoras de problemas</p></div></div>
       <div class="landing-feat"><div class="landing-feat-icon">📍</div><div class="landing-feat-info"><h4>Adaptado a Todas as Regiões Cafeeiras</h4><p>Mogiana, Sul de Minas, Cerrado Mineiro, Matas de Minas, Chapada Diamantina, Rondônia, Espírito Santo e mais</p></div></div>
@@ -690,7 +690,7 @@ canvas { display: none; }
   <div class="cad-inicial-header">
     <div class="cad-inicial-logo">🌿</div>
     <div class="cad-inicial-titulo">Doutor Café</div>
-    <div class="cad-inicial-sub">Libere suas 15 análises gratuitas</div>
+    <div class="cad-inicial-sub">Libere suas <span class="txt-gratis">6</span> análises gratuitas</div>
   </div>
   <div class="cad-inicial-card">
     <h3>Criar minha conta grátis</h3>
@@ -711,7 +711,7 @@ canvas { display: none; }
     <span class="cad-voltar" onclick="voltarParaLanding()">← Voltar</span>
   </div>
   <div class="cad-beneficios">
-    <div class="cad-ben-item"><span>🔬</span><p>15 análises de folhas, solo e daninhas grátis</p></div>
+    <div class="cad-ben-item"><span>🔬</span><p><span class="txt-gratis">6</span> análises de folhas, solo e daninhas grátis</p></div>
     <div class="cad-ben-item"><span>📋</span><p>Plano de ação com dosagem por tanque</p></div>
     <div class="cad-ben-item"><span>🔒</span><p>Seus dados protegidos — nunca vendemos</p></div>
   </div>
@@ -2759,6 +2759,19 @@ window.addEventListener("offline",function(){renderAreaHistorico();});
 var CADASTRO_INICIAL_KEY = 'doutorcafe_cadastro_v2';
 function mostrarTela(id){['tela-landing','tela-cadastro-inicial','tela-principal'].forEach(function(t){var el=document.getElementById(t);if(el)el.style.display=(t===id)?'block':'none';});window.scrollTo(0,0);}
 function irParaCadastroInicial(){mostrarTela('tela-cadastro-inicial');}
+// Mantem os textos de marketing ("N analises gratis") sincronizados com o
+// limite real. Motivo (31/08/2026): o limite caiu de 15 para 6 no codigo e no
+// backend, mas os tres textos da landing/cadastro continuaram dizendo 15 —
+// um amigo instalou o app pela Play Store e viu "15 analises gratis para
+// comecar" quando na verdade receberia 6. Promessa que o app nao cumpre e
+// pior do que numero pequeno: gera reclamacao e pode ser lido como
+// propaganda enganosa. O HTML ja vem com o valor certo (se o JS falhar, o
+// texto continua correto); isto aqui garante que uma futura mudanca em
+// TOTAL_GRATIS_COM_CAD se propague sozinha para a tela.
+function sincronizarTextosGratis(){
+  var els=document.querySelectorAll('.txt-gratis');
+  for(var i=0;i<els.length;i++){ els[i].textContent=TOTAL_GRATIS_COM_CAD; }
+}
 function voltarParaLanding(){mostrarTela('tela-landing');}
 
 function submeterCadastroInicial(){
@@ -2884,6 +2897,7 @@ function redimensionarFotoPerfil(file,callback){
   leitor.readAsDataURL(file);
 }
 document.addEventListener('DOMContentLoaded',function(){
+  sincronizarTextosGratis();
   var inputFoto=document.getElementById('inputFotoPerfil');
   if(!inputFoto)return;
   inputFoto.addEventListener('change',function(e){
@@ -3017,9 +3031,29 @@ function acordarServidor(callback){fetch("https://doutor-cafe-production.up.rail
 // ── PIX / USER ID ──
 var planoPixAtual='',pixPaymentId=null,pixCheckInterval=null;
 function obterUserId(){var u=localStorage.getItem('doutorcafe_uid');if(!u){u='user_'+Date.now()+'_'+Math.random().toString(36).substr(2,9);localStorage.setItem('doutorcafe_uid',u);}return u;}
-function abrirPix(tipo){planoPixAtual=tipo;fecharModal();document.getElementById('modalPix').classList.add('ativo');var nomes={basico_mensal:'Básico Mensal - R$ 29,90/mês',basico_anual:'Básico Anual - R$ 299,90/ano',pro_mensal:'Pro Mensal - R$ 39,90/mês',pro_anual:'Pro Anual - R$ 399,90/ano',premium_mensal:'Premium Mensal - R$ 49,90/mês',premium_anual:'Premium Anual - R$ 499,90/ano'};document.getElementById('pixSubtitulo').textContent='Plano '+(nomes[tipo+'_'+cicloAtual]||tipo);document.getElementById('pixArea').innerHTML='<label class="pix-form-label">Nome completo *</label><input class="pix-form-input" id="pixNome" type="text" placeholder="Ex: João da Silva"><label class="pix-form-label">CPF *</label><input class="pix-form-input" id="pixCpf" type="tel" placeholder="000.000.000-00" maxlength="14" oninput="mascararCpf(this)"><label class="pix-form-label">Email (opcional)</label><input class="pix-form-input" id="pixEmail" type="email" placeholder="seuemail@gmail.com"><button onclick="confirmarPix()" style="width:100%;padding:14px;background:linear-gradient(135deg,#2d8a3e,#1a5c2a);color:white;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px">Gerar QR Code PIX</button>';}
+function abrirPix(tipo){planoPixAtual=tipo;fecharModal();document.getElementById('modalPix').classList.add('ativo');var nomes={basico_mensal:'Básico Mensal - R$ 29,90/mês',basico_anual:'Básico Anual - R$ 299,90/ano',pro_mensal:'Pro Mensal - R$ 39,90/mês',pro_anual:'Pro Anual - R$ 399,90/ano',premium_mensal:'Premium Mensal - R$ 49,90/mês',premium_anual:'Premium Anual - R$ 499,90/ano'};document.getElementById('pixSubtitulo').textContent='Plano '+(nomes[tipo+'_'+cicloAtual]||tipo);gerarPix();}
+// SEM FORMULARIO ANTES DO QR (31/08/2026): o produtor escolhia o plano e caia
+// num formulario de nome + CPF + email ANTES de ver qualquer coisa. Sao tres
+// campos digitados numa tela pequena, no meio da lavoura, e nome/email JA
+// estao no cadastro que ele fez para usar o app — era retrabalho puro.
+// Agora vamos direto ao QR Code. O CPF so e pedido se o Mercado Pago recusar
+// sem ele (o backend responde 422 com precisaCpf:true nesse caso).
+function gerarPix(cpfManual){
+  var cad=getCadastro()||{};
+  document.getElementById('pixArea').innerHTML='<div class="pix-loading"><div class="pix-spinner"></div> Gerando QR Code...</div>';
+  fetch('https://doutor-cafe-production.up.railway.app/gerar-pix',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plano:planoPixAtual+'_'+cicloAtual,userId:obterUserId(),nome:cad.nome||'Produtor Rural',email:cad.email||'produtor@doutorcafe.app',cpf:cpfManual||''})})
+  .then(function(r){ if(r.status===422) return r.json().then(function(d){ d._precisaCpf=true; return d; }); return checarResposta(r); })
+  .then(function(d){
+    if(d&&d._precisaCpf){ pedirCpfPix(); return; }
+    if(d.qr_code_base64){ pixPaymentId=d.id;document.getElementById('pixArea').innerHTML='<div class="pix-qr-img"><img src="data:image/png;base64,'+d.qr_code_base64+'" alt="QR PIX"></div><div class="pix-codigo-box"><div class="pix-codigo-label">Código PIX:</div><div class="pix-codigo-txt" id="pixCodigoTxt">'+d.qr_code+'</div></div><div class="pix-status pix-status-aguardando" id="pixStatusTxt">Aguardando pagamento...</div><button class="btn-copiar-pix" onclick="copiarCodigoPix()">Copiar código PIX</button>';iniciarVerificacaoPix(); }
+    else { document.getElementById('pixArea').innerHTML='<div class="pix-status pix-status-erro">Erro: '+(d.erro||'Tente novamente.')+'</div>'; }
+  })
+  .catch(function(){ document.getElementById('pixArea').innerHTML='<div class="pix-status pix-status-erro">Erro de conexão.</div>'; });
+}
+function pedirCpfPix(){ document.getElementById('pixArea').innerHTML='<p style="font-size:14px;color:#555;margin-bottom:10px;line-height:1.5">O banco pede o CPF para emitir este PIX. É só desta vez.</p><label class="pix-form-label">CPF</label><input class="pix-form-input" id="pixCpf" type="tel" inputmode="numeric" placeholder="000.000.000-00" maxlength="14" oninput="mascararCpf(this)"><button onclick="confirmarCpfPix()" style="width:100%;padding:14px;background:linear-gradient(135deg,#2d8a3e,#1a5c2a);color:white;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px">Gerar QR Code PIX</button>'; }
+function confirmarCpfPix(){ var cpf=document.getElementById('pixCpf').value.replace(/[^0-9]/g,''); if(cpf.length!==11){alert('CPF inválido.');return;} gerarPix(cpf); }
 function mascararCpf(input){var v=input.value.replace(/[^0-9]/g,'');if(v.length>3)v=v.slice(0,3)+'.'+v.slice(3);if(v.length>7)v=v.slice(0,7)+'.'+v.slice(7);if(v.length>11)v=v.slice(0,11)+'-'+v.slice(11,13);input.value=v;}
-function confirmarPix(){var nome=document.getElementById('pixNome').value.trim(),cpf=document.getElementById('pixCpf').value.replace(/[^0-9]/g,''),email=document.getElementById('pixEmail').value.trim()||'produtor@doutorcafe.app';if(!nome){alert('Informe seu nome completo.');return;}if(cpf.length!==11){alert('CPF inválido.');return;}document.getElementById('pixArea').innerHTML='<div class="pix-loading"><div class="pix-spinner"></div> Gerando QR Code...</div>';fetch('https://doutor-cafe-production.up.railway.app/gerar-pix',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plano:planoPixAtual+'_'+cicloAtual,userId:obterUserId(),nome:nome,cpf:cpf,email:email})}).then(checarResposta).then(function(d){if(d.qr_code_base64){pixPaymentId=d.id;document.getElementById('pixArea').innerHTML='<div class="pix-qr-img"><img src="data:image/png;base64,'+d.qr_code_base64+'" alt="QR PIX"></div><div class="pix-codigo-box"><div class="pix-codigo-label">Código PIX:</div><div class="pix-codigo-txt" id="pixCodigoTxt">'+d.qr_code+'</div></div><div class="pix-status pix-status-aguardando" id="pixStatusTxt">Aguardando pagamento...</div><button class="btn-copiar-pix" onclick="copiarCodigoPix()">Copiar código PIX</button>';iniciarVerificacaoPix();}else{document.getElementById('pixArea').innerHTML='<div class="pix-status pix-status-erro">Erro: '+(d.erro||'Tente novamente.')+'</div>';}}).catch(function(){document.getElementById('pixArea').innerHTML='<div class="pix-status pix-status-erro">Erro de conexão.</div>';});}
+// confirmarPix() foi substituida por gerarPix() acima.
 function iniciarVerificacaoPix(){if(pixCheckInterval)clearInterval(pixCheckInterval);var t=0;pixCheckInterval=setInterval(function(){t++;if(t>72){clearInterval(pixCheckInterval);return;}if(!pixPaymentId)return;fetch('https://doutor-cafe-production.up.railway.app/verificar-pix/'+pixPaymentId).then(checarResposta).then(function(d){if(d.aprovado){clearInterval(pixCheckInterval);var tipo=d.plano_id&&d.plano_id.indexOf('premium')>-1?'premium':d.plano_id&&d.plano_id.indexOf('pro')>-1?'pro':'basico';salvarPlano({tipo:tipo,planoId:d.plano_id,dataAssinatura:new Date().toISOString()});localStorage.setItem(ANALISES_KEY,'0');atualizarContador();document.getElementById('pixArea').innerHTML='<div class="pix-status pix-status-aprovado">✅ Pagamento aprovado! Plano liberado!</div>';setTimeout(function(){fecharPix();},3000);}}).catch(function(){});},5000);}
 function copiarCodigoPix(){var txt=document.getElementById('pixCodigoTxt');if(!txt)return;if(navigator.clipboard){navigator.clipboard.writeText(txt.textContent).then(function(){alert('Código PIX copiado!');});}else{var el=document.createElement('textarea');el.value=txt.textContent;document.body.appendChild(el);el.select();document.execCommand('copy');document.body.removeChild(el);alert('Código PIX copiado!');}}
 function fecharPix(){if(pixCheckInterval)clearInterval(pixCheckInterval);pixPaymentId=null;document.getElementById('modalPix').classList.remove('ativo');}
