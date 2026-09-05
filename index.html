@@ -207,6 +207,17 @@ input[type="file"] { display: none; }
 .card-resultado { background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.1); animation: slideUp 0.4s ease; }
 .multi-header { padding: 16px 20px 8px; display: flex; align-items: center; gap: 12px; }
 .multi-foto { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; flex-shrink: 0; border: 2px solid #f0f0f0; }
+/* Miniatura tocavel: leve realce para o produtor perceber que da para ampliar */
+.multi-foto-zoom { cursor: pointer; position: relative; border-color: #cfe3c4; }
+.multi-foto-zoom:active { transform: scale(.96); }
+.multi-header { position: relative; }
+.multi-header::after {
+  content: "🔍"; position: absolute; left: 46px; top: 46px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: rgba(255,255,255,.96); font-size: 11px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,.22); pointer-events: none;
+}
 .multi-foto-placeholder { width: 60px; height: 60px; border-radius: 12px; background: var(--creme); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 24px; }
 .multi-titulo { flex: 1; }
 .multi-titulo h3 { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--marrom); }
@@ -1745,15 +1756,29 @@ function analisarDaFilaConfirmado(id) {
           .then(checarResposta).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultadoGraos(data);incrementarAnalise();})
           .catch(function(erro){document.getElementById("spinner").style.display="none";adicionarNaFila(item.foto,null,"graos",function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert(mensagemErroRede(erro));}});});
         } else {
-          document.getElementById("spinnerTexto").textContent = "Analisando...";
-          document.getElementById("spinnerSub").textContent = "Identificando sintomas e comparando padrões";
-          var bodyF = { imagem: item.foto, tipo: "image/jpeg" };
-          if (dadosGPS.regiao) bodyF.regiao = dadosGPS.regiao;
-          if (dadosGPS.altitude) bodyF.altitude = dadosGPS.altitude;
-          fetchSSEFinal("https://doutor-cafe-production.up.railway.app/diagnostico",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bodyF)},TIMEOUT_MS,function(erro,data){
-            if(erro){document.getElementById("spinner").style.display="none";adicionarNaFila(item.foto,null,"folha",function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert(mensagemErroRede(erro));}});return;}
-            document.getElementById("spinner").style.display="none";mostrarResultado(data,false);incrementarAnalise();
-          });
+          // FILA OFFLINE PASSA A USAR O MESMO FLUXO DA CAMERA (05/09/2026).
+          // Antes este ramo chamava fetchSSEFinal, que le o stream mas SO
+          // reage ao evento "fim" — os parciais eram descartados. Resultado:
+          // analisar pela camera revelava o nome da doenca em ~5s e o plano
+          // logo depois, mas analisar pela fila ficava 12-15s no spinner e
+          // despejava tudo de uma vez. Dois caminhos, duas experiencias.
+          //
+          // Em vez de duplicar aqui toda a logica de parciais/merge/plano de
+          // acao (que ja existe e esta testada em processar()), convertemos a
+          // foto guardada em base64 de volta num File e chamamos a MESMA
+          // funcao que a camera usa. Um fluxo so para manter daqui em diante.
+          try {
+            var fileDaFila = base64ParaFile(item.foto, "fila-"+item.id+".jpg");
+            document.getElementById("spinner").style.display = "none";
+            processar(fileDaFila, false);
+          } catch(e) {
+            // Se a conversao falhar por algum motivo, devolve a foto para a
+            // fila em vez de perder o trabalho do produtor.
+            document.getElementById("spinner").style.display = "none";
+            adicionarNaFila(item.foto, null, "folha", function(ok){
+              if(ok){ renderAreaHistorico(); alert("Não consegui reenviar essa foto agora. Ela continua salva na fila."); }
+            });
+          }
         }
       };
     };
@@ -2034,6 +2059,16 @@ function calcularGrupo(prefix,produtosStr){var areaEl=document.getElementById(pr
 // recomprime em JPEG e retorna só o base64 (sem o prefixo data:). Isso corta drasticamente
 // os tokens de entrada cobrados pela API por imagem, sem perda perceptível de qualidade
 // de diagnóstico. Em caso de falha (ex: arquivo corrompido), cai no base64 original.
+// Converte a foto guardada na fila offline (base64) de volta num File, para
+// que o reprocessamento possa usar processar() — a mesma funcao da camera,
+// com revelacao progressiva. Sem isso a fila precisaria de um fluxo proprio.
+function base64ParaFile(b64, nome){
+  var bin = atob(b64);
+  var bytes = new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+  return new File([bytes], nome||"foto.jpg", {type:"image/jpeg"});
+}
+
 function redimensionarImagem(file, maxDim, qualidade, callback) {
   var leitor = new FileReader();
   leitor.onload = function(e) {
@@ -2509,7 +2544,11 @@ function mostrarResultadoStreaming(diags,fotoBase64,isVideo){
   var ctExistente=document.getElementById("planoAcaoContainer");
   if(ctExistente&&ctExistente.innerHTML) planoHtmlSalvo=ctExistente.innerHTML;
 
-  var thumbHtml=fotoBase64?'<img class="multi-foto" src="data:image/jpeg;base64,'+fotoBase64+'" alt="foto">':"<div class='multi-foto-placeholder'>🌿</div>";
+  // A miniatura do topo do resultado tambem abre a foto em tela cheia
+// (05/09/2026). O produtor fotografa varias plantas seguidas na lavoura e,
+// ao ler o resultado, quer confirmar de qual folha veio aquele diagnostico —
+// entao tanto esta miniatura quanto a do plano de acao respondem ao toque.
+var thumbHtml=fotoBase64?'<img class="multi-foto multi-foto-zoom" src="data:image/jpeg;base64,'+fotoBase64+'" alt="Toque para ver a foto analisada em tamanho grande" title="Toque para ampliar" onclick="abrirVisorFoto(this.src)">':"<div class='multi-foto-placeholder'>🌿</div>";
   var qtd=diags.length>1?diags.length+" problemas detectados":"1 diagnóstico";
   var html='<div class="card-resultado"><div class="multi-header">'+thumbHtml+'<div class="multi-titulo"><h3>Resultado da Análise</h3><p>'+qtd;
   if(regiao)html+=' · 📍 '+regiao;
@@ -2747,7 +2786,7 @@ function mostrarSemCreditos(){
 
 // ── PLANO DE AÇÃO ──
 function buildResumo(diags){if(!diags||diags.length===0)return "";var doencas=diags.filter(function(d){return d.diagnostico!=="saudavel"&&CATEGORIAS[d.diagnostico]!=="Deficiência Nutricional"&&CATEGORIAS[d.diagnostico]!=="Deficiencia Nutricional";});var nutricao=diags.filter(function(d){return CATEGORIAS[d.diagnostico]==="Deficiência Nutricional"||CATEGORIAS[d.diagnostico]==="Deficiencia Nutricional";});var saudavel=diags.length===1&&diags[0].diagnostico==="saudavel";var html='<div class="resumo-diag-card"><div class="resumo-diag-titulo">🔬 Diagnóstico do seu cafeeiro</div>';var _idxAnim=0;var ATRASO=0;if(saudavel){html+='<div class="resumo-diag-linha resumo-linha-destaque" style="animation-delay:0s">✅ Nenhum problema detectado — planta saudável!</div>';}else{if(doencas.length>0){html+='<div class="resumo-diag-secao">🦠 '+doencas.length+' doença(s) detectada(s):</div>';doencas.forEach(function(d){var cor=d.estagio>=4?"#e53935":d.estagio>=3?"#ef6c00":"#f9a825";var delay=(_idxAnim*ATRASO).toFixed(2);var classeExtra=(_idxAnim===0)?" resumo-linha-destaque":"";_idxAnim++;html+='<div class="resumo-diag-linha'+classeExtra+'" style="animation-delay:'+delay+'s"><span style="color:'+cor+'">'+(EMOJIS[d.diagnostico]||"🌿")+'</span> <strong>'+d.diagnostico.replace(/_/g," ")+'</strong> <span style="color:#aaa;font-size:12px">— Estágio '+d.estagio+'/5</span>'+(d.parcial?' <span style="font-size:11px;color:#bbb">⏳</span>':'')+'</div>';});}if(nutricao.length>0){html+='<div class="resumo-diag-secao" style="margin-top:8px">⚗️ '+nutricao.length+' deficiência(s) nutricional(is):</div>';nutricao.forEach(function(d){var delay=(_idxAnim*ATRASO).toFixed(2);var classeExtra=(_idxAnim===0)?" resumo-linha-destaque":"";_idxAnim++;html+='<div class="resumo-diag-linha'+classeExtra+'" style="animation-delay:'+delay+'s">'+(EMOJIS[d.diagnostico]||"🔥")+' <strong>'+d.diagnostico.replace(/_/g," ")+'</strong>'+(d.parcial?' <span style="font-size:11px;color:#bbb">⏳</span>':'')+'</div>';});}}html+='</div>';return html;}
-function buildPlanoAcao(plano){if(!plano)return "";var html='<div class="plano-acao-card"><div class="plano-acao-header">';if(ultimaFotoBase64){html+='<img class="plano-foto-thumb" src="data:image/jpeg;base64,'+ultimaFotoBase64+'" alt="folha analisada" onclick="abrirVisorFoto()"><div class="plano-foto-lupa">🔍</div>';}html+='<div class="plano-acao-titulo">📋 O que sua planta precisa</div>';if(plano.resumo_geral)html+='<div class="plano-acao-resumo">'+plano.resumo_geral+'</div>';html+='</div>';if(plano.urgente)html+='<div class="plano-acao-item plano-acao-urgente"><strong>🔴 Esta semana:</strong> '+plano.urgente+'</div>';if(plano.em_21_dias)html+='<div class="plano-acao-item plano-acao-21dias"><strong>🟡 Em 21 dias:</strong> '+plano.em_21_dias+'</div>';if(plano.nutricao)html+='<div class="plano-acao-item plano-acao-nutricao"><strong>🟢 Nutrição:</strong> '+plano.nutricao+'</div>';html+='</div>';return html;}
+function buildPlanoAcao(plano){if(!plano)return "";var html='<div class="plano-acao-card"><div class="plano-acao-header">';if(ultimaFotoBase64){html+='<img class="plano-foto-thumb" src="data:image/jpeg;base64,'+ultimaFotoBase64+'" alt="folha analisada" onclick="abrirVisorFoto(this.src)"><div class="plano-foto-lupa">🔍</div>';}html+='<div class="plano-acao-titulo">📋 O que sua planta precisa</div>';if(plano.resumo_geral)html+='<div class="plano-acao-resumo">'+plano.resumo_geral+'</div>';html+='</div>';if(plano.urgente)html+='<div class="plano-acao-item plano-acao-urgente"><strong>🔴 Esta semana:</strong> '+plano.urgente+'</div>';if(plano.em_21_dias)html+='<div class="plano-acao-item plano-acao-21dias"><strong>🟡 Em 21 dias:</strong> '+plano.em_21_dias+'</div>';if(plano.nutricao)html+='<div class="plano-acao-item plano-acao-nutricao"><strong>🟢 Nutrição:</strong> '+plano.nutricao+'</div>';html+='</div>';return html;}
 
 // ── VOZ ──
 function falarTextoAtual(){falar(_textoParaFalar);}
@@ -3092,9 +3131,13 @@ function obterUserId(){var u=localStorage.getItem('doutorcafe_uid');if(!u){u='us
 // Abre a foto analisada em tela cheia. Motivo (05/09/2026): na lavoura o
 // produtor fotografa varias plantas em sequencia e, ao ler o plano de acao,
 // nao lembra a qual folha aquele resultado se refere.
-function abrirVisorFoto(){
-  if(!ultimaFotoBase64) return;
-  document.getElementById("visorFotoImg").src = "data:image/jpeg;base64,"+ultimaFotoBase64;
+// Recebe o src da imagem que o produtor REALMENTE tocou. Sem isso o visor
+// dependeria de ultimaFotoBase64, que aponta para a analise mais recente —
+// e mostraria a foto errada ao abrir uma analise antiga pelo historico.
+function abrirVisorFoto(srcTocado){
+  var src = srcTocado || (ultimaFotoBase64 ? "data:image/jpeg;base64,"+ultimaFotoBase64 : null);
+  if(!src) return;
+  document.getElementById("visorFotoImg").src = src;
   var leg = document.getElementById("visorFotoLegenda");
   if(leg) leg.textContent = "Esta é a foto que gerou este diagnóstico" + (dadosGPS.regiao?" · "+dadosGPS.regiao:"");
   document.getElementById("visorFoto").classList.add("ativo");
