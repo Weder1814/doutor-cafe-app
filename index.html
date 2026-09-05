@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Doutor Café">
-<link rel="apple-touch-icon" sizes="180x180" href="/icon-180-v2.png">
+<link rel="apple-touch-icon" href="/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -656,7 +656,7 @@ canvas { display: none; }
       <div class="landing-logo">🌿</div>
       <h1 class="landing-titulo">Doutor <span>Café</span></h1>
       <div class="landing-sub">O agrônomo no seu bolso</div>
-      <div class="landing-badge">✓ <span class="txt-gratis">6</span> análises grátis para começar</div>
+      <div class="landing-badge">✓ <span class="txt-gratis">10</span> análises grátis para começar</div>
     </div>
     <div class="landing-features">
       <div class="landing-feat"><div class="landing-feat-icon">🔬</div><div class="landing-feat-info"><h4>Diagnóstico por Foto</h4><p>IA identifica ferrugem, cercosporiose, phoma e mais de 30 problemas da lavoura com alta precisão</p></div></div>
@@ -690,7 +690,7 @@ canvas { display: none; }
   <div class="cad-inicial-header">
     <div class="cad-inicial-logo">🌿</div>
     <div class="cad-inicial-titulo">Doutor Café</div>
-    <div class="cad-inicial-sub">Libere suas <span class="txt-gratis">6</span> análises gratuitas</div>
+    <div class="cad-inicial-sub">Libere suas <span class="txt-gratis">10</span> análises gratuitas</div>
   </div>
   <div class="cad-inicial-card">
     <h3>Criar minha conta grátis</h3>
@@ -711,7 +711,7 @@ canvas { display: none; }
     <span class="cad-voltar" onclick="voltarParaLanding()">← Voltar</span>
   </div>
   <div class="cad-beneficios">
-    <div class="cad-ben-item"><span>🔬</span><p><span class="txt-gratis">6</span> análises de folhas, solo e daninhas grátis</p></div>
+    <div class="cad-ben-item"><span>🔬</span><p><span class="txt-gratis">10</span> análises de folhas, solo e daninhas grátis</p></div>
     <div class="cad-ben-item"><span>📋</span><p>Plano de ação com dosagem por tanque</p></div>
     <div class="cad-ben-item"><span>🔒</span><p>Seus dados protegidos — nunca vendemos</p></div>
   </div>
@@ -1002,6 +1002,10 @@ canvas { display: none; }
     <div style="margin-top:10px;font-size:11.5px;color:#8a6d1e;background:#faf0d8;border-radius:10px;padding:8px 12px;line-height:1.4">&#128248; <strong>Dica:</strong> fotografe a planta INTEIRA, de lado (da base at&#233; o topo) &#8212; n&#227;o s&#243; de cima. Isso evita confundir plantas parecidas.</div>
   </div>
 
+  <!-- FILA OFFLINE logo apos as acoes de foto: e o que o produtor volta para resolver quando chega no sinal (movida de baixo em 05/09/2026) -->
+  <div class="secao-titulo" style="margin-top:4px" id="tituloSecaoHistorico">&#128203; Hist&#243;rico de An&#225;lises</div>
+  <div id="areaHistorico"></div>
+
   <!-- TRIAGEM DE DEFEITOS DO GRAO DESATIVADA TEMPORARIAMENTE (guardada para
        proxima atualizacao — mais tempo para calibrar o prompt de visao contra
        normas IN MAPA/SENAR/SCA). Backend /identifica-defeito-grao continua intacto.
@@ -1048,7 +1052,6 @@ canvas { display: none; }
     <div id="guiaSafraLista"></div>
   </div>
 
-  <div class="secao-titulo" style="margin-top:4px" id="tituloSecaoHistorico">&#128203; Hist&#243;rico de An&#225;lises</div>
 
   <div class="talhoes-section" id="secaoTalhoes">
     <div class="talhoes-titulo">🗺️ Meus Talhões <button onclick="limparTodosTalhoes()" style="background:none;border:none;font-size:11px;color:#aaa;cursor:pointer;text-decoration:underline;font-weight:400;letter-spacing:0;text-transform:none;margin-left:8px">Limpar tudo</button></div>
@@ -1056,7 +1059,6 @@ canvas { display: none; }
     <button class="btn-novo-talhao" onclick="abrirCriarTalhaoSemFoto()">+ Cadastrar Novo Talhão</button>
   </div>
 
-  <div id="areaHistorico"></div>
 
   <div class="secao-titulo" style="margin-top:4px">&#10067; O Que Significam os Termos</div>
   <details class="dica" style="display:block">
@@ -1530,7 +1532,7 @@ var ANALISES_BONUS_CAD = 10;
 // O numero NAO e mais exibido ao usuario no plano gratuito — ver
 // atualizarContador(). Continua aqui porque a UI precisa saber quando
 // bloquear e quando avisar que esta acabando.
-var TOTAL_GRATIS_COM_CAD = 6;
+var TOTAL_GRATIS_COM_CAD = 10;
 
 function getCadastro(){try{return JSON.parse(localStorage.getItem(CADASTRO_KEY))||null;}catch(e){return null;}}
 function salvarCadastroLocal(dados){try{localStorage.setItem(CADASTRO_KEY,JSON.stringify(dados));}catch(e){}}
@@ -2752,7 +2754,10 @@ if(document.getElementById("btnGraos"))document.getElementById("btnGraos").addEv
 if(document.getElementById("btnGraosGal"))document.getElementById("btnGraosGal").addEventListener("click",function(){document.getElementById("graosGal").click();});
 
 bindCam();bindGal();bindVid();bindSolo();bindSoloGal();bindDaninha();bindDaninhaGal();bindGraos();bindGraosGal();
-window.addEventListener("online",function(){renderAreaHistorico();});
+// Ao voltar o sinal, nao basta redesenhar: o servidor pode estar dormindo.
+// Pingamos na hora (sem esperar o intervalo de 25s) e o proprio acordarServidor
+// redesenha a fila quando a resposta chega.
+window.addEventListener("online",function(){renderAreaHistorico();acordarServidor(null);});
 window.addEventListener("offline",function(){renderAreaHistorico();});
 
 // ── NAVEGAÇÃO DE TELAS ──
@@ -3026,7 +3031,25 @@ function confirmarLoginPin(){
 
 // ── KEEP-ALIVE ──
 var servidorAcordado = false;
-function acordarServidor(callback){fetch("https://doutor-cafe-production.up.railway.app/ping").then(checarResposta).then(function(){servidorAcordado=true;var av=document.getElementById("avisoServidor");if(av)av.style.display="none";if(callback)callback();}).catch(function(){servidorAcordado=false;});}
+// CORRIGIDO 05/09/2026 — APP FICAVA PRESO EM "SEM INTERNET".
+// Caso real: 9 fotos tiradas offline na lavoura; ao chegar na cidade com 4G,
+// o app continuou mostrando "Sem internet. As fotos ficam salvas aqui".
+// Motivo: o banner usa `navigator.onLine && servidorAcordado`. Quando o sinal
+// voltava, navigator.onLine virava true, mas servidorAcordado continuava
+// false ate o proximo ping (ate 25s depois) — e quando esse ping enfim
+// respondia, NINGUEM re-renderizava a fila. A tela ficava travada no aviso
+// errado ate o produtor mexer em outra coisa.
+// Agora, quando o servidor SAI de dormindo para acordado, a fila e
+// redesenhada sozinha.
+function acordarServidor(callback){
+  fetch("https://doutor-cafe-production.up.railway.app/ping").then(checarResposta).then(function(){
+    var estavaDormindo = !servidorAcordado;
+    servidorAcordado=true;
+    var av=document.getElementById("avisoServidor");if(av)av.style.display="none";
+    if(estavaDormindo){ try{ renderAreaHistorico(); }catch(e){} }
+    if(callback)callback();
+  }).catch(function(){servidorAcordado=false;});
+}
 
 // ── PIX / USER ID ──
 var planoPixAtual='',pixPaymentId=null,pixCheckInterval=null;
