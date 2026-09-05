@@ -246,6 +246,41 @@ input[type="file"] { display: none; }
 .card-topo { padding: 20px 20px 16px; display: flex; align-items: center; gap: 14px; }
 .card-foto-thumb { width: 72px; height: 72px; border-radius: 14px; object-fit: cover; flex-shrink: 0; border: 2px solid #f0f0f0; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
 .card-foto-thumb-placeholder { width: 72px; height: 72px; border-radius: 14px; background: var(--creme); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+/* FOTO ANALISADA NO PLANO DE ACAO (05/09/2026) — o produtor pediu para ver,
+   ao lado do plano, qual folha gerou aquele resultado; e poder tocar para
+   ver grande, porque na lavoura ele fotografa varias plantas seguidas e
+   depois nao lembra qual e qual. */
+.plano-acao-header { position: relative; }
+.plano-foto-thumb {
+  position: absolute; top: 0; right: 0;
+  width: 58px; height: 58px; border-radius: 12px; object-fit: cover;
+  border: 2px solid rgba(255,255,255,.85);
+  box-shadow: 0 2px 10px rgba(0,0,0,.28);
+  cursor: pointer; z-index: 2;
+}
+.plano-foto-lupa {
+  position: absolute; top: 44px; right: -4px;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(255,255,255,.95); color: #2d5016;
+  font-size: 12px; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,.25); pointer-events: none; z-index: 3;
+}
+/* deixa espaco para a miniatura nao cobrir o titulo/resumo */
+.plano-acao-header .plano-acao-titulo,
+.plano-acao-header .plano-acao-resumo { padding-right: 70px; }
+
+#visorFoto {
+  display: none; position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0,0,0,.92); align-items: center; justify-content: center;
+  padding: 16px; flex-direction: column; gap: 14px;
+}
+#visorFoto.ativo { display: flex; }
+#visorFoto img { max-width: 100%; max-height: 78vh; border-radius: 14px; box-shadow: 0 8px 40px rgba(0,0,0,.6); }
+.visor-legenda { color: #eee; font-size: 13.5px; text-align: center; line-height: 1.5; max-width: 90%; }
+.visor-fechar {
+  background: rgba(255,255,255,.15); color: #fff; border: 1.5px solid rgba(255,255,255,.4);
+  border-radius: 999px; padding: 10px 26px; font-size: 15px; font-weight: 600; cursor: pointer;
+}
 .card-titulo h2 { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--marrom); text-transform: capitalize; }
 .card-titulo .categoria { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--cinza); margin-top: 2px; }
 .badges { padding: 0 20px 16px; display: flex; gap: 8px; flex-wrap: wrap; }
@@ -2712,7 +2747,7 @@ function mostrarSemCreditos(){
 
 // ── PLANO DE AÇÃO ──
 function buildResumo(diags){if(!diags||diags.length===0)return "";var doencas=diags.filter(function(d){return d.diagnostico!=="saudavel"&&CATEGORIAS[d.diagnostico]!=="Deficiência Nutricional"&&CATEGORIAS[d.diagnostico]!=="Deficiencia Nutricional";});var nutricao=diags.filter(function(d){return CATEGORIAS[d.diagnostico]==="Deficiência Nutricional"||CATEGORIAS[d.diagnostico]==="Deficiencia Nutricional";});var saudavel=diags.length===1&&diags[0].diagnostico==="saudavel";var html='<div class="resumo-diag-card"><div class="resumo-diag-titulo">🔬 Diagnóstico do seu cafeeiro</div>';var _idxAnim=0;var ATRASO=0;if(saudavel){html+='<div class="resumo-diag-linha resumo-linha-destaque" style="animation-delay:0s">✅ Nenhum problema detectado — planta saudável!</div>';}else{if(doencas.length>0){html+='<div class="resumo-diag-secao">🦠 '+doencas.length+' doença(s) detectada(s):</div>';doencas.forEach(function(d){var cor=d.estagio>=4?"#e53935":d.estagio>=3?"#ef6c00":"#f9a825";var delay=(_idxAnim*ATRASO).toFixed(2);var classeExtra=(_idxAnim===0)?" resumo-linha-destaque":"";_idxAnim++;html+='<div class="resumo-diag-linha'+classeExtra+'" style="animation-delay:'+delay+'s"><span style="color:'+cor+'">'+(EMOJIS[d.diagnostico]||"🌿")+'</span> <strong>'+d.diagnostico.replace(/_/g," ")+'</strong> <span style="color:#aaa;font-size:12px">— Estágio '+d.estagio+'/5</span>'+(d.parcial?' <span style="font-size:11px;color:#bbb">⏳</span>':'')+'</div>';});}if(nutricao.length>0){html+='<div class="resumo-diag-secao" style="margin-top:8px">⚗️ '+nutricao.length+' deficiência(s) nutricional(is):</div>';nutricao.forEach(function(d){var delay=(_idxAnim*ATRASO).toFixed(2);var classeExtra=(_idxAnim===0)?" resumo-linha-destaque":"";_idxAnim++;html+='<div class="resumo-diag-linha'+classeExtra+'" style="animation-delay:'+delay+'s">'+(EMOJIS[d.diagnostico]||"🔥")+' <strong>'+d.diagnostico.replace(/_/g," ")+'</strong>'+(d.parcial?' <span style="font-size:11px;color:#bbb">⏳</span>':'')+'</div>';});}}html+='</div>';return html;}
-function buildPlanoAcao(plano){if(!plano)return "";var html='<div class="plano-acao-card"><div class="plano-acao-header"><div class="plano-acao-titulo">📋 O que sua planta precisa</div>';if(plano.resumo_geral)html+='<div class="plano-acao-resumo">'+plano.resumo_geral+'</div>';html+='</div>';if(plano.urgente)html+='<div class="plano-acao-item plano-acao-urgente"><strong>🔴 Esta semana:</strong> '+plano.urgente+'</div>';if(plano.em_21_dias)html+='<div class="plano-acao-item plano-acao-21dias"><strong>🟡 Em 21 dias:</strong> '+plano.em_21_dias+'</div>';if(plano.nutricao)html+='<div class="plano-acao-item plano-acao-nutricao"><strong>🟢 Nutrição:</strong> '+plano.nutricao+'</div>';html+='</div>';return html;}
+function buildPlanoAcao(plano){if(!plano)return "";var html='<div class="plano-acao-card"><div class="plano-acao-header">';if(ultimaFotoBase64){html+='<img class="plano-foto-thumb" src="data:image/jpeg;base64,'+ultimaFotoBase64+'" alt="folha analisada" onclick="abrirVisorFoto()"><div class="plano-foto-lupa">🔍</div>';}html+='<div class="plano-acao-titulo">📋 O que sua planta precisa</div>';if(plano.resumo_geral)html+='<div class="plano-acao-resumo">'+plano.resumo_geral+'</div>';html+='</div>';if(plano.urgente)html+='<div class="plano-acao-item plano-acao-urgente"><strong>🔴 Esta semana:</strong> '+plano.urgente+'</div>';if(plano.em_21_dias)html+='<div class="plano-acao-item plano-acao-21dias"><strong>🟡 Em 21 dias:</strong> '+plano.em_21_dias+'</div>';if(plano.nutricao)html+='<div class="plano-acao-item plano-acao-nutricao"><strong>🟢 Nutrição:</strong> '+plano.nutricao+'</div>';html+='</div>';return html;}
 
 // ── VOZ ──
 function falarTextoAtual(){falar(_textoParaFalar);}
@@ -3054,6 +3089,18 @@ function acordarServidor(callback){
 // ── PIX / USER ID ──
 var planoPixAtual='',pixPaymentId=null,pixCheckInterval=null;
 function obterUserId(){var u=localStorage.getItem('doutorcafe_uid');if(!u){u='user_'+Date.now()+'_'+Math.random().toString(36).substr(2,9);localStorage.setItem('doutorcafe_uid',u);}return u;}
+// Abre a foto analisada em tela cheia. Motivo (05/09/2026): na lavoura o
+// produtor fotografa varias plantas em sequencia e, ao ler o plano de acao,
+// nao lembra a qual folha aquele resultado se refere.
+function abrirVisorFoto(){
+  if(!ultimaFotoBase64) return;
+  document.getElementById("visorFotoImg").src = "data:image/jpeg;base64,"+ultimaFotoBase64;
+  var leg = document.getElementById("visorFotoLegenda");
+  if(leg) leg.textContent = "Esta é a foto que gerou este diagnóstico" + (dadosGPS.regiao?" · "+dadosGPS.regiao:"");
+  document.getElementById("visorFoto").classList.add("ativo");
+}
+function fecharVisorFoto(){ document.getElementById("visorFoto").classList.remove("ativo"); }
+
 function abrirPix(tipo){planoPixAtual=tipo;fecharModal();document.getElementById('modalPix').classList.add('ativo');var nomes={basico_mensal:'Básico Mensal - R$ 29,90/mês',basico_anual:'Básico Anual - R$ 299,90/ano',pro_mensal:'Pro Mensal - R$ 39,90/mês',pro_anual:'Pro Anual - R$ 399,90/ano',premium_mensal:'Premium Mensal - R$ 49,90/mês',premium_anual:'Premium Anual - R$ 499,90/ano'};document.getElementById('pixSubtitulo').textContent='Plano '+(nomes[tipo+'_'+cicloAtual]||tipo);gerarPix();}
 // SEM FORMULARIO ANTES DO QR (31/08/2026): o produtor escolhia o plano e caia
 // num formulario de nome + CPF + email ANTES de ver qualquer coisa. Sao tres
@@ -3103,5 +3150,12 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
+
+<!-- VISOR DA FOTO ANALISADA — aberto ao tocar na miniatura do plano de acao -->
+<div id="visorFoto" onclick="fecharVisorFoto()">
+  <img id="visorFotoImg" src="" alt="Foto analisada">
+  <div class="visor-legenda" id="visorFotoLegenda"></div>
+  <button class="visor-fechar" onclick="fecharVisorFoto()">Fechar</button>
+</div>
 </body>
 </html>
