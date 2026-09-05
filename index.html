@@ -74,6 +74,17 @@ body { font-family: 'DM Sans', sans-serif; background: var(--creme); min-height:
 .safra-toggle { display:flex; gap:8px; margin-bottom:14px; background:#f0e6da; border-radius:14px; padding:4px; }
 .safra-toggle-btn { flex:1; border:none; background:none; padding:10px 6px; border-radius:11px; font-family:'DM Sans',sans-serif; font-weight:700; font-size:12.5px; color:#8a6a4a; cursor:pointer; transition:background .2s, color .2s; }
 .safra-toggle-btn.ativo { background:var(--tema-grad); color:white; box-shadow:0 3px 10px var(--tema-sombra); }
+/* SELETOR DE ESPECIE (05/09/2026) — o produtor escolhe explicitamente o que
+   plantou, em vez de o app deduzir so pelo GPS. Ele sabe melhor que o mapa:
+   as faixas de coordenada nao cobrem o Brasil inteiro, o Espirito Santo tem
+   as duas especies, e o produtor pode estar fora de qualquer regiao
+   catalogada. O GPS passa a SUGERIR; a escolha do produtor decide. */
+.especie-barra { display:flex; align-items:center; gap:10px; background:#fff; border:1.5px solid #e6e0d4; border-radius:16px; padding:10px 12px; margin:0 0 8px; }
+.especie-barra-lbl { font-size:11.5px; font-weight:700; letter-spacing:.04em; color:#8a6a4a; text-transform:uppercase; flex-shrink:0; }
+.especie-toggle { display:flex; gap:6px; background:#f4f1e9; border-radius:12px; padding:3px; flex:1; }
+.especie-btn { flex:1; border:none; background:none; padding:9px 6px; border-radius:10px; font-family:'DM Sans',sans-serif; font-weight:700; font-size:13px; color:#8a6a4a; cursor:pointer; transition:.15s; }
+.especie-btn.ativo { background:linear-gradient(135deg,#2d8a3e,#1a5c2a); color:#fff; box-shadow:0 3px 10px rgba(45,138,62,.28); }
+.especie-sugestao { font-size:11.5px; color:#7d8a72; margin:0 0 12px; padding:0 6px; line-height:1.45; }
 .safra-nota { font-size:11px; color:#9a8265; line-height:1.4; margin-bottom:14px; padding:10px 12px; background:#f5efe6; border-radius:12px; }
 .safra-fase { border-radius:14px; background:white; border:1.5px solid #f0e4d4; margin-bottom:10px; overflow:hidden; }
 .safra-fase-head { display:flex; align-items:center; gap:10px; padding:13px 14px; cursor:pointer; }
@@ -978,6 +989,16 @@ canvas { display: none; }
     <button class="banner-ios-fechar" onclick="fecharBannerIOS()">✕</button>
   </div>
 
+  <!-- ESPECIE DO CAFE: escolha explicita do produtor, usada em TODOS os diagnosticos -->
+  <div class="especie-barra">
+    <span class="especie-barra-lbl">Meu café</span>
+    <div class="especie-toggle">
+      <button class="especie-btn" data-especie="arabica" onclick="definirEspecie('arabica')">Arábica</button>
+      <button class="especie-btn" data-especie="conilon" onclick="definirEspecie('conilon')">Conilon</button>
+    </div>
+  </div>
+  <div class="especie-sugestao" id="especieSugestao"></div>
+
   <div class="secao-card tema-folha">
     <div class="secao-card-head">
       <div class="secao-badge">&#127807;</div>
@@ -1187,7 +1208,7 @@ canvas { display: none; }
       <option value="">Selecione sua região...</option>
       <option value="Mogiana">Mogiana (SP/MG)</option><option value="Sul de Minas">Sul de Minas</option>
       <option value="Cerrado Mineiro">Cerrado Mineiro</option><option value="Matas de Minas">Matas de Minas</option>
-      <option value="Chapada Diamantina">Chapada Diamantina (BA)</option><option value="Planalto da Bahia">Planalto da Bahia</option>
+      <option value="Chapada Diamantina">Chapada Diamantina (BA)</option><option value="Planalto da Bahia">Planalto da Bahia</option><option value="Extremo Sul da Bahia">Extremo Sul da Bahia (conilon)</option>
       <option value="Rondonia">Rondônia</option><option value="Norte do Parana">Norte do Paraná</option>
       <option value="Espirito Santo">Espírito Santo</option><option value="Alta Paulista">Alta Paulista (SP)</option>
       <option value="Outra">Outra região</option>
@@ -1722,7 +1743,7 @@ function analisarDaFilaConfirmado(id) {
           document.getElementById("spinnerTexto").textContent = "Analisando "+item.frames.length+" ângulos...";
           document.getElementById("spinnerSub").textContent = "Processando vídeo da fila offline";
           var bodyV = { frames: item.frames, tipo: "image/jpeg" };
-          if (dadosGPS.regiao) bodyV.regiao = dadosGPS.regiao;
+          if (dadosGPS.regiao) bodyV.regiao = dadosGPS.regiao; bodyV.especie = getEspecie();
           if (dadosGPS.altitude) bodyV.altitude = dadosGPS.altitude;
           fetchComTimeout("https://doutor-cafe-production.up.railway.app/diagnostico-video",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bodyV)},TIMEOUT_MS)
           .then(checarResposta).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultado(data,true);incrementarAnalise();})
@@ -1731,7 +1752,7 @@ function analisarDaFilaConfirmado(id) {
           document.getElementById("spinnerTexto").textContent = "Identificando planta daninha...";
           document.getElementById("spinnerSub").textContent = "Lendo o que ela revela sobre o seu solo (fila offline)";
           var bodyD = { imagem: item.foto, tipo: "image/jpeg" };
-          if (dadosGPS.regiao) bodyD.regiao = dadosGPS.regiao;
+          if (dadosGPS.regiao) bodyD.regiao = dadosGPS.regiao; bodyD.especie = getEspecie();
           fetchSSEFinal("https://doutor-cafe-production.up.railway.app/identifica-daninha",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bodyD)},TIMEOUT_MS,function(erro,data){
             if(erro){document.getElementById("spinner").style.display="none";adicionarNaFila(item.foto,null,"daninha",function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert(mensagemErroRede(erro));}});return;}
             document.getElementById("spinner").style.display="none";mostrarResultadoDaninha(data);incrementarAnalise();
@@ -1743,7 +1764,7 @@ function analisarDaFilaConfirmado(id) {
           document.getElementById("spinnerTexto").textContent = "Lendo laudo de solo...";
           document.getElementById("spinnerSub").textContent = "Interpretando valores e calculando recomendações (fila offline)";
           var bodyS = { imagem: item.foto, tipo: "image/jpeg" };
-          if (dadosGPS.regiao) bodyS.regiao = dadosGPS.regiao;
+          if (dadosGPS.regiao) bodyS.regiao = dadosGPS.regiao; bodyS.especie = getEspecie();
           fetchComRetry("https://doutor-cafe-production.up.railway.app/analise-solo",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bodyS)},TIMEOUT_MS)
           .then(checarResposta).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultadoSolo(data);incrementarAnalise();})
           .catch(function(erro){document.getElementById("spinner").style.display="none";adicionarNaFila(item.foto,null,"solo",function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert(mensagemErroRede(erro));}});});
@@ -1751,7 +1772,7 @@ function analisarDaFilaConfirmado(id) {
           document.getElementById("spinnerTexto").textContent = "Analisando os grãos...";
           document.getElementById("spinnerSub").textContent = "Triagem de defeitos (fila offline)";
           var bodyGr = { imagem: item.foto, tipo: "image/jpeg" };
-          if (dadosGPS.regiao) bodyGr.regiao = dadosGPS.regiao;
+          if (dadosGPS.regiao) bodyGr.regiao = dadosGPS.regiao; bodyGr.especie = getEspecie();
           fetchComRetry("https://doutor-cafe-production.up.railway.app/identifica-defeito-grao",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bodyGr)},TIMEOUT_MS)
           .then(checarResposta).then(function(data){document.getElementById("spinner").style.display="none";mostrarResultadoGraos(data);incrementarAnalise();})
           .catch(function(erro){document.getElementById("spinner").style.display="none";adicionarNaFila(item.foto,null,"graos",function(ok){if(ok){renderAreaHistorico();document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});alert(mensagemErroRede(erro));}});});
@@ -1903,6 +1924,11 @@ var safraTipoAtual = localStorage.getItem("doutorcafe_safra_tipo") || "arabica";
 function renderGuiaSafra(tipo){
   safraTipoAtual = tipo;
   localStorage.setItem("doutorcafe_safra_tipo", tipo);
+  // mantem o seletor do topo em sincronia: e a MESMA especie
+  document.querySelectorAll(".especie-btn").forEach(function(b){
+    b.classList.toggle("ativo", b.getAttribute("data-especie")===tipo);
+  });
+  try{ atualizarSugestaoEspecie(); }catch(e){}
   document.querySelectorAll(".safra-toggle-btn").forEach(function(b){
     b.classList.toggle("ativo", b.getAttribute("data-tipo")===tipo);
   });
@@ -1981,7 +2007,7 @@ function travarAnalise(){
   return true;
 }
 function destravarAnalise(){_analiseEmAndamento=false;}
-function identificarRegiao(lat,lon){if(lat>=-20.5&&lat<=-15.0&&lon>=-50.0&&lon<=-44.0)return "Cerrado Mineiro";if(lat>=-22.5&&lat<=-19.5&&lon>=-46.5&&lon<=-43.5)return "Sul de Minas";if(lat>=-21.5&&lat<=-19.0&&lon>=-48.5&&lon<=-46.0)return "Mogiana";if(lat>=-20.0&&lat<=-17.0&&lon>=-42.5&&lon<=-40.0)return "Matas de Minas";if(lat>=-15.0&&lat<=-10.0&&lon>=-41.5&&lon<=-38.5)return "Chapada Diamantina";if(lat>=-12.0&&lat<=-8.0&&lon>=-40.0&&lon<=-36.0)return "Planalto da Bahia";if(lat>=-12.0&&lat<=-6.0&&lon>=-62.0&&lon<=-56.0)return "Rondônia";if(lat>=-22.0&&lat<=-19.0&&lon>=-52.0&&lon<=-48.0)return "Alta Paulista";if(lat>=-25.0&&lat<=-21.0&&lon>=-54.0&&lon<=-49.0)return "Norte do Paraná";if(lat>=-21.0&&lat<=-17.0&&lon>=-41.5&&lon<=-39.0)return "Espírito Santo";return "Região Cafeeira";}
+function identificarRegiao(lat,lon){if(lat>=-20.5&&lat<=-15.0&&lon>=-50.0&&lon<=-44.0)return "Cerrado Mineiro";if(lat>=-22.5&&lat<=-19.5&&lon>=-46.5&&lon<=-43.5)return "Sul de Minas";if(lat>=-21.5&&lat<=-19.0&&lon>=-48.5&&lon<=-46.0)return "Mogiana";if(lat>=-20.0&&lat<=-17.0&&lon>=-42.5&&lon<=-40.0)return "Matas de Minas";if(lat>=-18.0&&lat<=-15.0&&lon>=-40.5&&lon<=-38.8)return "Extremo Sul da Bahia";if(lat>=-15.0&&lat<=-10.0&&lon>=-41.5&&lon<=-38.5)return "Chapada Diamantina";if(lat>=-12.0&&lat<=-8.0&&lon>=-40.0&&lon<=-36.0)return "Planalto da Bahia";if(lat>=-12.0&&lat<=-6.0&&lon>=-62.0&&lon<=-56.0)return "Rondônia";if(lat>=-22.0&&lat<=-19.0&&lon>=-52.0&&lon<=-48.0)return "Alta Paulista";if(lat>=-25.0&&lat<=-21.0&&lon>=-54.0&&lon<=-49.0)return "Norte do Paraná";if(lat>=-21.0&&lat<=-17.0&&lon>=-41.5&&lon<=-39.0)return "Espírito Santo";return "Região Cafeeira";}
 function obterGPS(){if(!navigator.geolocation){document.getElementById("regiaoTag").textContent="\uD83D\uDCCD GPS não disponível";return;}navigator.geolocation.getCurrentPosition(function(pos){dadosGPS.lat=pos.coords.latitude;dadosGPS.lon=pos.coords.longitude;dadosGPS.altitude=pos.coords.altitude?Math.round(pos.coords.altitude):null;dadosGPS.regiao=identificarRegiao(dadosGPS.lat,dadosGPS.lon);var tag="\uD83D\uDCCD "+dadosGPS.regiao;if(dadosGPS.altitude)tag+=" \u00b7 "+dadosGPS.altitude+"m";document.getElementById("regiaoTag").textContent=tag;obterClima(dadosGPS.lat,dadosGPS.lon);},function(){document.getElementById("regiaoTag").textContent="\uD83D\uDCCD Localização não obtida";document.getElementById("cardClima").innerHTML='<div class="clima-topo"><span style="font-size:13px;color:var(--cinza)">Ative o GPS para ver o clima</span></div>';},{timeout:8000,enableHighAccuracy:false});}
 
 // ── CALCULADORA FUNGICIDA ──
@@ -2129,7 +2155,7 @@ function processar(file, isVideo) {
     }
     ultimaFotoBase64=b64;
     var body={imagem:b64,tipo:"image/jpeg"};
-    if (dadosGPS.regiao) body.regiao=dadosGPS.regiao;
+    if (dadosGPS.regiao) body.regiao=dadosGPS.regiao; body.especie=getEspecie();
     if (dadosGPS.altitude) body.altitude=dadosGPS.altitude;
     if (usuarioAtual && usuarioAtual.userId) body.userId=usuarioAtual.userId;
     var diagsSSE = [];
@@ -2977,6 +3003,7 @@ function redimensionarFotoPerfil(file,callback){
 }
 document.addEventListener('DOMContentLoaded',function(){
   sincronizarTextosGratis();
+  definirEspecie(getEspecie(), true);
   var inputFoto=document.getElementById('inputFotoPerfil');
   if(!inputFoto)return;
   inputFoto.addEventListener('change',function(e){
@@ -3143,6 +3170,59 @@ function abrirVisorFoto(srcTocado){
   document.getElementById("visorFoto").classList.add("ativo");
 }
 function fecharVisorFoto(){ document.getElementById("visorFoto").classList.remove("ativo"); }
+
+// ── ESPECIE DO CAFE ─────────────────────────────────────────────
+// Fonte de verdade: a escolha do produtor. O GPS apenas SUGERE.
+// Reaproveita a mesma chave que o guia de safra ja usava
+// ("doutorcafe_safra_tipo"), para o app nao ter duas nocoes de especie
+// discordando entre si — o produtor marcar "Conilon" no guia e receber
+// diagnostico de arabica seria pior do que nao ter a opcao.
+var ESPECIE_KEY = "doutorcafe_safra_tipo";
+function getEspecie(){ try{ return localStorage.getItem(ESPECIE_KEY)||"arabica"; }catch(e){ return "arabica"; } }
+
+function definirEspecie(especie, silencioso){
+  try{ localStorage.setItem(ESPECIE_KEY, especie); }catch(e){}
+  safraTipoAtual = especie;
+  document.querySelectorAll(".especie-btn").forEach(function(b){
+    b.classList.toggle("ativo", b.getAttribute("data-especie")===especie);
+  });
+  document.querySelectorAll(".safra-toggle-btn").forEach(function(b){
+    b.classList.toggle("ativo", b.getAttribute("data-tipo")===especie);
+  });
+  try{ if(typeof GUIA_SAFRA!=="undefined" && document.getElementById("guiaSafraLista")) renderGuiaSafra(especie); }catch(e){}
+  if(!silencioso) atualizarSugestaoEspecie();
+}
+
+// Espécie tipicamente cultivada em cada região, para SUGERIR ao produtor.
+// Espelha ESPECIE_POR_REGIAO do servidor.
+var ESPECIE_SUGERIDA = {
+  "Cerrado Mineiro":"arabica","Sul de Minas":"arabica","Mogiana":"arabica",
+  "Matas de Minas":"arabica","Chapada Diamantina":"arabica",
+  "Planalto da Bahia":"arabica","Norte do Parana":"arabica","Alta Paulista":"arabica",
+  "Rondonia":"conilon","Extremo Sul da Bahia":"conilon",
+  "Espirito Santo":"mista"
+};
+function semAcento(t){ return String(t||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim(); }
+
+// Mostra uma linha discreta abaixo do seletor. Nunca troca a escolha do
+// produtor sozinha: so avisa quando o que ele marcou destoa da regiao.
+function atualizarSugestaoEspecie(){
+  var el=document.getElementById("especieSugestao"); if(!el) return;
+  var reg=dadosGPS && dadosGPS.regiao ? semAcento(dadosGPS.regiao) : "";
+  var atual=getEspecie();
+  if(!reg){ el.textContent=""; return; }
+  var sug=ESPECIE_SUGERIDA[reg];
+  if(!sug){ el.textContent="📍 "+dadosGPS.regiao+" — confirme acima qual café você planta."; return; }
+  if(sug==="mista"){
+    el.textContent="📍 "+dadosGPS.regiao+" tem as duas espécies: conilon nas áreas baixas e quentes, arábica nas montanhas. Confirme acima.";
+    return;
+  }
+  if(sug!==atual){
+    el.textContent="📍 Em "+dadosGPS.regiao+" predomina "+(sug==="conilon"?"conilon":"arábica")+". Se o seu for diferente, mantenha a sua escolha — ela é a que vale.";
+  } else {
+    el.textContent="📍 "+dadosGPS.regiao+" · "+(atual==="conilon"?"Conilon":"Arábica");
+  }
+}
 
 function abrirPix(tipo){planoPixAtual=tipo;fecharModal();document.getElementById('modalPix').classList.add('ativo');var nomes={basico_mensal:'Básico Mensal - R$ 29,90/mês',basico_anual:'Básico Anual - R$ 299,90/ano',pro_mensal:'Pro Mensal - R$ 39,90/mês',pro_anual:'Pro Anual - R$ 399,90/ano',premium_mensal:'Premium Mensal - R$ 49,90/mês',premium_anual:'Premium Anual - R$ 499,90/ano'};document.getElementById('pixSubtitulo').textContent='Plano '+(nomes[tipo+'_'+cicloAtual]||tipo);gerarPix();}
 // SEM FORMULARIO ANTES DO QR (31/08/2026): o produtor escolhia o plano e caia
