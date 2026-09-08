@@ -2207,7 +2207,12 @@ function processar(file, isVideo) {
       incrementarAnalise();
       var ok=diags.every(function(d){return d.diagnostico==="saudavel";});
       if(diags.length>0&&!ok){
+        // userId adicionado 07/09/2026: sem ele o /plano-acao caia em "anonimo"
+        // no servidor, e o rate limit de la e indexado por userId — ou seja,
+        // TODOS os produtores dividiam o mesmo balde de 1 minuto, e um uso um
+        // pouco mais pesado derrubava o plano de acao dos outros.
         var bp={diagnosticos:diags}; if(dadosGPS.regiao) bp.regiao=dadosGPS.regiao;
+        if(usuarioAtual&&usuarioAtual.userId) bp.userId=usuarioAtual.userId; else { try{ bp.userId=obterUserId(); }catch(e){} }
         fetch("https://doutor-cafe-production.up.railway.app/plano-acao",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bp)})
         .then(function(r2){return r2.json();})
         .then(function(plano){
@@ -2873,7 +2878,18 @@ function irParaCadastroInicial(){mostrarTela('tela-cadastro-inicial');}
 // propaganda enganosa. O HTML ja vem com o valor certo (se o JS falhar, o
 // texto continua correto); isto aqui garante que uma futura mudanca em
 // TOTAL_GRATIS_COM_CAD se propague sozinha para a tela.
-function sincronizarTextosGratis(){
+// CORRIGIDO 07/09/2026 — esta funcao existia desde 31/08 e NUNCA ERA CHAMADA.
+// Ela foi escrita justamente para impedir que o texto de marketing prometesse
+// um numero de analises diferente do limite real, e ficou so declarada. Foi
+// por isso que o app aberto no Android mostrava "10 analises gratis" no topo
+// e "libere suas 15 analises" logo abaixo: cada texto vinha de um deploy
+// diferente preso no cache, e nada no boot reconciliava os dois.
+// Agora: (a) e chamada no boot; (b) aceita o limite vindo do /ping, entao o
+// numero certo aparece mesmo num shell antigo que o service worker ainda
+// esteja servindo.
+function sincronizarTextosGratis(valorServidor){
+  var n = parseInt(valorServidor, 10);
+  if (Number.isInteger(n) && n > 0) { TOTAL_GRATIS_COM_CAD = n; }
   var els=document.querySelectorAll('.txt-gratis');
   for(var i=0;i<els.length;i++){ els[i].textContent=TOTAL_GRATIS_COM_CAD; }
 }
@@ -3143,7 +3159,10 @@ var servidorAcordado = false;
 // Agora, quando o servidor SAI de dormindo para acordado, a fila e
 // redesenhada sozinha.
 function acordarServidor(callback){
-  fetch("https://doutor-cafe-production.up.railway.app/ping").then(checarResposta).then(function(){
+  fetch("https://doutor-cafe-production.up.railway.app/ping").then(checarResposta).then(function(d){
+    // O /ping devolve o limite gratuito real; o texto da tela segue ele, nunca
+    // o numero que ficou escrito no HTML de um deploy antigo.
+    try { if(d && d.gratis) sincronizarTextosGratis(d.gratis); } catch(e){}
     var estavaDormindo = !servidorAcordado;
     servidorAcordado=true;
     var av=document.getElementById("avisoServidor");if(av)av.style.display="none";
@@ -3257,18 +3276,75 @@ acordarServidor(null);
 setInterval(function(){acordarServidor(null);},25000);
 
 (function(){
+  try { sincronizarTextosGratis(); } catch(e){}
   var cadastro=verificarCadastroInicial();
   if(cadastro&&cadastro.nome){entrarNoApp(cadastro.nome);}
   else{mostrarTela('tela-landing');}
 })();
 </script>
 <script>
+// ── SERVICE WORKER COM ATUALIZACAO (reescrito 07/09/2026) ──────────
+// Antes era so register('/sw.js'), sem nenhum caminho de atualizacao. Num TWA
+// isso significa que o shell (index.html) cacheado na primeira instalacao fica
+// ali para sempre: o produtor abre o app, o SW serve a copia antiga do cache e
+// o deploy novo do Vercel nunca chega nele. Foi assim que apareceu a tela com
+// "10 analises" e "libere 15 analises" ao mesmo tempo — dois deploys
+// convivendo no mesmo aparelho.
+//
+// O impacto e maior que o texto: TODA correcao de diagnostico feita no
+// frontend (as travas de streaming, o seletor de especie, a fila offline) fica
+// presa no servidor enquanto o aparelho continua rodando a versao velha.
+//
+// Fluxo agora: pede update no boot e a cada 30 min; quando uma versao nova
+// termina de instalar E ja existe um controller (ou seja, nao e a primeira
+// instalacao), avisa o produtor com uma barra discreta em vez de recarregar
+// por baixo dele no meio de uma analise.
+// IMPORTANTE: o sw.js precisa responder ao SKIP_WAITING — snippet nas notas.
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
     navigator.serviceWorker.register('/sw.js').then(function(reg){
-      console.log('SW registrado:', reg.scope);
+      try { reg.update(); } catch(e){}
+      setInterval(function(){ try { reg.update(); } catch(e){} }, 30*60*1000);
+
+      function oferecerAtualizacao(worker){
+        if(document.getElementById('barraAtualizar')) return;
+        var b=document.createElement('div');
+        b.id='barraAtualizar';
+        b.style.cssText='position:fixed;left:12px;right:12px;bottom:12px;z-index:99999;background:#5d4037;color:#fff;padding:12px 14px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.3);font-size:14px;display:flex;align-items:center;gap:10px';
+        b.innerHTML='<span style="flex:1">Nova versão do Doutor Café disponível.</span>';
+        var btn=document.createElement('button');
+        btn.textContent='Atualizar';
+        btn.style.cssText='background:#fff;color:#5d4037;border:0;border-radius:8px;padding:8px 14px;font-weight:700';
+        btn.onclick=function(){
+          btn.disabled=true; btn.textContent='Atualizando...';
+          try { worker.postMessage({type:'SKIP_WAITING'}); } catch(e){}
+          // Se o sw.js ainda nao tratar SKIP_WAITING, o reload abaixo garante
+          // que pelo menos a proxima navegacao pegue a versao nova.
+          setTimeout(function(){ window.location.reload(); }, 1200);
+        };
+        b.appendChild(btn);
+        document.body.appendChild(b);
+      }
+
+      if(reg.waiting && navigator.serviceWorker.controller) oferecerAtualizacao(reg.waiting);
+      reg.addEventListener('updatefound', function(){
+        var novo = reg.installing;
+        if(!novo) return;
+        novo.addEventListener('statechange', function(){
+          if(novo.state === 'installed' && navigator.serviceWorker.controller){
+            oferecerAtualizacao(novo);
+          }
+        });
+      });
     }).catch(function(err){
       console.log('SW erro:', err);
+    });
+
+    var recarregou=false;
+    navigator.serviceWorker.addEventListener('controllerchange', function(){
+      if(recarregou) return;
+      recarregou=true;
+      window.location.reload();
     });
   });
 }
