@@ -879,33 +879,33 @@ canvas { display: none; }
     <div class="modal-esgotado" id="modalEsgotado" style="display:none"><p>&#128274; Suas análises gratuitas foram usadas. Assine para continuar!</p></div>
     <div class="toggle-ciclo">
       <button class="toggle-btn ativo" id="btnMensal" onclick="setCiclo('mensal')">Mensal</button>
-      <button class="toggle-btn" id="btnAnual" onclick="setCiclo('anual')">Anual <span class="toggle-economia">2 meses gr&#225;tis</span></button>
+      <button class="toggle-btn" id="btnAnual" onclick="setCiclo('anual')">Anual <span class="toggle-economia">economize at&#233; R$98,90</span></button>
     </div>
     <div class="plano-card">
       <div class="plano-nome">&#127807; Plano B&#225;sico</div>
       <div class="plano-preco"><span class="plano-valor" id="precoBasico">R$29,90</span><span class="plano-periodo">/m&#234;s</span></div>
-      <div class="plano-anual-desc" id="descBasico" style="display:none">R$299,90/ano &#8212; equivale a 2 meses gr&#225;tis!</div>
-      <ul class="plano-features"><li>150 análises por mês</li><li>Diagnóstico de doenças e pragas</li><li>Calculadora de fungicida</li><li>Análise de solo</li><li>Plantas daninhas</li><li>Suporte via WhatsApp</li></ul>
-      <button class="btn-assinar" onclick="assinar('basico')">&#128179; Assinar com Cart&#227;o</button>
-      <button class="btn-pix-plano" onclick="abrirPix('basico')">&#9889; Pagar via PIX</button>
+      <div class="plano-anual-desc" id="descBasico" style="display:none">R$299,90/ano &#8212; cobrado uma vez, economia de R$58,90 no ano</div>
+      <ul class="plano-features"><li>150 análises por mês</li><li>Até 10 análises por vídeo/mês</li><li>Diagnóstico de doenças e pragas</li><li>Calculadora de fungicida</li><li>Análise de solo</li><li>Plantas daninhas</li><li>Suporte via WhatsApp</li></ul>
+      <button class="btn-assinar btn-pgto-web" onclick="assinar('basico')">&#128179; Assinar com Cart&#227;o</button>
+      <button class="btn-pix-plano btn-pgto-web" onclick="abrirPix('basico')">&#9889; Pagar via PIX</button><button class="btn-assinar btn-pgto-play" style="display:none" onclick="assinar('basico')">&#128179; Assinar pelo Google Play</button>
     </div>
     <div class="plano-card destaque">
       <div class="plano-badge">&#11088; Mais Popular</div>
       <div class="plano-nome">&#128640; Plano Pro</div>
       <div class="plano-preco"><span class="plano-valor" id="precoPro">R$39,90</span><span class="plano-periodo">/m&#234;s</span></div>
-      <div class="plano-anual-desc" id="descPro" style="display:none">R$399,90/ano &#8212; equivale a 2 meses gr&#225;tis!</div>
-      <ul class="plano-features"><li>300 análises por mês</li><li>Tudo do Básico</li><li>Histórico completo</li><li>Atendimento prioritário</li><li>Acesso a novos recursos primeiro</li></ul>
-      <button class="btn-assinar" onclick="assinar('pro')">&#128179; Assinar com Cart&#227;o</button>
-      <button class="btn-pix-plano" onclick="abrirPix('pro')">&#9889; Pagar via PIX</button>
+      <div class="plano-anual-desc" id="descPro" style="display:none">R$399,90/ano &#8212; cobrado uma vez, economia de R$78,90 no ano</div>
+      <ul class="plano-features"><li>300 análises por mês</li><li>Até 25 análises por vídeo/mês</li><li>Tudo do Básico</li><li>Atendimento prioritário no WhatsApp</li><li>Acesso a novos recursos primeiro</li></ul>
+      <button class="btn-assinar btn-pgto-web" onclick="assinar('pro')">&#128179; Assinar com Cart&#227;o</button>
+      <button class="btn-pix-plano btn-pgto-web" onclick="abrirPix('pro')">&#9889; Pagar via PIX</button><button class="btn-assinar btn-pgto-play" style="display:none" onclick="assinar('pro')">&#128179; Assinar pelo Google Play</button>
     </div>
     <div class="plano-card">
       <div class="plano-badge" style="background:linear-gradient(135deg,#b8860b,#daa520)">&#128081; Premium</div>
       <div class="plano-nome">&#128081; Plano Premium</div>
       <div class="plano-preco"><span class="plano-valor" id="precoPremium">R$49,90</span><span class="plano-periodo">/m&#234;s</span></div>
-      <div class="plano-anual-desc" id="descPremium" style="display:none">R$499,90/ano &#8212; equivale a 2 meses gr&#225;tis!</div>
-      <ul class="plano-features"><li>500 análises por mês</li><li>Tudo do Pro</li><li>Prioridade máxima no suporte</li><li>Relatório mensal da lavoura</li><li>Acesso antecipado a novidades</li></ul>
-      <button class="btn-assinar" onclick="assinar('premium')">&#128179; Assinar com Cart&#227;o</button>
-      <button class="btn-pix-plano" onclick="abrirPix('premium')">&#9889; Pagar via PIX</button>
+      <div class="plano-anual-desc" id="descPremium" style="display:none">R$499,90/ano &#8212; cobrado uma vez, economia de R$98,90 no ano</div>
+      <ul class="plano-features"><li>500 análises por mês</li><li>Até 50 análises por vídeo/mês</li><li>Tudo do Pro</li><li>Prioridade máxima no suporte</li><li>Acesso antecipado a novidades</li></ul>
+      <button class="btn-assinar btn-pgto-web" onclick="assinar('premium')">&#128179; Assinar com Cart&#227;o</button>
+      <button class="btn-pix-plano btn-pgto-web" onclick="abrirPix('premium')">&#9889; Pagar via PIX</button><button class="btn-assinar btn-pgto-play" style="display:none" onclick="assinar('premium')">&#128179; Assinar pelo Google Play</button>
     </div>
     <div class="plano-card">
       <div class="plano-nome">&#127970; Empresarial</div>
@@ -1261,8 +1261,14 @@ function sincronizarContadorServidor(){
       if(d&&typeof d.analisesRestantes==="number"&&typeof d.limite==="number"){
         var usadasReais=Math.max(0,d.limite-d.analisesRestantes);
         localStorage.setItem(ANALISES_KEY,usadasReais.toString());
-        // Se o servidor conhece o plano do usuario, alinha o plano local tambem
-        if(d.plano&&d.plano!=="gratuito"){var pl=getPlano();if(pl.tipo!==d.plano){pl.tipo=d.plano;salvarPlano(pl);}}
+        // Alinha o plano local com o servidor — NOS DOIS SENTIDOS.
+        // Ate 18/09/2026 esta linha so aceitava subir de plano
+        // (`d.plano !== "gratuito"`), nunca descer. Efeito pratico: assinatura
+        // vencida, cancelada ou estornada continuava aparecendo como "Plano
+        // Premium" no chip do app para sempre, porque nada nunca escrevia
+        // "gratuito" de volta. O produtor via Premium na tela e levava um
+        // bloqueio ao tentar analisar — sem entender por que.
+        if(d.plano){var pl=getPlano();if(pl.tipo!==d.plano){pl.tipo=d.plano;salvarPlano(pl);}}
         atualizarContador();
       }
     })
@@ -1373,9 +1379,101 @@ function atualizarBadgeVideo(){
   }
 }
 
-function abrirModal(esgotado){document.getElementById("modalPlanos").classList.add("ativo");document.getElementById("modalEsgotado").style.display=esgotado?"block":"none";document.getElementById("modalSubtitulo").textContent=esgotado?"Continue diagnosticando sua lavoura sem limites":"Escolha o plano ideal para sua lavoura";}
+function abrirModal(esgotado){
+  // Esconde meios de pagamento alternativos quando estamos dentro do app
+  // Android (politica do Google Play) e busca o preco real da loja antes de
+  // o produtor olhar os valores.
+  try { ajustarBotoesPagamento(); } catch(e){}
+  try { sincronizarPrecosComPlay(); } catch(e){}
+  try { sincronizarPlanoComServidor(); } catch(e){}
+  document.getElementById("modalPlanos").classList.add("ativo");document.getElementById("modalEsgotado").style.display=esgotado?"block":"none";document.getElementById("modalSubtitulo").textContent=esgotado?"Continue diagnosticando sua lavoura sem limites":"Escolha o plano ideal para sua lavoura";}
 function fecharModal(){document.getElementById("modalPlanos").classList.remove("ativo");}
-function setCiclo(c){cicloAtual=c;document.getElementById("btnMensal").className="toggle-btn"+(c==="mensal"?" ativo":"");document.getElementById("btnAnual").className="toggle-btn"+(c==="anual"?" ativo":"");document.getElementById("precoBasico").textContent=c==="mensal"?"R$29,90":"R$24,92";document.getElementById("precoPro").textContent=c==="mensal"?"R$39,90":"R$33,25";var pp=document.getElementById("precoPremium");if(pp)pp.textContent=c==="mensal"?"R$49,90":"R$41,58";document.getElementById("descBasico").style.display=c==="anual"?"block":"none";document.getElementById("descPro").style.display=c==="anual"?"block":"none";var dp=document.getElementById("descPremium");if(dp)dp.style.display=c==="anual"?"block":"none";}
+// ── PRECOS: UMA FONTE SO (18/09/2026) ────────────────────────────
+// Antes os valores estavam espalhados: no HTML de cada cartao, de novo
+// dentro de setCiclo(), e mais uma vez na lista de nomes do modal do Pix.
+// Tres copias do mesmo numero e o mesmo erro que ja aconteceu com "15
+// analises gratis": muda-se uma e esquecem-se as outras.
+//
+// A auditoria tambem encontrou as equivalencias mensais do plano anual
+// ERRADAS — mostravam R$24,92 / R$33,25 / R$41,58, quando a conta real
+// (anual dividido por 12) da R$24,99 / R$33,32 / R$41,66. Nao era um erro
+// grande em dinheiro, mas era um numero que o produtor consegue conferir
+// com a calculadora do celular; errar nisso custa confianca no resto.
+// Agora nada e digitado: tudo deriva desta tabela.
+//
+// E "2 meses gratis" era arredondamento para cima: a economia real e de
+// 1,97 a 1,98 mensalidade. Passamos a mostrar a economia em reais, que e
+// exata, verificavel e soa mais concreta para quem compra.
+var PRECOS = {
+  basico:  { mensal: 29.90, anual: 299.90 },
+  pro:     { mensal: 39.90, anual: 399.90 },
+  premium: { mensal: 49.90, anual: 499.90 }
+};
+function brl(v){ return "R$" + v.toFixed(2).replace(".", ","); }
+
+function precoPorCiclo(tipo, ciclo){
+  var pr = PRECOS[tipo];
+  if (!pr) return "";
+  return ciclo === "anual" ? brl(pr.anual / 12) : brl(pr.mensal);
+}
+
+function setCiclo(c){
+  cicloAtual = c;
+  document.getElementById("btnMensal").className = "toggle-btn" + (c==="mensal"?" ativo":"");
+  document.getElementById("btnAnual").className  = "toggle-btn" + (c==="anual"?" ativo":"");
+  ["basico","pro","premium"].forEach(function(tipo){
+    var id = tipo.charAt(0).toUpperCase() + tipo.slice(1);
+    var elPreco = document.getElementById("preco"+id);
+    if (elPreco) elPreco.textContent = precoPorCiclo(tipo, c);
+    var elDesc = document.getElementById("desc"+id);
+    if (elDesc) {
+      var pr = PRECOS[tipo];
+      var economia = (pr.mensal * 12) - pr.anual;
+      elDesc.textContent = brl(pr.anual) + "/ano — cobrado uma vez, economia de " + brl(economia) + " no ano";
+      elDesc.style.display = (c === "anual") ? "block" : "none";
+    }
+  });
+}
+
+// ── PRECO REAL DA LOJA (18/09/2026) ──────────────────────────────
+// Ate aqui o app NUNCA perguntava o preco ao Google Play: os valores eram
+// fixos no HTML. Se o preco no Play Console fosse diferente (uma promocao,
+// um reajuste, um erro de digitacao la ou aqui), o produtor via um valor na
+// tela e outro na hora de pagar — e quem decide o que sera cobrado e sempre
+// o Play Console, nao o nosso HTML.
+//
+// getDetails() devolve o preco que sera realmente cobrado, ja formatado na
+// moeda do usuario. Passa a ser ele que manda; a tabela acima vira so o
+// valor exibido enquanto a loja nao responde (e no site, onde nao ha Play).
+async function sincronizarPrecosComPlay(){
+  if (!playBillingDisponivel()) return;
+  try {
+    var service = await window.getDigitalGoodsService("https://play.google.com/billing");
+    if (!service.getDetails) return;
+    var ids = Object.keys(PLAY_PRODUTOS).map(function(k){ return PLAY_PRODUTOS[k]; });
+    var detalhes = await service.getDetails(ids);
+    if (!detalhes || !detalhes.length) return;
+
+    detalhes.forEach(function(d){
+      var tipo = null;
+      Object.keys(PLAY_PRODUTOS).forEach(function(k){ if (PLAY_PRODUTOS[k] === d.itemId) tipo = k; });
+      if (!tipo || !d.price || !d.price.value) return;
+      var valor = parseFloat(d.price.value);
+      if (isNaN(valor) || valor <= 0) return;
+      // subscriptionPeriod vem em formato ISO-8601 de duracao: P1M, P1Y.
+      var per = (d.subscriptionPeriod || "").toUpperCase();
+      var ciclo = per.indexOf("Y") > -1 ? "anual" : (per.indexOf("M") > -1 ? "mensal" : null);
+      if (!ciclo) return;
+      PRECOS[tipo][ciclo] = valor;
+      PLAY_ITEM_ID[tipo + "_" + ciclo] = d.itemId;   // usado na hora da compra
+    });
+    setCiclo(cicloAtual);   // redesenha ja com o preco real da loja
+  } catch(e) {
+    // Sem drama: mantem os valores da tabela. So registra para o log.
+    console.log("Nao consegui ler os precos do Google Play:", e && e.message);
+  }
+}
+
 // ══════════════════════════════════════════════════════════════════
 // GOOGLE PLAY BILLING (28/07/2026) — fluxo de assinatura dentro do TWA
 // ══════════════════════════════════════════════════════════════════
@@ -1391,6 +1489,11 @@ var PLAY_PRODUTOS = {
   pro:     "plano_pro",
   premium: "plano_premium"
 };
+
+// Preenchido por sincronizarPrecosComPlay(): guarda o itemId que o proprio
+// Google devolve para cada combinacao plano+ciclo. E o que permite comprar
+// o ANUAL de verdade — ver comentario em assinarPlayBilling().
+var PLAY_ITEM_ID = {};
 
 // Mapeia tipo+ciclo pro basePlanId que o backend usa (bate com as
 // chaves do objeto PLANOS no server_2.js: basico_mensal, pro_anual, etc)
@@ -1411,8 +1514,33 @@ async function assinarPlayBilling(tipo, ciclo){
   try{
     var service = await window.getDigitalGoodsService("https://play.google.com/billing");
 
+    // ── CICLO MENSAL x ANUAL (corrigido 18/09/2026) ──────────────
+    // A chamada anterior mandava apenas { sku: productId }. O productId e o
+    // mesmo para os dois ciclos ("plano_basico" cobre mensal e anual), entao
+    // a escolha que o produtor fez no botao "Mensal / Anual" simplesmente
+    // NAO CHEGAVA ao Google: ele clicava em Anual e a loja decidia sozinha
+    // o que apresentar. Vender um ciclo e cobrar outro e problema serio —
+    // R$299,90 de uma vez, quando a pessoa achava que pagaria R$29,90, vira
+    // estorno e reclamacao na hora.
+    //
+    // Agora usamos o itemId especifico daquele ciclo, que o proprio Google
+    // devolveu em getDetails() (ver sincronizarPrecosComPlay). Se ainda nao
+    // tivermos essa lista — loja lenta, primeira abertura sem rede — nao
+    // arriscamos comprar o ciclo errado em silencio: tentamos buscar na
+    // hora e, se ainda assim nao der, avisamos e paramos.
+    if (!Object.keys(PLAY_ITEM_ID).length) { await sincronizarPrecosComPlay(); }
+    var itemId = PLAY_ITEM_ID[tipo + "_" + ciclo];
+
+    if (!itemId) {
+      if (ciclo === "anual") {
+        alert("Não consegui confirmar com o Google Play o valor do plano anual agora. Para não correr o risco de cobrar o valor errado, tente de novo em instantes ou assine o plano mensal.");
+        return;
+      }
+      itemId = productId;   // mensal: o proprio produto ja e o padrao da loja
+    }
+
     var request = new PaymentRequest(
-      [{ supportedMethods:"https://play.google.com/billing", data:{ sku: productId } }],
+      [{ supportedMethods:"https://play.google.com/billing", data:{ sku: itemId } }],
       { total:{ label:"Assinatura", amount:{ currency:"BRL", value:"0" } } } // valor real vem do Play Console, isso e so obrigatorio pela spec da API
     );
 
@@ -1430,7 +1558,12 @@ async function assinarPlayBilling(tipo, ciclo){
     });
     var data = await r.json();
     if(data.ok){
-      alert("Assinatura ativada! Aproveite o plano "+tipo+".");
+      // O backend responde com o plano REAL confirmado pela Play API (ele
+      // deriva do lineItems, nunca do que o app alegou). Mostramos esse, e
+      // nao o que o usuario clicou: se por algum motivo a loja vendeu outro
+      // ciclo, o produtor fica sabendo agora, nao na fatura.
+      var nomeReal = (data.plano||"").indexOf("anual")>-1 ? "anual" : "mensal";
+      alert("Assinatura ativada! Plano "+(data.tipo||tipo)+" "+nomeReal+".");
       location.reload();
     } else {
       alert("Compra recebida, mas não conseguimos confirmar automaticamente. Se o valor foi cobrado, entre em contato pelo suporte. Detalhe: "+(data.erro||''));
@@ -1471,20 +1604,147 @@ async function reconciliarComprasPlayNoBoot(){
   }
 }
 
+// ── POLITICA DE PAGAMENTOS DO GOOGLE PLAY (18/09/2026) ───────────
+// A tela de planos mostrava "Assinar com Cartao" e "Pagar via PIX" SEMPRE,
+// inclusive dentro do app Android. O botao de cartao ate desviava para o
+// Play Billing por dentro, mas o de PIX nao: ele abria o Mercado Pago
+// direto, de dentro do app.
+//
+// Isso infringe a politica de pagamentos do Google Play, que exige o
+// faturamento do proprio Play para conteudo digital e proibe levar o
+// usuario a um meio de pagamento alternativo dentro do app. A penalidade
+// nao e multa: e remocao do app da loja. Como o Doutor Cafe acabou de
+// conseguir acesso a producao e esta comecando a divulgacao, perder a
+// listagem agora custaria muito mais do que a diferenca de taxa.
+//
+// Esta funcao esconde os meios alternativos quando o app roda dentro da
+// TWA, e mostra o botao do Google Play no lugar. No site (navegador comum,
+// iPhone) nada muda: la o Pix e o cartao continuam validos e liberados.
+function ajustarBotoesPagamento(){
+  var naTWA = playBillingDisponivel();
+  document.querySelectorAll('.btn-pgto-web').forEach(function(b){ b.style.display = naTWA ? 'none' : ''; });
+  document.querySelectorAll('.btn-pgto-play').forEach(function(b){ b.style.display = naTWA ? '' : 'none'; });
+}
+
 function assinar(tipo){
   if (playBillingDisponivel()) {
     assinarPlayBilling(tipo, cicloAtual);
     return;
   }
-  // Fallback: usuario acessando fora do app Android (navegador comum,
-  // iOS, etc) — mantem o fluxo antigo do Mercado Pago, que so e proibido
-  // DENTRO do app Android pela politica do Google Play, nao na web solta.
-  var links={basico_mensal:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=3bdcbffc028a4d259f32fe37a96ae224",basico_anual:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=bd08a04de79f4213886611769b6c9486",pro_mensal:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=106181c5ed584a65af06403bd1af0608",pro_anual:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=661a046d15c9415a9508970d2f45c819",premium_mensal:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=5bcfb2b27c6241b8a433b3ec0fb2a5c7",premium_anual:"https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=346f4589aca84ba3b4e76351563fdbe1"};
-  var url=links[tipo+"_"+cicloAtual];
-  if(url)window.open(url,"_blank");else alert("Plano não encontrado.");
+  // ── ASSINATURA PELO SITE (reescrito 18/09/2026) ───────────────
+  // O que havia aqui: uma lista de seis links FIXOS do Mercado Pago, um por
+  // plano, abertos direto em nova aba. Esses links sao iguais para todo
+  // mundo e nao carregam nenhuma identificacao — o Mercado Pago avisava o
+  // nosso servidor que alguem pagou, e o servidor nao tinha como saber QUEM.
+  // O plano nunca era ativado. Quem assinava pelo site pagava e continuava
+  // preso no limite gratuito.
+  //
+  // Agora pedimos o link ao backend, que cria a assinatura com o userId
+  // anexado (external_reference). Assim toda notificacao futura daquela
+  // assinatura diz a quem ela pertence.
+  var planoId = tipo + "_" + cicloAtual;
+  var cad = getCadastro() || verificarCadastroInicial() || {};
+  var btnsAntes = document.querySelectorAll('.btn-pgto-web');
+  btnsAntes.forEach(function(b){ b.disabled = true; });
+
+  fetch('https://doutor-cafe-production.up.railway.app/assinar-site', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ plano: planoId, userId: obterUserId(), email: cad.email || '' })
+  })
+  .then(checarResposta)
+  .then(function(d){
+    if (!d || !d.url) { alert("Não consegui abrir o pagamento agora. Tente de novo em instantes."); return; }
+    if (d.automatico === false) {
+      // O link saiu, mas sem o vinculo com a conta. Melhor avisar do que
+      // deixar o produtor pagar achando que libera sozinho.
+      alert("Vou abrir o pagamento, mas a liberação automática pode falhar nesta tentativa. Se o plano não aparecer em alguns minutos depois de pagar, fale com o suporte pelo WhatsApp com o comprovante que a gente libera na hora.");
+    }
+    window.open(d.url, "_blank");
+  })
+  .catch(function(){
+    alert("Sem conexão para abrir o pagamento. Verifique a internet e tente de novo.");
+  })
+  .finally(function(){ btnsAntes.forEach(function(b){ b.disabled = false; }); });
 }
 function contatoEmpresarial(){window.open("https://wa.me/5535998823395?text="+encodeURIComponent("Olá! Tenho interesse no Plano Empresarial do Doutor Café."),"_blank");fecharModal();}
-function verificarRetornoPagamento(){var params=new URLSearchParams(window.location.search),pagamento=params.get("pagamento"),planoId=params.get("plano");if(pagamento==="sucesso"&&planoId){var tipo=planoId.indexOf("premium")>-1?"premium":planoId.indexOf("pro")>-1?"pro":"basico";var nomePlano={premium:"Premium",pro:"Pro",basico:"Básico"}[tipo];salvarPlano({tipo:tipo,planoId:planoId,dataAssinatura:new Date().toISOString()});localStorage.setItem(ANALISES_KEY,"0");atualizarContador();alert("Bem-vindo ao Plano "+nomePlano+"! Suas análises estão liberadas.");window.history.replaceState({},"",window.location.pathname);}}
+// ── RETORNO DO PAGAMENTO (reescrito 18/09/2026) ──────────────────
+// O que esta funcao fazia antes: lia "?pagamento=sucesso&plano=premium" da
+// URL e, so com isso, GRAVAVA o plano premium no aparelho e dizia "Suas
+// analises estao liberadas".
+//
+// Dois problemas graves nisso.
+//
+// Primeiro, era mentira na maior parte das vezes. O servidor e quem conta as
+// analises, e ele so libera quando confirma o pagamento. Como a assinatura
+// pelo site nunca chegava a ser confirmada (ver /assinar-site no servidor),
+// o produtor pagava, via a tela dizer "Bem-vindo ao Plano Premium", tentava
+// analisar e continuava travado no limite gratuito. Pagou, foi parabenizado
+// e nao recebeu nada.
+//
+// Segundo, qualquer pessoa podia digitar esse endereco a mao e ficar com um
+// "Premium" na tela sem pagar. Nao dava analises de verdade (o servidor
+// continuava barrando), mas fazia o app exibir uma informacao falsa — e um
+// app que mostra plano errado nao tem como ser levado a serio quando mostra
+// dose de fungicida.
+//
+// Agora o app nao decide mais nada sozinho: ele PERGUNTA ao servidor.
+function verificarRetornoPagamento(){
+  var params = new URLSearchParams(window.location.search);
+  var pagamento = params.get("pagamento");
+  if (!pagamento) return;
+  window.history.replaceState({}, "", window.location.pathname);
+
+  if (pagamento === "falha") { alert("O pagamento não foi concluído. Nenhuma cobrança foi feita."); return; }
+
+  // Aprovacao de cartao/assinatura nao e instantanea; o webhook pode levar
+  // alguns segundos. Consultamos algumas vezes antes de dar uma resposta.
+  var tentativas = 0;
+  (function conferir(){
+    tentativas++;
+    sincronizarPlanoComServidor().then(function(plano){
+      if (plano && plano !== "gratuito") {
+        var nome = {premium:"Premium", pro:"Pro", basico:"Básico", admin:"Admin"}[plano] || plano;
+        alert("Pagamento confirmado! Plano " + nome + " liberado.");
+        return;
+      }
+      if (tentativas < 5) { setTimeout(conferir, 3000); return; }
+      alert("Recebemos seu retorno do pagamento, mas a confirmação ainda não chegou. Isso costuma levar alguns minutos. Se o valor já foi cobrado e o plano não aparecer, fale com o suporte pelo WhatsApp que a gente libera na hora.");
+    });
+  })();
+}
+
+// ── QUEM MANDA NO PLANO E O SERVIDOR ─────────────────────────────
+// Busca o plano real e alinha o aparelho com ele. Usada no boot, ao abrir a
+// tela de planos e ao voltar de um pagamento. Se o aparelho estiver sem
+// rede, mantem o que tem e nao apaga nada — offline nao pode rebaixar
+// ninguem.
+function sincronizarPlanoComServidor(){
+  var uid;
+  try { uid = (usuarioAtual && usuarioAtual.userId) || obterUserId(); } catch(e) { uid = null; }
+  if (!uid) return Promise.resolve(null);
+  return fetch("https://doutor-cafe-production.up.railway.app/plano/" + encodeURIComponent(uid))
+    .then(checarResposta)
+    .then(function(d){
+      if (!d || !d.plano) return null;
+      var atual = getPlano();
+      if (d.plano === "gratuito") {
+        // So limpa se havia plano pago gravado — e registra, porque isso
+        // acontece quando a assinatura venceu ou foi estornada.
+        if (atual && atual.tipo && atual.tipo !== "gratuito") {
+          salvarPlano({ tipo:"gratuito" });
+          console.log("Plano local alinhado com o servidor: assinatura não está mais ativa.");
+        }
+      } else if (!atual || atual.tipo !== d.plano) {
+        salvarPlano({ tipo:d.plano, planoId:d.plano, dataAssinatura:new Date().toISOString() });
+      }
+      if (typeof d.limite === "number" && typeof d.analisesRestantes === "number") {
+        localStorage.setItem(ANALISES_KEY, String(Math.max(0, d.limite - d.analisesRestantes)));
+      }
+      atualizarContador();
+      return d.plano;
+    })
+    .catch(function(){ return null; });
+}
 
 var ultimaFotoBase64 = null;
 var HIST_KEY = "doutorcafe_hist";
@@ -3243,7 +3503,20 @@ function atualizarSugestaoEspecie(){
   }
 }
 
-function abrirPix(tipo){planoPixAtual=tipo;fecharModal();document.getElementById('modalPix').classList.add('ativo');var nomes={basico_mensal:'Básico Mensal - R$ 29,90/mês',basico_anual:'Básico Anual - R$ 299,90/ano',pro_mensal:'Pro Mensal - R$ 39,90/mês',pro_anual:'Pro Anual - R$ 399,90/ano',premium_mensal:'Premium Mensal - R$ 49,90/mês',premium_anual:'Premium Anual - R$ 499,90/ano'};document.getElementById('pixSubtitulo').textContent='Plano '+(nomes[tipo+'_'+cicloAtual]||tipo);gerarPix();}
+function abrirPix(tipo){
+  // Barreira dupla: alem de o botao estar escondido na TWA, a funcao se
+  // recusa a abrir o Pix dentro do app. Se um caminho novo chamar isso sem
+  // querer (um link antigo, um atalho), a politica do Play continua de pe.
+  if (playBillingDisponivel()) { assinarPlayBilling(tipo, cicloAtual); return; }
+planoPixAtual=tipo;fecharModal();document.getElementById('modalPix').classList.add('ativo');// Nome e valor vem da tabela PRECOS (18/09/2026). Antes esta linha tinha os
+// seis precos escritos de novo — era a terceira copia dos mesmos numeros no
+// arquivo, e a mais facil de esquecer num reajuste, porque so aparece depois
+// de o produtor escolher o Pix.
+var nomeTipo={basico:'Básico',pro:'Pro',premium:'Premium'}[tipo]||tipo;
+var prTipo=PRECOS[tipo];
+var rotulo=nomeTipo+(cicloAtual==='anual'?' Anual':' Mensal');
+if(prTipo)rotulo+=' - '+brl(cicloAtual==='anual'?prTipo.anual:prTipo.mensal)+(cicloAtual==='anual'?'/ano':'/mês');
+document.getElementById('pixSubtitulo').textContent='Plano '+rotulo;gerarPix();}
 // SEM FORMULARIO ANTES DO QR (31/08/2026): o produtor escolhia o plano e caia
 // num formulario de nome + CPF + email ANTES de ver qualquer coisa. Sao tres
 // campos digitados numa tela pequena, no meio da lavoura, e nome/email JA
