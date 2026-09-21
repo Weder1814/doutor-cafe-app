@@ -392,6 +392,25 @@ input[type="file"] { display: none; }
 .modal-titulo { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--marrom); font-weight: 900; margin-bottom: 4px; }
 .modal-sub { font-size: 13px; color: var(--cinza); margin-bottom: 14px; line-height: 1.4; }
 .modal-esgotado { background: #fce4ec; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; font-size: 13px; color: #c62828; font-weight: 600; line-height: 1.4; }
+/* Condicoes da assinatura, mostradas ANTES de pagar (20/09/2026).
+   Ate aqui a tela de compra nao dizia em lugar nenhum que a assinatura
+   renova sozinha nem como cancelar — a unica frase "Cancele quando quiser"
+   estava na landing, ao lado de "Sem cartao de credito", falando do plano
+   GRATUITO. A politica de assinaturas do Google Play exige que periodo,
+   renovacao automatica e forma de cancelar estejam claros antes da compra,
+   e o Codigo de Defesa do Consumidor pede informacao previa e adequada.
+   Texto pequeno, mas legivel: cinza escuro sobre creme, nao cinza claro. */
+.termos-assinatura { font-size: 11.5px; line-height: 1.5; color: #5d4037; background: #f7f3ec;
+  border-radius: 10px; padding: 9px 11px; margin-top: 9px; }
+.termos-assinatura strong { font-weight: 700; }
+.termos-onde { margin-top: 5px; padding-top: 5px; border-top: 1px solid #e6ddd0; }
+.minha-assinatura { background: #eef6ef; border: 1px solid #cfe3d2; border-radius: 14px;
+  padding: 12px 14px; margin-bottom: 14px; }
+.minha-assinatura-topo { font-size: 14px; color: #1a5c2a; margin-bottom: 4px; }
+.minha-assinatura-txt { font-size: 12px; line-height: 1.5; color: #3d5a40; }
+.minha-assinatura .termos-onde { border-top-color: #cfe3d2; }
+.aviso-cartao-off { font-size: 11.5px; line-height: 1.5; color: #2e4a7a; background: #eaf1fb;
+  border-radius: 10px; padding: 9px 11px; margin-top: 7px; }
 .toggle-ciclo { display: flex; gap: 6px; background: white; border-radius: 14px; padding: 4px; margin-bottom: 16px; }
 .toggle-btn { flex: 1; border: none; border-radius: 10px; padding: 9px 6px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; background: transparent; color: var(--cinza); transition: all 0.2s; }
 .toggle-btn.ativo { background: var(--verde); color: white; }
@@ -877,35 +896,62 @@ canvas { display: none; }
     <div class="modal-titulo">&#127807; Doutor Caf&#233; Premium</div>
     <div class="modal-sub" id="modalSubtitulo">Escolha o plano ideal para sua lavoura</div>
     <div class="modal-esgotado" id="modalEsgotado" style="display:none"><p>&#128274; Suas análises gratuitas foram usadas. Assine para continuar!</p></div>
+    <!-- SUA ASSINATURA (20/09/2026) — so aparece para quem ja assina.
+         Antes, o assinante que tocava no chip do plano caia direto nos
+         cartoes de venda, sendo oferecido um plano que ele ja tem, e sem
+         nenhum lugar no app que dissesse quando renova ou como cancelar.
+         Esconder o caminho do cancelamento nao segura ninguem: quem quer
+         cancelar e nao acha, pede estorno no banco — o que custa a taxa,
+         a assinatura e ainda deixa uma nota 1. -->
+    <div class="minha-assinatura" id="minhaAssinatura" style="display:none">
+      <div class="minha-assinatura-topo">&#9989; <strong id="minhaAssinaturaPlano">Sua assinatura</strong></div>
+      <div class="minha-assinatura-txt" id="minhaAssinaturaRenova"></div>
+      <div class="minha-assinatura-txt termos-onde"></div>
+    </div>
+    <!-- PLANO ANUAL RETIRADO DA TELA EM 20/09/2026 (decisao do Dinho).
+         O servidor CONTINUA suportando anual por inteiro: os planos estao em
+         PLANOS, o ciclo e derivado do basePlanId confirmado pela Google, e o
+         teste-planos.js cobre o caso. Nada foi apagado — so deixou de ser
+         oferecido. Para reativar, basta devolver este bloco de botoes; o
+         resto do caminho ja funciona.
+
+         Por que tirar agora: pedir R$299,90 de uma vez a um produtor que
+         conheceu o app ha dez analises e um salto de confianca grande demais,
+         e um cliente anual insatisfeito no segundo mes quer dez meses de
+         volta — o que vira estorno e nota 1 na loja. Alem disso, a compra do
+         anual e o unico caminho do codigo que depende de o Google devolver o
+         item certo do ciclo, e esse e justamente o trecho que nao da para
+         testar sem uma compra real em aparelho.
     <div class="toggle-ciclo">
       <button class="toggle-btn ativo" id="btnMensal" onclick="setCiclo('mensal')">Mensal</button>
       <button class="toggle-btn" id="btnAnual" onclick="setCiclo('anual')">Anual <span class="toggle-economia">economize at&#233; R$98,90</span></button>
     </div>
+    -->
     <div class="plano-card">
       <div class="plano-nome">&#127807; Plano B&#225;sico</div>
       <div class="plano-preco"><span class="plano-valor" id="precoBasico">R$29,90</span><span class="plano-periodo">/m&#234;s</span></div>
       <div class="plano-anual-desc" id="descBasico" style="display:none">R$299,90/ano &#8212; cobrado uma vez, economia de R$58,90 no ano</div>
-      <ul class="plano-features"><li>150 análises por mês</li><li>Até 10 análises por vídeo/mês</li><li>Diagnóstico de doenças e pragas</li><li>Calculadora de fungicida</li><li>Análise de solo</li><li>Plantas daninhas</li><li>Suporte via WhatsApp</li></ul>
+      <ul class="plano-features"><li>150 análises por mês</li><!-- A linha "Até N análises por vídeo/mês" foi removida em 20/09/2026: o botão de vídeo está desativado no app (ver bloco comentado na tela inicial), e anunciar no cartão de venda um recurso que o produtor não encontra é a mesma promessa vazia que tiramos do "Relatório mensal da lavoura". Quando o vídeo voltar, devolver aqui: <li>Até 10 análises por vídeo/mês</li> — os limites já estão no servidor, em VIDEO_LIMITES. --><li>Diagnóstico de doenças e pragas</li><li>Calculadora de fungicida</li><li>Análise de solo</li><li>Plantas daninhas</li><li>Suporte via WhatsApp</li></ul>
       <button class="btn-assinar btn-pgto-web" onclick="assinar('basico')">&#128179; Assinar com Cart&#227;o</button>
-      <button class="btn-pix-plano btn-pgto-web" onclick="abrirPix('basico')">&#9889; Pagar via PIX</button><button class="btn-assinar btn-pgto-play" style="display:none" onclick="assinar('basico')">&#128179; Assinar pelo Google Play</button>
+      <button class="btn-pix-plano btn-pgto-web" onclick="abrirPix('basico')">&#9889; Pagar via PIX</button><button class="btn-assinar btn-pgto-play" style="display:none" onclick="assinar('basico')">&#128179; Assinar pelo Google Play</button><div class="termos-assinatura"><strong>Assinatura mensal.</strong> Renova sozinha todo m&#234;s at&#233; voc&#234; cancelar. D&#225; pra cancelar quando quiser, direto no celular, e voc&#234; continua usando at&#233; o fim do m&#234;s que j&#225; pagou. <span class="termos-pix">No <strong>PIX &#233; diferente</strong>: pagamento &#250;nico, libera 1 m&#234;s e <strong>n&#227;o renova sozinho</strong>.</span><div class="termos-onde"></div><div class="aviso-cartao-off" style="display:none">&#128241; <strong>Prefere cart&#227;o?</strong> Assine pelo app do Doutor Caf&#233; no Android — l&#225; a cobran&#231;a passa pelo Google, com cancelamento direto na Play Store. Aqui no site, por enquanto, o pagamento &#233; por PIX.</div></div>
     </div>
     <div class="plano-card destaque">
       <div class="plano-badge">&#11088; Mais Popular</div>
       <div class="plano-nome">&#128640; Plano Pro</div>
       <div class="plano-preco"><span class="plano-valor" id="precoPro">R$39,90</span><span class="plano-periodo">/m&#234;s</span></div>
       <div class="plano-anual-desc" id="descPro" style="display:none">R$399,90/ano &#8212; cobrado uma vez, economia de R$78,90 no ano</div>
-      <ul class="plano-features"><li>300 análises por mês</li><li>Até 25 análises por vídeo/mês</li><li>Tudo do Básico</li><li>Atendimento prioritário no WhatsApp</li><li>Acesso a novos recursos primeiro</li></ul>
+      <ul class="plano-features"><li>300 análises por mês</li><!-- A linha "Até N análises por vídeo/mês" foi removida em 20/09/2026: o botão de vídeo está desativado no app (ver bloco comentado na tela inicial), e anunciar no cartão de venda um recurso que o produtor não encontra é a mesma promessa vazia que tiramos do "Relatório mensal da lavoura". Quando o vídeo voltar, devolver aqui: <li>Até 25 análises por vídeo/mês</li> — os limites já estão no servidor, em VIDEO_LIMITES. --><li>Tudo do Básico</li><li>Atendimento prioritário no WhatsApp</li><li>Acesso a novos recursos primeiro</li></ul>
       <button class="btn-assinar btn-pgto-web" onclick="assinar('pro')">&#128179; Assinar com Cart&#227;o</button>
-      <button class="btn-pix-plano btn-pgto-web" onclick="abrirPix('pro')">&#9889; Pagar via PIX</button><button class="btn-assinar btn-pgto-play" style="display:none" onclick="assinar('pro')">&#128179; Assinar pelo Google Play</button>
+      <button class="btn-pix-plano btn-pgto-web" onclick="abrirPix('pro')">&#9889; Pagar via PIX</button><button class="btn-assinar btn-pgto-play" style="display:none" onclick="assinar('pro')">&#128179; Assinar pelo Google Play</button><div class="termos-assinatura"><strong>Assinatura mensal.</strong> Renova sozinha todo m&#234;s at&#233; voc&#234; cancelar. D&#225; pra cancelar quando quiser, direto no celular, e voc&#234; continua usando at&#233; o fim do m&#234;s que j&#225; pagou. <span class="termos-pix">No <strong>PIX &#233; diferente</strong>: pagamento &#250;nico, libera 1 m&#234;s e <strong>n&#227;o renova sozinho</strong>.</span><div class="termos-onde"></div><div class="aviso-cartao-off" style="display:none">&#128241; <strong>Prefere cart&#227;o?</strong> Assine pelo app do Doutor Caf&#233; no Android — l&#225; a cobran&#231;a passa pelo Google, com cancelamento direto na Play Store. Aqui no site, por enquanto, o pagamento &#233; por PIX.</div></div>
     </div>
     <div class="plano-card">
       <div class="plano-badge" style="background:linear-gradient(135deg,#b8860b,#daa520)">&#128081; Premium</div>
       <div class="plano-nome">&#128081; Plano Premium</div>
       <div class="plano-preco"><span class="plano-valor" id="precoPremium">R$49,90</span><span class="plano-periodo">/m&#234;s</span></div>
       <div class="plano-anual-desc" id="descPremium" style="display:none">R$499,90/ano &#8212; cobrado uma vez, economia de R$98,90 no ano</div>
-      <ul class="plano-features"><li>500 análises por mês</li><li>Até 50 análises por vídeo/mês</li><li>Tudo do Pro</li><li>Prioridade máxima no suporte</li><li>Acesso antecipado a novidades</li></ul>
+      <ul class="plano-features"><li>500 análises por mês</li><!-- A linha "Até N análises por vídeo/mês" foi removida em 20/09/2026: o botão de vídeo está desativado no app (ver bloco comentado na tela inicial), e anunciar no cartão de venda um recurso que o produtor não encontra é a mesma promessa vazia que tiramos do "Relatório mensal da lavoura". Quando o vídeo voltar, devolver aqui: <li>Até 50 análises por vídeo/mês</li> — os limites já estão no servidor, em VIDEO_LIMITES. --><li>Tudo do Pro</li><li>Prioridade máxima no suporte</li><li>Acesso antecipado a novidades</li></ul>
       <button class="btn-assinar btn-pgto-web" onclick="assinar('premium')">&#128179; Assinar com Cart&#227;o</button>
-      <button class="btn-pix-plano btn-pgto-web" onclick="abrirPix('premium')">&#9889; Pagar via PIX</button><button class="btn-assinar btn-pgto-play" style="display:none" onclick="assinar('premium')">&#128179; Assinar pelo Google Play</button>
+      <button class="btn-pix-plano btn-pgto-web" onclick="abrirPix('premium')">&#9889; Pagar via PIX</button><button class="btn-assinar btn-pgto-play" style="display:none" onclick="assinar('premium')">&#128179; Assinar pelo Google Play</button><div class="termos-assinatura"><strong>Assinatura mensal.</strong> Renova sozinha todo m&#234;s at&#233; voc&#234; cancelar. D&#225; pra cancelar quando quiser, direto no celular, e voc&#234; continua usando at&#233; o fim do m&#234;s que j&#225; pagou. <span class="termos-pix">No <strong>PIX &#233; diferente</strong>: pagamento &#250;nico, libera 1 m&#234;s e <strong>n&#227;o renova sozinho</strong>.</span><div class="termos-onde"></div><div class="aviso-cartao-off" style="display:none">&#128241; <strong>Prefere cart&#227;o?</strong> Assine pelo app do Doutor Caf&#233; no Android — l&#225; a cobran&#231;a passa pelo Google, com cancelamento direto na Play Store. Aqui no site, por enquanto, o pagamento &#233; por PIX.</div></div>
     </div>
     <div class="plano-card">
       <div class="plano-nome">&#127970; Empresarial</div>
@@ -1419,8 +1465,11 @@ function precoPorCiclo(tipo, ciclo){
 
 function setCiclo(c){
   cicloAtual = c;
-  document.getElementById("btnMensal").className = "toggle-btn" + (c==="mensal"?" ativo":"");
-  document.getElementById("btnAnual").className  = "toggle-btn" + (c==="anual"?" ativo":"");
+  // Os botoes de ciclo podem nao existir (plano anual retirado da tela em
+  // 20/09/2026). A funcao continua inteira para quando ele voltar.
+  var bM = document.getElementById("btnMensal"), bA = document.getElementById("btnAnual");
+  if (bM) bM.className = "toggle-btn" + (c==="mensal"?" ativo":"");
+  if (bA) bA.className = "toggle-btn" + (c==="anual"?" ativo":"");
   ["basico","pro","premium"].forEach(function(tipo){
     var id = tipo.charAt(0).toUpperCase() + tipo.slice(1);
     var elPreco = document.getElementById("preco"+id);
@@ -1620,9 +1669,34 @@ async function reconciliarComprasPlayNoBoot(){
 // Esta funcao esconde os meios alternativos quando o app roda dentro da
 // TWA, e mostra o botao do Google Play no lugar. No site (navegador comum,
 // iPhone) nada muda: la o Pix e o cartao continuam validos e liberados.
+// ── CARTAO NO SITE: LIGADO PELO SERVIDOR (20/09/2026) ────────────
+// Comeca falso de proposito: se o /ping nao responder (offline, servidor
+// dormindo), o botao NAO aparece. Errar para o lado de nao oferecer um
+// pagamento ainda nao testado e mais barato do que errar para o outro lado.
+var CARTAO_SITE_LIBERADO = false;
+
+// Modo de teste: abrir o site com ?cartao=teste no fim do endereco revela o
+// botao so para quem usar esse endereco. E assim que o Dinho faz a compra de
+// validacao sem expor o caminho para o produtor comum.
+function modoTesteCartao(){
+  try { return new URLSearchParams(window.location.search).get("cartao") === "teste"; }
+  catch(e){ return false; }
+}
+
 function ajustarBotoesPagamento(){
   var naTWA = playBillingDisponivel();
-  document.querySelectorAll('.btn-pgto-web').forEach(function(b){ b.style.display = naTWA ? 'none' : ''; });
+  // .btn-pgto-web sao os botoes do SITE (cartao e PIX). Dentro do app todos
+  // somem, por politica do Google Play. No site, o PIX aparece sempre; o
+  // CARTAO so aparece quando o servidor liberar (ou no modo de teste).
+  var cartaoOk = CARTAO_SITE_LIBERADO || modoTesteCartao();
+  document.querySelectorAll('.btn-pgto-web').forEach(function(b){
+    var ehCartao = /Cart/i.test(b.textContent || "");
+    b.style.display = naTWA ? 'none' : ((ehCartao && !cartaoOk) ? 'none' : '');
+  });
+  // Quando o cartao esta escondido, o produtor precisa saber para onde ir.
+  document.querySelectorAll('.aviso-cartao-off').forEach(function(e){
+    e.style.display = (!naTWA && !cartaoOk) ? 'block' : 'none';
+  });
   document.querySelectorAll('.btn-pgto-play').forEach(function(b){ b.style.display = naTWA ? '' : 'none'; });
 }
 
@@ -1649,10 +1723,61 @@ function assinar(tipo){
 
   fetch('https://doutor-cafe-production.up.railway.app/assinar-site', {
     method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ plano: planoId, userId: obterUserId(), email: cad.email || '' })
+    body: JSON.stringify({ plano: planoId, userId: obterUserId(), email: cad.email || '',
+      modoTeste: modoTesteCartao() ? 'teste' : '' })
   })
-  .then(checarResposta)
+  .then(function(r){
+    // 400 com precisaEmail nao e erro de rede: o servidor esta pedindo o
+    // e-mail, que o Mercado Pago exige para criar assinatura e que o cadastro
+    // do app nao obriga. Pedimos na hora e tentamos de novo, em vez de deixar
+    // o produtor sem entender por que nao abriu.
+    if (r.status === 503) {
+      return r.json().then(function(err){ return { desligado:true, msg:err && err.erro }; });
+    }
+    if (r.status === 400) {
+      return r.json().then(function(err){
+        if (err && err.precisaEmail) return { precisaEmail:true, msg:err.erro };
+        throw new Error(err && err.erro || "erro");
+      });
+    }
+    return checarResposta(r);
+  })
   .then(function(d){
+    if (d && d.desligado) {
+      alert(d.msg || "A assinatura por cartão no site está em testes. Use o PIX aqui, ou assine pelo app do Android.");
+      return;
+    }
+    if (d && d.precisaEmail) {
+      // ── POR QUE SO AQUI PEDE E-MAIL ───────────────────────────
+      // Nao e exigencia nossa: o Mercado Pago so cria assinatura RECORRENTE
+      // (cartao, cobranca automatica todo mes) vinculada a um e-mail. E o
+      // endereco para onde ele manda o comprovante e o aviso de renovacao.
+      //
+      // Esta tela so aparece no SITE, com cartao. No app do Android quem
+      // cobra e o Google, pela conta que ja esta no celular — nao passa por
+      // aqui. E o PIX tambem nao precisa. Entao, para quem nao lembra o
+      // e-mail, existem DOIS caminhos que resolvem sem e-mail nenhum, e o
+      // texto abaixo oferece os dois em vez de deixar a pessoa travada.
+      var digitado = prompt(
+        "Para assinar com CARTÃO aqui no site, o Mercado Pago pede um e-mail — é nele que chega o comprovante e o aviso de renovação.\n\n" +
+        "Não lembra o e-mail? Toque em Cancelar: dá pra pagar por PIX aqui mesmo, ou assinar pelo app do Doutor Café no celular. Nenhum dos dois precisa de e-mail.\n\n" +
+        "Seu e-mail:", (cad.email || ""));
+      if (digitado === null) {
+        alert("Sem problema. Você pode:\n\n• Pagar por PIX aqui no site (botão ⚡ Pagar via PIX)\n• Ou assinar pelo app do Doutor Café no Android\n\nNos dois casos não precisa de e-mail.");
+        return;
+      }
+      if (digitado.indexOf("@") < 0) {
+        alert("Esse e-mail não parece válido. Pode ser qualquer e-mail que você consiga abrir — o do celular serve.");
+        return;
+      }
+      // guarda no aparelho para nao pedir de novo
+      try {
+        var c2 = getCadastro() || {}; c2.email = digitado.trim(); salvarCadastroLocal(c2);
+        var ci = verificarCadastroInicial(); if (ci) { ci.email = digitado.trim(); localStorage.setItem(CADASTRO_INICIAL_KEY, JSON.stringify(ci)); }
+      } catch(e){}
+      cad.email = digitado.trim();
+      return assinar(tipo);   // tenta de novo, agora com e-mail
+    }
     if (!d || !d.url) { alert("Não consegui abrir o pagamento agora. Tente de novo em instantes."); return; }
     if (d.automatico === false) {
       // O link saiu, mas sem o vinculo com a conta. Melhor avisar do que
@@ -1718,6 +1843,40 @@ function verificarRetornoPagamento(){
 // tela de planos e ao voltar de um pagamento. Se o aparelho estiver sem
 // rede, mantem o que tem e nao apaga nada — offline nao pode rebaixar
 // ninguem.
+// Monta o bloco "sua assinatura" a partir do que o servidor respondeu.
+// Usa SEMPRE a data do servidor: o aparelho nao tem como saber quando a
+// proxima cobranca cai, e chutar isso seria pior que nao mostrar.
+function mostrarMinhaAssinatura(d){
+  var caixa = document.getElementById("minhaAssinatura");
+  if (!caixa) return;
+  var pago = d && d.plano && d.plano !== "gratuito";
+  caixa.style.display = pago ? "block" : "none";
+  if (!pago) return;
+
+  var nomes = { basico:"Plano B\u00e1sico", pro:"Plano Pro", premium:"Plano Premium", admin:"Plano Admin" };
+  var elPlano = document.getElementById("minhaAssinaturaPlano");
+  if (elPlano) elPlano.textContent = "Voc\u00ea j\u00e1 assina o " + (nomes[d.plano] || d.plano);
+
+  var elRenova = document.getElementById("minhaAssinaturaRenova");
+  if (elRenova) {
+    var txt = "";
+    if (d.expiraEm) {
+      var dt = new Date(d.expiraEm);
+      if (!isNaN(dt.getTime())) {
+        var dd = String(dt.getDate()).padStart(2,"0") + "/" + String(dt.getMonth()+1).padStart(2,"0") + "/" + dt.getFullYear();
+        txt = "Vale at\u00e9 " + dd + ". Se a renova\u00e7\u00e3o autom\u00e1tica estiver ligada, a pr\u00f3xima cobran\u00e7a \u00e9 nessa data.";
+      }
+    }
+    if (!txt) txt = "Assinatura ativa.";
+    if (typeof d.analisesRestantes === "number" && typeof d.limite === "number") {
+      txt += " Voc\u00ea tem " + d.analisesRestantes + " de " + d.limite + " an\u00e1lises neste m\u00eas.";
+    }
+    elRenova.textContent = txt;
+  }
+  // a linha de "onde cancelar" e preenchida por ajustarBotoesPagamento()
+  try { ajustarBotoesPagamento(); } catch(e){}
+}
+
 function sincronizarPlanoComServidor(){
   var uid;
   try { uid = (usuarioAtual && usuarioAtual.userId) || obterUserId(); } catch(e) { uid = null; }
@@ -1740,6 +1899,7 @@ function sincronizarPlanoComServidor(){
       if (typeof d.limite === "number" && typeof d.analisesRestantes === "number") {
         localStorage.setItem(ANALISES_KEY, String(Math.max(0, d.limite - d.analisesRestantes)));
       }
+      mostrarMinhaAssinatura(d);
       atualizarContador();
       return d.plano;
     })
@@ -3423,6 +3583,10 @@ function acordarServidor(callback){
     // O /ping devolve o limite gratuito real; o texto da tela segue ele, nunca
     // o numero que ficou escrito no HTML de um deploy antigo.
     try { if(d && d.gratis) sincronizarTextosGratis(d.gratis); } catch(e){}
+    // O servidor diz se a assinatura por cartao no site ja esta liberada.
+    // Nasce DESLIGADA e so liga quando uma compra real confirmar que o plano
+    // ativa sozinho — ver CARTAO_SITE_ATIVO no servidor.
+    try { if(d) { CARTAO_SITE_LIBERADO = (d.cartaoSite === true); ajustarBotoesPagamento(); } } catch(e){}
     var estavaDormindo = !servidorAcordado;
     servidorAcordado=true;
     var av=document.getElementById("avisoServidor");if(av)av.style.display="none";
