@@ -1911,6 +1911,34 @@ var HIST_KEY = "doutorcafe_hist";
 var FILA_MAX = 50;
 var TIMEOUT_MS = 45000; // reduzido de 150s: em campo sem sinal, 150s (ou 300s com retry) e tempo demais parado esperando
 
+// ── SONDA DE CONEXAO REAL (23/09/2026) ───────────────────────────
+// navigator.onLine NAO significa "tem internet": significa "tem uma interface
+// de rede". No iPhone, com barras de sinal mas sem dados (sinal fraco no
+// sitio, dados desligados, wifi sem saida), ele devolve TRUE alegremente.
+//
+// Foi o que aconteceu num teste em campo: o app passou pela checagem, tentou
+// enviar a foto, e ficou pendurado. Como o fluxo principal usava fetch CRU,
+// sem timeout nenhum, nao havia nada para interromper — mais de 25 segundos
+// parado, com a animacao dando vistos verdes falsos.
+//
+// A sonda resolve indo direto ao ponto: pede o /ping, que e o endpoint mais
+// leve que existe, com um tempo curto. Se ele nao voltar em 6 segundos, nao
+// adianta tentar subir uma foto de centenas de kB — vai para a fila offline.
+//
+// 6 segundos e escolhido para ser tolerante com 4G ruim de lavoura sem
+// castigar o produtor: e curto o bastante para nao parecer travado, e longo
+// o bastante para nao mandar para a fila quem esta so com sinal fraco.
+function sondarConexao(callback) {
+  if (!navigator.onLine) { callback(false); return; }
+  var ctrl = new AbortController();
+  var timer = setTimeout(function(){ try { ctrl.abort(); } catch(e){} }, 6000);
+  fetch("https://doutor-cafe-production.up.railway.app/ping", {
+    method: "GET", cache: "no-store", signal: ctrl.signal
+  })
+  .then(function(r){ clearTimeout(timer); servidorAcordado = !!(r && r.ok); callback(!!(r && r.ok)); })
+  .catch(function(){ clearTimeout(timer); callback(false); });
+}
+
 function fetchComTimeout(url, opcoes, ms) {
   var controller = new AbortController();
   var timer = setTimeout(function(){ controller.abort(); }, ms);
@@ -1922,10 +1950,25 @@ function fetchComTimeout(url, opcoes, ms) {
 // pontual de rede), tenta mais UMA vez automaticamente antes de desistir.
 // Isso cobre o caso comum de a Railway estar "dormindo": a 1ª tentativa acorda
 // o servidor e pode estourar o tempo limite, mas a 2ª já encontra ele ativo.
+// ── A SEGUNDA TENTATIVA PRECISA FAZER SENTIDO (23/09/2026) ───────
+// A ideia original esta certa: se a Railway estava dormindo, a 1a chamada
+// acorda o servidor e a 2a encontra ele de pe. Mas a repeticao era cega — ela
+// acontecia TAMBEM quando o celular simplesmente nao tinha internet.
+//
+// Nesse caso o produtor esperava o tempo limite DUAS vezes: 45s + 45s = 90
+// segundos olhando para a tela, para no fim a foto ir para a fila do mesmo
+// jeito. Tentar de novo numa conexao morta nao acorda nada; so dobra a espera.
+//
+// Agora, antes de repetir, perguntamos ao /ping se ha conexao. Se nao houver,
+// desiste na hora. A sonda so roda DEPOIS de uma falha, entao nao custa nada
+// quando esta tudo funcionando.
 function fetchComRetry(url, opcoes, ms) {
   return fetchComTimeout(url, opcoes, ms).catch(function(erroOriginal){
-    return fetchComTimeout(url, opcoes, ms).catch(function(){
-      throw erroOriginal;
+    return new Promise(function(resolve, reject){
+      sondarConexao(function(temRede){
+        if (!temRede) { reject(erroOriginal); return; }   // sem rede: nao insiste
+        fetchComTimeout(url, opcoes, ms).then(resolve).catch(function(){ reject(erroOriginal); });
+      });
     });
   });
 }
@@ -2568,11 +2611,33 @@ function processar(file, isVideo) {
   // graos (1600/0.88) precisam de resolucao para LER NUMEROS de laudo e ver
   // detalhe fino de defeito no grao — ali baixar resolucao quebra a funcao.
   redimensionarImagem(file, 1024, 0.90, function(b64) {
-    if(!navigator.onLine){
-      pararDicasSpinner();destravarAnalise();document.getElementById("spinner").style.display="none";
-      adicionarNaFila(b64,null,"folha",function(ok){ if(ok){renderAreaHistorico();alert("Sem sinal — foto salva na fila. Assim que a internet voltar, toque nela para analisar.");} });
-      return;
-    }
+    // ── SONDA ANTES DE SUBIR A FOTO (23/09/2026) ────────────────
+    // O que havia aqui era "if(!navigator.onLine)". Essa checagem sozinha
+    // deixou passar um caso real: iPhone com barras de sinal e sem dados.
+    // navigator.onLine diz que EXISTE uma interface de rede, nao que ela
+    // chega em algum lugar. O app passou pela checagem, tentou subir a foto
+    // e ficou pendurado.
+    //
+    // Agora confirmamos com o servidor ANTES de gastar o upload — ver
+    // sondarConexao(). Foto pesa centenas de kB; o /ping pesa alguns bytes.
+    sondarConexao(function(temRede){
+      if (!temRede) {
+        pararDicasSpinner(); destravarAnalise();
+        document.getElementById("spinner").style.display = "none";
+        adicionarNaFila(b64, null, "folha", function(ok){
+          if (ok) {
+            renderAreaHistorico();
+            document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});
+            // Duas mensagens diferentes de proposito: "sem sinal nenhum" e
+            // "sinal fraco demais" pedem atitudes diferentes do produtor.
+            alert(navigator.onLine
+              ? "O sinal está fraco demais para enviar a foto agora.\n\nEla ficou salva na fila, aqui embaixo. Quando o sinal melhorar, é só tocar nela."
+              : "Sem sinal — foto salva na fila.\n\nQuando a internet voltar, toque nela para analisar.");
+          } else { mostrarErro(); }
+        });
+        return;
+      }
+
     ultimaFotoBase64=b64;
     var body={imagem:b64,tipo:"image/jpeg"};
     if (dadosGPS.regiao) body.regiao=dadosGPS.regiao; body.especie=getEspecie();
@@ -2665,11 +2730,34 @@ function processar(file, isVideo) {
     // Se um dia valer a pena tentar de novo, a mudanca teria que ser no
     // SERVIDOR (ex: so abortar se o cliente cair antes de X, ou desacoplar a
     // geracao do ciclo de vida da requisicao), nao no frontend.
+    // ── TIMEOUT DE PRIMEIRO BYTE (23/09/2026) ─────────────────
+    // Este fetch estava CRU: sem AbortController, sem tempo limite, sem
+    // nada. Todos os outros fluxos (solo, daninha, graos, video) usam
+    // fetchComRetry com 45s; o principal, o mais usado do app, nao tinha
+    // protecao nenhuma. Numa conexao morta ele fica pendurado ate o sistema
+    // operacional desistir, o que pode levar minutos — foi isso que deixou
+    // o produtor olhando a tela por mais de 25 segundos sem resposta.
+    //
+    // O limite e para o PRIMEIRO BYTE, nao para a analise inteira: assim que
+    // o servidor comeca a responder, o relogio e desarmado e o stream pode
+    // demorar o quanto precisar. Um teto na analise toda cortaria
+    // diagnosticos legitimos de foto pesada em 4G ruim.
+    var abortDiag = new AbortController();
+    var respondeu = false;
+    var relogioPrimeiroByte = setTimeout(function(){
+      if (!respondeu) { try { abortDiag.abort(); } catch(e){} }
+    }, 20000);
+
     fetch("https://doutor-cafe-production.up.railway.app/diagnostico",{
       method:"POST", headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(body)
+      body:JSON.stringify(body), signal: abortDiag.signal
     })
     .then(function(r){
+      respondeu = true;
+      clearTimeout(relogioPrimeiroByte);
+      // O servidor respondeu de verdade — so AGORA o visto verde de
+      // "Enviando foto" e honesto.
+      try { confirmarEnvioSpinner(); } catch(e){}
       // Sem créditos: servidor responde 403 JSON (não é stream SSE)
       if(r.status===403||r.status===404){
         r.json().then(function(d){ if(!bloqueioTratado(d)){ destravarAnalise(); mostrarErro(); } }).catch(function(){ destravarAnalise(); mostrarErro(); });
@@ -2774,10 +2862,29 @@ function processar(file, isVideo) {
       }
       ler();
     })
-    .catch(function(){
+    .catch(function(erro){
+      // pararDicasSpinner() faltava aqui: o intervalo das dicas seguia
+      // rodando depois da falha, mesmo com o spinner escondido.
+      pararDicasSpinner();
+      clearTimeout(relogioPrimeiroByte);
       destravarAnalise();
       document.getElementById("spinner").style.display="none";
-      adicionarNaFila(b64,null,"folha",function(ok){ if(ok){renderAreaHistorico();alert("Sem conexão estável. Foto salva na fila offline com o talhão selecionado!");} });
+      // AbortError = foi o NOSSO relogio de primeiro byte que cortou, ou seja
+      // o servidor nao respondeu a tempo. Dizer "sem conexao estavel" nesse
+      // caso e vago; o produtor precisa saber que a foto esta guardada e o
+      // que fazer com ela.
+      var porTempo = erro && erro.name === "AbortError";
+      adicionarNaFila(b64,null,"folha",function(ok){
+        if(ok){
+          renderAreaHistorico();
+          document.getElementById("areaHistorico").scrollIntoView({behavior:"smooth",block:"start"});
+          alert(porTempo
+            ? "O servidor não respondeu a tempo.\n\nSua foto está salva na fila, aqui embaixo — toque nela para tentar de novo."
+            : "Sem conexão estável.\n\nFoto salva na fila offline, com o talhão selecionado.");
+        } else { mostrarErro(); }
+      });
+    });
+  
     });
   });
 }
@@ -3138,13 +3245,44 @@ function iniciarEtapasSpinner() {
   // quase nao chegava a acender antes do resultado pronto. Reduzido
   // proporcionalmente para a faixa nova; se trocar de modelo de novo,
   // reajustar aqui com base no tempo real observado nos logs.
-  var tempos = [0, 1800, 3800, 6000]; // quando cada etapa acende (ms)
+  // ── CORRIGIDO 23/09/2026 — A ANIMACAO MENTIA ──────────────────
+  // Antes, as quatro etapas acendiam por cronometro puro (0, 1800, 3800,
+  // 6000 ms), sem olhar para a rede. Resultado num teste sem internet: o
+  // produtor viu "Enviando foto ✓", "Identificando padroes ✓" e "Comparando
+  // base tecnica ✓" — tres confirmacoes de coisas que NAO aconteceram —
+  // enquanto o celular nao tinha conseguido mandar um unico byte.
+  //
+  // Isso e pior do que uma tela de espera sem detalhe: cria confianca falsa.
+  // Se o produtor acredita que a foto subiu, ele sai do lugar onde pegava
+  // sinal, fecha o app, ou culpa o diagnostico depois.
+  //
+  // Agora a etapa 1 ("Enviando foto") fica PISCANDO enquanto a foto esta
+  // realmente subindo, e so vira visto verde quando o servidor responde de
+  // fato — quem chama isso e confirmarEnvioSpinner(), no primeiro byte que
+  // chega. As etapas seguintes, essas sim, podem seguir por tempo: depois da
+  // conexao confirmada, elas descrevem o que o modelo esta fazendo do outro
+  // lado, e nao ha como saber o instante exato de cada uma.
+  var etapa1 = document.querySelector('.spinner-etapa[data-etapa="1"]');
+  if (etapa1) etapa1.classList.add("ativo");
+}
+
+// Chamada quando o servidor REALMENTE respondeu (primeiro byte). So a partir
+// daqui as etapas seguintes fazem sentido.
+function confirmarEnvioSpinner() {
+  var etapas = document.querySelectorAll(".spinner-etapa");
+  if (!etapas.length) return;
+  etapas[0].classList.remove("ativo");
+  etapas[0].classList.add("concluido");
+  // tempos medidos com o qwen3.7-flash (8-13s). Se trocar de modelo,
+  // reajustar com base no tempo real observado nos logs.
+  var tempos = [0, 2000, 4200];   // para as etapas 2, 3 e 4
   tempos.forEach(function(t, i){
     _spinnerEtapaTimers.push(setTimeout(function(){
       var atuais = document.querySelectorAll(".spinner-etapa");
       atuais.forEach(function(el, idx){
-        if (idx < i) { el.classList.remove("ativo"); el.classList.add("concluido"); }
-        else if (idx === i) { el.classList.remove("concluido"); el.classList.add("ativo"); }
+        if (idx === 0) return;               // a 1a ja esta concluida
+        if (idx < i + 1) { el.classList.remove("ativo"); el.classList.add("concluido"); }
+        else if (idx === i + 1) { el.classList.remove("concluido"); el.classList.add("ativo"); }
       });
     }, t));
   });
