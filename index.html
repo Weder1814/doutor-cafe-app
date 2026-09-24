@@ -903,6 +903,17 @@ canvas { display: none; }
          Esconder o caminho do cancelamento nao segura ninguem: quem quer
          cancelar e nao acha, pede estorno no banco — o que custa a taxa,
          a assinatura e ainda deixa uma nota 1. -->
+    <!-- JA PAGUEI E NAO LIBEROU (24/09/2026) — aparece para quem NAO tem
+         plano ativo. E a saida do produtor que pagou e ficou sem nada: em vez
+         de mandar WhatsApp e esperar, ele toca aqui e o servidor reconfere o
+         pagamento na hora. A maioria dos casos (notificacao do Mercado Pago
+         perdida) se resolve nesse toque, sem virar atendimento. -->
+    <div id="jaPaguei" style="display:none;text-align:center;margin-bottom:12px">
+      <button onclick="conferirMeuPagamento(this)"
+        style="background:none;border:1px solid #cbb89b;color:#6b5540;border-radius:10px;padding:9px 14px;font-size:12.5px;font-family:inherit;font-weight:600;cursor:pointer">
+        &#128179; J&#225; paguei e n&#227;o liberou &#8212; conferir agora
+      </button>
+    </div>
     <div class="minha-assinatura" id="minhaAssinatura" style="display:none">
       <div class="minha-assinatura-topo">&#9989; <strong id="minhaAssinaturaPlano">Sua assinatura</strong></div>
       <div class="minha-assinatura-txt" id="minhaAssinaturaRenova"></div>
@@ -1851,6 +1862,10 @@ function mostrarMinhaAssinatura(d){
   if (!caixa) return;
   var pago = d && d.plano && d.plano !== "gratuito";
   caixa.style.display = pago ? "block" : "none";
+  // O "ja paguei e nao liberou" e o inverso: so faz sentido para quem NAO
+  // tem plano ativo. Para quem ja tem, seria ruido.
+  var btnPaguei = document.getElementById("jaPaguei");
+  if (btnPaguei) btnPaguei.style.display = pago ? "none" : "block";
   if (!pago) return;
 
   var nomes = { basico:"Plano B\u00e1sico", pro:"Plano Pro", premium:"Plano Premium", admin:"Plano Admin" };
@@ -1875,6 +1890,30 @@ function mostrarMinhaAssinatura(d){
   }
   // a linha de "onde cancelar" e preenchida por ajustarBotoesPagamento()
   try { ajustarBotoesPagamento(); } catch(e){}
+}
+
+// Pede ao servidor para reconferir os pagamentos pendentes desta conta.
+// Ver /conferir-meu-pagamento no servidor.
+function conferirMeuPagamento(btn){
+  var txt = btn.textContent;
+  btn.disabled = true; btn.textContent = "Conferindo...";
+  var uid;
+  try { uid = (usuarioAtual && usuarioAtual.userId) || obterUserId(); } catch(e) { uid = null; }
+  if (!uid) { btn.disabled = false; btn.textContent = txt; return; }
+  fetch("https://doutor-cafe-production.up.railway.app/conferir-meu-pagamento", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ userId: uid })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    btn.disabled = false; btn.textContent = txt;
+    alert((d && d.mensagem) || "Não consegui conferir agora. Tente de novo em instantes.");
+    if (d && d.liberou) { sincronizarPlanoComServidor(); }
+  })
+  .catch(function(){
+    btn.disabled = false; btn.textContent = txt;
+    alert("Sem conexão para conferir agora. Tente de novo quando o sinal voltar.");
+  });
 }
 
 function sincronizarPlanoComServidor(){
