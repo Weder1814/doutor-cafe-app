@@ -467,6 +467,19 @@ input[type="file"] { display: none; }
 .talhao-status.pendente { background: #fff3e0; color: #e65100; }
 .talhao-status.ok { background: #e8f5e9; color: #2e7d32; }
 .btn-novo-talhao { width: 100%; margin-top: 10px; padding: 12px; background: transparent; border: 2px dashed #2d8a3e; border-radius: 16px; color: #2d8a3e; font-size: 14px; font-weight: 700; cursor: pointer; }
+/* ── CARTAO NA PROPRIA TELA (25/09/2026) ── */
+.modal-cartao { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:1200; align-items:flex-end; justify-content:center; }
+.modal-cartao.ativo { display:flex; }
+.modal-cartao-box { background:#fff; border-radius:24px 24px 0 0; padding:22px 18px calc(24px + env(safe-area-inset-bottom)); width:100%; max-width:440px; max-height:94vh; overflow-y:auto; }
+.modal-cartao-titulo { font-family:'Playfair Display',serif; font-size:20px; color:var(--marrom); font-weight:900; }
+.modal-cartao-plano { font-size:13.5px; color:var(--cinza); margin:2px 0 14px; line-height:1.45; }
+.modal-cartao-label { display:block; font-size:12.5px; font-weight:700; color:var(--marrom); margin-bottom:5px; }
+.modal-cartao-email { width:100%; padding:12px 14px; border:1.5px solid #d8d8d8; border-radius:12px; font-size:16px; font-family:inherit; margin-bottom:6px; }
+.modal-cartao-dica { font-size:11.5px; color:var(--cinza); line-height:1.45; margin-bottom:14px; }
+.modal-cartao-erro { display:none; background:#fce4ec; color:#c62828; font-size:12.5px; font-weight:600; border-radius:10px; padding:10px 12px; margin-bottom:12px; line-height:1.45; }
+.modal-cartao-seguro { font-size:11px; color:var(--cinza); line-height:1.5; margin-top:12px; text-align:center; }
+.btn-cartao-continuar { width:100%; padding:13px; border:none; border-radius:12px; background:var(--verde); color:#fff; font-size:15px; font-weight:700; font-family:inherit; cursor:pointer; margin-bottom:12px; }
+.btn-fechar-cartao { width:100%; padding:12px; border:none; border-radius:12px; background:#eee; color:#555; font-size:14px; font-weight:600; font-family:inherit; cursor:pointer; margin-top:10px; }
 .modal-talhao-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 1000; align-items: flex-end; }
 .modal-talhao-overlay.ativo { display: flex; }
 .modal-talhao-box { background: white; border-radius: 24px 24px 0 0; padding: 20px 16px 90px; width: 100%; max-height: 80vh; overflow-y: auto; }
@@ -988,6 +1001,21 @@ canvas { display: none; }
   </div>
 </div>
 
+<div class="modal-cartao" id="modalCartao">
+  <div class="modal-cartao-box">
+    <div class="modal-cartao-titulo">&#128179; Assinar com Cart&#227;o</div>
+    <div class="modal-cartao-plano" id="cartaoPlanoTxt"></div>
+    <div class="modal-cartao-erro" id="cartaoErro"></div>
+    <label class="modal-cartao-label" for="cartaoEmail">Seu e-mail</label>
+    <input class="modal-cartao-email" id="cartaoEmail" type="email" inputmode="email" autocomplete="email" placeholder="voce@exemplo.com">
+    <div class="modal-cartao-dica">&#201; para onde o Mercado Pago envia o comprovante e o aviso de renova&#231;&#227;o.</div>
+    <button class="btn-cartao-continuar" id="btnCartaoContinuar" onclick="prepararCartao()">Continuar</button>
+    <div id="brickCartao"></div>
+    <div class="modal-cartao-seguro" id="cartaoSeguro" style="display:none">&#128274; Os dados do cart&#227;o v&#227;o direto para o Mercado Pago. O Doutor Caf&#233; n&#227;o v&#234; nem guarda o n&#250;mero do seu cart&#227;o.</div>
+    <button class="btn-fechar-cartao" onclick="fecharCartao()">Cancelar</button>
+  </div>
+</div>
+
 <!-- TELA PRINCIPAL -->
 <div id="tela-principal" style="display:none">
 <div class="header">
@@ -1280,7 +1308,7 @@ canvas { display: none; }
 </div>
 <script>
 // ── PLANOS E PAGAMENTO ──
-var PLANO_KEY="doutorcafe_plano",ANALISES_KEY="doutorcafe_analises",LIMITE_GRATIS=15,cicloAtual="mensal";
+var PLANO_KEY="doutorcafe_plano",ANALISES_KEY="doutorcafe_analises",LIMITE_GRATIS=10,cicloAtual="mensal";
 var LIMITE_BASICO=150,LIMITE_PRO=300,LIMITE_PREMIUM=500,LIMITE_ADMIN=999999;
 // Quantas analises restantes disparam o aviso discreto de "acabando" no
 // plano gratuito. Precisa bater com AVISAR_QUANDO_RESTAM do backend.
@@ -1711,11 +1739,192 @@ function ajustarBotoesPagamento(){
   document.querySelectorAll('.btn-pgto-play').forEach(function(b){ b.style.display = naTWA ? '' : 'none'; });
 }
 
+// ── CARTAO NA PROPRIA TELA, SEM SAIR DO APP (25/09/2026) ─────────
+// Antes, tocar em "Assinar com Cartao" levava o produtor para DUAS telas do
+// Mercado Pago: o resumo da assinatura e, depois, o formulario do cartao. Em
+// celular cada tela a mais e gente que desiste no meio — e ainda tira o
+// produtor de dentro do Doutor Cafe justo na hora de pagar.
+//
+// Agora o formulario e nosso. O numero do cartao NAO passa por este codigo
+// nem pelo nosso servidor: o SDK do Mercado Pago, carregado com a chave
+// PUBLICA, envia os dados direto para eles e devolve um token descartavel. E
+// esse token que o servidor usa para criar a assinatura, em /assinar-site-cartao.
+//
+// O caminho antigo continua inteiro, como reserva. Se a chave publica nao
+// estiver configurada, se o SDK nao carregar (internet de lavoura, bloqueio de
+// script, service worker velho) ou se o servidor recusar o token, o app manda
+// o produtor para o Mercado Pago como antes. Pior caso: volta a ser o que ja
+// era hoje — nunca fica sem caminho para pagar.
+var MP_PUBLIC_KEY = "";
+var _mpSdk = null, _mpInstancia = null, _brickCartao = null, _cartaoTipo = null;
+
+function carregarSdkMP(){
+  if (_mpSdk) return _mpSdk;
+  _mpSdk = new Promise(function(resolve, reject){
+    if (window.MercadoPago) return resolve(window.MercadoPago);
+    var s = document.createElement("script");
+    s.src = "https://sdk.mercadopago.com/js/v2";
+    // Sem este relogio, um celular com sinal fraco ficaria preso em
+    // "Abrindo o formulario..." sem nunca falhar nem seguir.
+    var relogio = setTimeout(function(){ reject(new Error("sdk demorou")); }, 8000);
+    s.onload = function(){
+      clearTimeout(relogio);
+      if (window.MercadoPago) resolve(window.MercadoPago); else reject(new Error("sdk sem MercadoPago"));
+    };
+    s.onerror = function(){ clearTimeout(relogio); reject(new Error("sdk nao carregou")); };
+    document.head.appendChild(s);
+  });
+  // Se falhar, permite tentar de novo mais tarde em vez de guardar o erro.
+  _mpSdk.catch(function(){ _mpSdk = null; });
+  return _mpSdk;
+}
+
+function mostrarErroCartao(txt){
+  var e = document.getElementById("cartaoErro");
+  if (!e) return;
+  e.textContent = txt || "";
+  e.style.display = txt ? "block" : "none";
+}
+
+function fecharCartao(){
+  var m = document.getElementById("modalCartao");
+  if (m) m.classList.remove("ativo");
+  try { if (_brickCartao && _brickCartao.unmount) _brickCartao.unmount(); } catch(e){}
+  _brickCartao = null;
+  var a = document.getElementById("brickCartao"); if (a) a.innerHTML = "";
+  var seg = document.getElementById("cartaoSeguro"); if (seg) seg.style.display = "none";
+  var btn = document.getElementById("btnCartaoContinuar");
+  if (btn) { btn.style.display = ""; btn.disabled = false; btn.textContent = "Continuar"; }
+  mostrarErroCartao("");
+}
+
+function abrirCartaoNaTela(tipo){
+  // Sem a chave publica nao ha formulario proprio: segue pelo caminho antigo.
+  if (!MP_PUBLIC_KEY) return assinarPeloRedirecionamento(tipo);
+  _cartaoTipo = tipo;
+  var cad = getCadastro() || verificarCadastroInicial() || {};
+  var nomes = { basico:"Básico", pro:"Pro", premium:"Premium" };
+  var txt = document.getElementById("cartaoPlanoTxt");
+  if (txt) txt.innerHTML = "Plano <strong>" + (nomes[tipo] || tipo) + "</strong> — " +
+    precoPorCiclo(tipo, cicloAtual) + " por mês. Renova sozinha todo mês até você cancelar.";
+  var inp = document.getElementById("cartaoEmail");
+  if (inp) inp.value = (cad.email || "");
+  mostrarErroCartao("");
+  var m = document.getElementById("modalCartao");
+  if (m) m.classList.add("ativo");
+  // Quem ja tem e-mail no cadastro nao precisa tocar em "Continuar" a toa:
+  // o formulario do cartao abre direto. E ai vira UMA tela so, de verdade.
+  if (inp && inp.value.indexOf("@") > 0) prepararCartao();
+}
+
+function prepararCartao(){
+  var inp = document.getElementById("cartaoEmail");
+  var email = inp ? inp.value.trim() : "";
+  if (email.indexOf("@") < 1) {
+    mostrarErroCartao("Escreva um e-mail válido. Pode ser qualquer um que você consiga abrir — o do celular serve.");
+    if (inp) inp.focus();
+    return;
+  }
+  mostrarErroCartao("");
+  // Guarda no aparelho para nao perguntar de novo na proxima assinatura.
+  try {
+    var c = getCadastro() || {}; c.email = email; salvarCadastroLocal(c);
+    var ci = verificarCadastroInicial();
+    if (ci) { ci.email = email; localStorage.setItem(CADASTRO_INICIAL_KEY, JSON.stringify(ci)); }
+  } catch(e){}
+
+  var btn = document.getElementById("btnCartaoContinuar");
+  if (btn) { btn.disabled = true; btn.textContent = "Abrindo o formulário..."; }
+
+  carregarSdkMP().then(function(){
+    return montarBrickCartao(email);
+  }).then(function(){
+    if (btn) btn.style.display = "none";
+    var seg = document.getElementById("cartaoSeguro"); if (seg) seg.style.display = "block";
+  }).catch(function(err){
+    // Nunca deixa o produtor na mao: cai no Mercado Pago, como era antes.
+    console.warn("cartao na tela indisponivel:", err && err.message);
+    var tipo = _cartaoTipo;
+    fecharCartao();
+    assinarPeloRedirecionamento(tipo);
+  });
+}
+
+function montarBrickCartao(email){
+  var area = document.getElementById("brickCartao");
+  if (area) area.innerHTML = "";
+  var pr = PRECOS[_cartaoTipo];
+  var valor = pr ? (cicloAtual === "anual" ? pr.anual : pr.mensal) : 0;
+  if (!valor) return Promise.reject(new Error("preco desconhecido"));
+  if (!_mpInstancia) _mpInstancia = new window.MercadoPago(MP_PUBLIC_KEY, { locale: "pt-BR" });
+  return _mpInstancia.bricks().create("cardPayment", "brickCartao", {
+    initialization: { amount: valor, payer: { email: email } },
+    customization: {
+      // Assinatura nao tem parcelamento: e uma cobranca por mes. Oferecer
+      // "12x" faria o produtor entender uma coisa e receber outra.
+      paymentMethods: { maxInstallments: 1, minInstallments: 1 }
+    },
+    callbacks: {
+      onReady: function(){},
+      onError: function(e){ console.warn("brick cartao:", e && (e.message || e.cause)); },
+      onSubmit: function(dados){ return enviarCartao(dados, email); }
+    }
+  }).then(function(ctrl){ _brickCartao = ctrl; });
+}
+
+function enviarCartao(dados, email){
+  var token = "";
+  try { token = (dados && dados.token) || (dados && dados.formData && dados.formData.token) || ""; } catch(e){}
+  if (!token) {
+    mostrarErroCartao("Não consegui ler os dados do cartão. Preencha de novo, por favor.");
+    return Promise.resolve();
+  }
+  mostrarErroCartao("");
+  var tipo = _cartaoTipo;
+  return fetch('https://doutor-cafe-production.up.railway.app/assinar-site-cartao', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      plano: tipo + "_" + cicloAtual,
+      userId: obterUserId(),
+      email: email,
+      cardTokenId: token,
+      modoTeste: modoTesteCartao() ? 'teste' : ''
+    })
+  })
+  .then(function(r){ return r.json().then(function(d){ return { http:r.status, d:d||{} }; }); })
+  .then(function(res){
+    var d = res.d;
+    if (res.http === 200 && d.ok) {
+      fecharCartao();
+      try { fecharModal(); } catch(e){}
+      alert(d.mensagem || "Assinatura confirmada! Seu plano já está liberado.");
+      try { sincronizarPlanoComServidor(); } catch(e){}
+      return;
+    }
+    if (d.usarRedirecionamento) {
+      // O token do cartao so serve uma vez, e nenhuma assinatura foi criada
+      // aqui — o caminho do Mercado Pago comeca do zero. Nao ha risco de
+      // cobranca dupla.
+      mostrarErroCartao((d.erro ? d.erro + " " : "") + "Vou abrir o pagamento no Mercado Pago.");
+      setTimeout(function(){ fecharCartao(); assinarPeloRedirecionamento(tipo); }, 2000);
+      return;
+    }
+    mostrarErroCartao(d.erro || "Não consegui concluir com esse cartão. Confira os dados ou tente outro.");
+  })
+  .catch(function(){
+    mostrarErroCartao("Sem conexão para concluir. Verifique a internet e tente de novo.");
+  });
+}
+
 function assinar(tipo){
   if (playBillingDisponivel()) {
     assinarPlayBilling(tipo, cicloAtual);
     return;
   }
+  abrirCartaoNaTela(tipo);
+}
+
+function assinarPeloRedirecionamento(tipo){
   // ── ASSINATURA PELO SITE (reescrito 18/09/2026) ───────────────
   // O que havia aqui: uma lista de seis links FIXOS do Mercado Pago, um por
   // plano, abertos direto em nova aba. Esses links sao iguais para todo
@@ -1787,7 +1996,7 @@ function assinar(tipo){
         var ci = verificarCadastroInicial(); if (ci) { ci.email = digitado.trim(); localStorage.setItem(CADASTRO_INICIAL_KEY, JSON.stringify(ci)); }
       } catch(e){}
       cad.email = digitado.trim();
-      return assinar(tipo);   // tenta de novo, agora com e-mail
+      return assinarPeloRedirecionamento(tipo);   // tenta de novo, agora com e-mail
     }
     if (!d || !d.url) { alert("Não consegui abrir o pagamento agora. Tente de novo em instantes."); return; }
     if (d.automatico === false) {
@@ -1795,7 +2004,23 @@ function assinar(tipo){
       // deixar o produtor pagar achando que libera sozinho.
       alert("Vou abrir o pagamento, mas a liberação automática pode falhar nesta tentativa. Se o plano não aparecer em alguns minutos depois de pagar, fale com o suporte pelo WhatsApp com o comprovante que a gente libera na hora.");
     }
-    window.open(d.url, "_blank");
+    // ── POR QUE NA MESMA ABA E NAO EM ABA NOVA (25/09/2026) ───────
+    // Antes: window.open(d.url, "_blank"). No celular isso abre uma ABA
+    // SEPARADA, e ai tres coisas ruins acontecem:
+    //   1. o botao "voltar" nao traz o produtor de volta ao app — ele volta
+    //      para dentro do fluxo do Mercado Pago, ou para nada;
+    //   2. quando o Mercado Pago termina, ele manda para o nosso back_url
+    //      (?pagamento=retorno) NESSA aba nova. O produtor acaba com DUAS
+    //      abas do Doutor Cafe abertas, e a aba original — a que ele conhece
+    //      — nunca fica sabendo que o pagamento aconteceu;
+    //   3. navegador de celular com bloqueio de pop-up simplesmente engole a
+    //      aba nova, e para o produtor parece que o botao nao funciona.
+    //
+    // O retorno JA foi construido para a mesma aba: o back_url volta com
+    // ?pagamento=retorno e verificarRetornoPagamento() pergunta ao servidor
+    // se liberou. Trocando para location.href o caminho inteiro vira ida e
+    // volta numa aba so — menos saltos, e o "voltar" funciona.
+    window.location.href = d.url;
   })
   .catch(function(){
     alert("Sem conexão para abrir o pagamento. Verifique a internet e tente de novo.");
@@ -3486,7 +3711,7 @@ function irParaCadastroInicial(){mostrarTela('tela-cadastro-inicial');}
 // esteja servindo.
 function sincronizarTextosGratis(valorServidor){
   var n = parseInt(valorServidor, 10);
-  if (Number.isInteger(n) && n > 0) { TOTAL_GRATIS_COM_CAD = n; }
+  if (Number.isInteger(n) && n > 0) { TOTAL_GRATIS_COM_CAD = n; LIMITE_GRATIS = n; }
   var els=document.querySelectorAll('.txt-gratis');
   for(var i=0;i<els.length;i++){ els[i].textContent=TOTAL_GRATIS_COM_CAD; }
 }
@@ -3764,6 +3989,10 @@ function acordarServidor(callback){
     // Nasce DESLIGADA e so liga quando uma compra real confirmar que o plano
     // ativa sozinho — ver CARTAO_SITE_ATIVO no servidor.
     try { if(d) { CARTAO_SITE_LIBERADO = (d.cartaoSite === true); ajustarBotoesPagamento(); } } catch(e){}
+    // Chave PUBLICA do Mercado Pago. Publica mesmo: serve so para o SDK
+    // cifrar o cartao no celular do produtor. Vem do servidor para nao ficar
+    // escrita no HTML e poder mudar sem novo deploy do app.
+    try { if(d && typeof d.mpPublicKey === "string") MP_PUBLIC_KEY = d.mpPublicKey; } catch(e){}
     var estavaDormindo = !servidorAcordado;
     servidorAcordado=true;
     var av=document.getElementById("avisoServidor");if(av)av.style.display="none";
