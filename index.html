@@ -2104,7 +2104,9 @@ function mostrarMinhaAssinatura(d){
       var dt = new Date(d.expiraEm);
       if (!isNaN(dt.getTime())) {
         var dd = String(dt.getDate()).padStart(2,"0") + "/" + String(dt.getMonth()+1).padStart(2,"0") + "/" + dt.getFullYear();
-        txt = "Vale at\u00e9 " + dd + ". Se a renova\u00e7\u00e3o autom\u00e1tica estiver ligada, a pr\u00f3xima cobran\u00e7a \u00e9 nessa data.";
+        txt = (d.renovaSozinho === false)
+          ? "Pago por PIX, vale at\u00e9 " + dd + ". O PIX n\u00e3o renova sozinho: perto dessa data, renove aqui para n\u00e3o ficar sem an\u00e1lises."
+          : "Vale at\u00e9 " + dd + ". Se a renova\u00e7\u00e3o autom\u00e1tica estiver ligada, a pr\u00f3xima cobran\u00e7a \u00e9 nessa data.";
       }
     }
     if (!txt) txt = "Assinatura ativa.";
@@ -2115,6 +2117,59 @@ function mostrarMinhaAssinatura(d){
   }
   // a linha de "onde cancelar" e preenchida por ajustarBotoesPagamento()
   try { ajustarBotoesPagamento(); } catch(e){}
+}
+
+// ── AVISO DE VENCIMENTO DO PIX (13/10/2026) ──────────────────────
+// PIX e pagamento unico: libera um mes e nao renova sozinho. Sem aviso, o
+// produtor so descobria no dia em que a analise era recusada — no meio da
+// lavoura, com a folha na mao. Agora, a partir de 5 dias antes de vencer, a
+// tela principal mostra uma faixa com quantos dias faltam e um botao para
+// renovar. Cartao e Google Play renovam sozinhos e nao recebem aviso.
+//
+// Dentro do app Android o botao abre a tela de planos, que la so oferece o
+// Google Play (regra da loja). No site, a mesma tela oferece PIX e cartao.
+var AVISAR_PIX_DIAS = 5;
+function avisoVencimentoPix(d){
+  var velho = document.getElementById("avisoVencPix");
+  if (velho) velho.parentNode.removeChild(velho);
+  if (!d || d.renovaSozinho !== false || !d.expiraEm) return;
+  if (!d.plano || d.plano === "gratuito" || d.plano === "admin") return;
+  var fim = new Date(d.expiraEm).getTime();
+  if (isNaN(fim)) return;
+  var dias = Math.ceil((fim - Date.now()) / 86400000);
+  if (dias > AVISAR_PIX_DIAS) return;
+  try { if (sessionStorage.getItem("avisoVencPixFechado") === String(fim)) return; } catch(e){}
+
+  var tela = document.getElementById("tela-principal");
+  if (!tela) return;
+  var txt = dias > 1 ? "Seu plano vence em " + dias + " dias."
+          : dias === 1 ? "Seu plano vence amanhã."
+          : dias === 0 ? "Seu plano vence hoje."
+          : "Seu plano venceu. Você ainda tem alguns dias de carência.";
+  var faixa = document.createElement("div");
+  faixa.id = "avisoVencPix";
+  faixa.setAttribute("role", "status");
+  faixa.style.cssText = "margin:12px 16px 0;padding:12px 14px;border-radius:14px;background:#fff4e0;" +
+    "border:1px solid #f0c27a;color:#6b4300;font-size:13.5px;line-height:1.45;display:flex;gap:10px;align-items:center;flex-wrap:wrap";
+  var msg = document.createElement("div");
+  msg.style.cssText = "flex:1 1 180px";
+  msg.innerHTML = "<strong>" + txt + "</strong> O PIX não renova sozinho. Renove para continuar analisando.";
+  var btn = document.createElement("button");
+  btn.textContent = "Renovar";
+  btn.style.cssText = "border:none;border-radius:10px;background:var(--verde);color:#fff;font-weight:700;padding:9px 16px;font-size:14px;cursor:pointer;font-family:inherit";
+  btn.onclick = function(){ try { abrirModal(false); } catch(e){} };
+  var x = document.createElement("button");
+  x.setAttribute("aria-label", "Fechar aviso");
+  x.textContent = "×";
+  x.style.cssText = "border:none;background:none;color:#6b4300;font-size:20px;line-height:1;cursor:pointer;padding:2px 4px";
+  x.onclick = function(){
+    try { sessionStorage.setItem("avisoVencPixFechado", String(fim)); } catch(e){}
+    faixa.parentNode && faixa.parentNode.removeChild(faixa);
+  };
+  faixa.appendChild(msg); faixa.appendChild(btn); faixa.appendChild(x);
+  var depoisDe = tela.querySelector(".header");
+  if (depoisDe && depoisDe.nextSibling) tela.insertBefore(faixa, depoisDe.nextSibling);
+  else tela.insertBefore(faixa, tela.firstChild);
 }
 
 // Pede ao servidor para reconferir os pagamentos pendentes desta conta.
@@ -2164,6 +2219,7 @@ function sincronizarPlanoComServidor(){
         localStorage.setItem(ANALISES_KEY, String(Math.max(0, d.limite - d.analisesRestantes)));
       }
       mostrarMinhaAssinatura(d);
+      try { avisoVencimentoPix(d); } catch(eAv){}
       atualizarContador();
       return d.plano;
     })
@@ -3788,7 +3844,7 @@ function navegarMais(){
   var el=document.getElementById("cardClima");
   if(el)el.scrollIntoView({behavior:"smooth",block:"start"});
 }
-function entrarNoApp(nome){usuarioAtual=verificarCadastroInicial();mostrarTela('tela-principal');var nav=document.getElementById('navInferior');if(nav)nav.style.display='flex';sincronizarIdentidade(function(){atualizarContador();sincronizarContadorServidor();});inicializarChipPerfil();renderAreaHistorico();renderCalendario();renderGuiaSafra(safraTipoAtual);obterGPS();obterPrecoCafe();checarLembretesPendentes();reconciliarComprasPlayNoBoot();verificarBannerIOS();if(nome){var primeiroNome=nome.split(' ')[0];setTimeout(function(){var tag=document.getElementById('regiaoTag');if(tag)tag.innerHTML='Olá, '+primeiroNome+'! Vamos diagnosticar';setTimeout(function(){obterGPS();},3000);},600);}}
+function entrarNoApp(nome){usuarioAtual=verificarCadastroInicial();mostrarTela('tela-principal');var nav=document.getElementById('navInferior');if(nav)nav.style.display='flex';sincronizarIdentidade(function(){atualizarContador();sincronizarContadorServidor();/* 13/10/2026: confere o plano ao abrir o app (antes so ao abrir a tela de planos). E o que faz o aviso de vencimento do PIX aparecer sem o produtor precisar procurar. */try{sincronizarPlanoComServidor();}catch(e){}});inicializarChipPerfil();renderAreaHistorico();renderCalendario();renderGuiaSafra(safraTipoAtual);obterGPS();obterPrecoCafe();checarLembretesPendentes();reconciliarComprasPlayNoBoot();verificarBannerIOS();if(nome){var primeiroNome=nome.split(' ')[0];setTimeout(function(){var tag=document.getElementById('regiaoTag');if(tag)tag.innerHTML='Olá, '+primeiroNome+'! Vamos diagnosticar';setTimeout(function(){obterGPS();},3000);},600);}}
 function verificarCadastroInicial(){try{return JSON.parse(localStorage.getItem(CADASTRO_INICIAL_KEY));}catch(e){return null;}}
 
 // ── SAIR DA CONTA (30/07/2026) ────────────────────────────────
